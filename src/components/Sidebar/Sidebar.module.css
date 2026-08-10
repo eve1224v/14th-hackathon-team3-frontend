@@ -1,0 +1,170 @@
+.sidebar {
+  width: 234px;
+  min-width: 234px;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background-color: #151936;
+  color: #ffffff;
+
+  overflow: hidden;
+}
+
+.logoArea {
+  flex-shrink: 0;
+
+  padding-top: 26px;
+  padding-left: 23px;
+}
+
+.logo {
+  display: block;
+}
+
+.sidebarContent {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  min-height: 0;
+
+  padding-top: clamp(35px, 7vh, 83.94px);
+  padding-bottom: 35px;
+}
+
+.loginText {
+  margin: 0 0 38px;
+  margin-left: 36px;
+
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  margin-left: 36px;
+}
+
+.menuItem {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.menuItem img {
+  width: 18.165px;
+  height: 18.165px;
+}
+
+.actionMenu {
+  margin-top: clamp(30px, 6vh, 73.13px);
+
+  margin-left: 33px;
+  margin-right: 33px;
+}
+
+.actionMenu button {
+  width: 100%;
+
+  padding: 15px 0 15px 5px;
+
+  background: none;
+
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  color: #ffffff;
+
+  text-align: left;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.actionMenu button:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.timeSection {
+  margin-top: clamp(35px, 8vh, 125.32px);
+  margin-left: 27px;
+}
+
+.timeSection > div + div {
+  margin-top: 25px;
+}
+
+.timeSection p {
+  margin: 0 0 0.76px;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.timeSection strong {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+.bottomMenu {
+  /*
+    남은 공간을 전부 위쪽에 배치해서
+    bottomMenu를 아래쪽으로 밀어줌
+  */
+  margin-top: auto;
+  margin-left: 34px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  gap: 13px;
+
+  flex-shrink: 0;
+}
+
+.bottomMenu button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  background: none;
+  border: none;
+
+  cursor: pointer;
+}
+
+.bottomMenu img {
+  width: 24px;
+  height: 24px;
+}
