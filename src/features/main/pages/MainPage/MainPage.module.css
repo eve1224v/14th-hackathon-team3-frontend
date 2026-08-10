@@ -1,0 +1,83 @@
+.page {
+  width: 100%;
+  height: 100vh;
+
+  display: flex;
+
+  background-color: #0d1021;
+
+  overflow: hidden;
+}
+
+.mainContent {
+  position: relative;
+
+  flex: 1;
+  height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: #0d1021;
+
+  overflow: hidden;
+}
+
+
+/* 왼쪽 타원 */
+.glowSmall {
+  position: absolute;
+
+  width: 268px;
+  height: 259px;
+
+  /* 사이드바 오른쪽 끝에서 166px */
+  left: 166px;
+
+  /* 1024px 기준 위에서 325px */
+  top: 31.74vh;
+
+  border-radius: 268px;
+
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(166, 180, 255, 0.17) 0%,
+    rgba(115, 115, 115, 0) 100%
+  );
+
+  filter: blur(2px);
+
+  pointer-events: none;
+
+  z-index: 0;
+}
+
+
+/* 오른쪽 타원 */
+.glowLarge {
+  position: absolute;
+
+  width: 336px;
+  height: 325px;
+
+  /* 전체 화면 오른쪽 끝과 228px */
+  right: 228px;
+
+  /* 1024px 기준 위에서 204px */
+  top: 19.92vh;
+
+  border-radius: 336px;
+
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(166, 180, 255, 0.17) 0%,
+    rgba(115, 115, 115, 0) 100%
+  );
+
+  filter: blur(2px);
+
+  pointer-events: none;
+
+  z-index: 0;
+}
