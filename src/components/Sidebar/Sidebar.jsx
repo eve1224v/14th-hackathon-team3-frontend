@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./Sidebar.module.css";
 
 import homeIcon from "../../assets/icons/homeIcon.svg";
@@ -12,11 +13,23 @@ import logoutIcon from "../../assets/icons/logoutIcon.svg";
 import dropdownIcon from "../../assets/icons/dropdownIcon.svg";
 
 function Sidebar() {
+  const navigate = useNavigate();
+
   // 임시 로그인 상태
-  // 백엔드 연결 전에는 true / false 바꿔가면서 확인하면 됨
-  const isLoggedIn = true;
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
   const userName = "김메리";
+
+  const handleLogout = () => {
+    // 로그인 상태 제거
+    localStorage.removeItem("isLoggedIn");
+
+    // 처음 화면으로 이동
+    navigate("/");
+
+    // Sidebar / MainHero가 바로 다시 렌더링되도록
+    window.location.reload();
+  };
 
   return (
     <aside className={styles.sidebar}>
@@ -36,6 +49,7 @@ function Sidebar() {
                 type="button"
                 className={styles.logoutButton}
                 aria-label="로그아웃"
+                onClick={handleLogout}
               >
                 <img src={logoutIcon} alt="" />
               </button>
@@ -49,7 +63,11 @@ function Sidebar() {
                 <option value="workspace1">Workspace1</option>
               </select>
 
-              <img className={styles.dropdownIcon} src={dropdownIcon} alt="" />
+              <img
+                className={styles.dropdownIcon}
+                src={dropdownIcon}
+                alt=""
+              />
             </div>
           </>
         ) : (
@@ -117,7 +135,6 @@ function Sidebar() {
             {isLoggedIn && (
               <label className={styles.toggle}>
                 <input type="checkbox" aria-label="알림 켜기" />
-
                 <span className={styles.toggleSlider} />
               </label>
             )}
