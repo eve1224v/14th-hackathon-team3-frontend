@@ -1,6 +1,10 @@
 .hero {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+
+  top: 374px;
+  left: 50%;
+
+  transform: translateX(-50%);
 
   display: flex;
   flex-direction: column;
@@ -9,7 +13,13 @@
   text-align: center;
 
   color: #ffffff;
+
+  z-index: 1;
 }
+
+/* =========================
+   Title
+========================= */
 
 .title {
   margin: 0;
@@ -21,6 +31,10 @@
   letter-spacing: -0.8px;
 }
 
+/* =========================
+   Description
+========================= */
+
 .description {
   margin: 20px 0 39px;
 
@@ -29,8 +43,15 @@
 
   line-height: 110%;
 
-  color: #fff;
+  color: #ffffff;
+
+  white-space: nowrap;
 }
+
+/* =========================
+   로그인 전
+   워크스페이스 만들기
+========================= */
 
 .workspaceButton {
   width: 161px;
@@ -48,12 +69,17 @@
   font-size: 14px;
   font-weight: 700;
   line-height: 110%;
+
+  cursor: pointer;
 }
+
+/* =========================
+   로그인 / 회원가입
+========================= */
 
 .authArea {
   display: flex;
   flex-direction: column;
-
   align-items: center;
 
   margin-top: 25px;
@@ -71,12 +97,10 @@
 
   font-size: 12px;
   font-weight: 400;
+
   line-height: 110%;
 
   text-decoration: underline;
-  text-decoration-style: solid;
-
-  text-underline-offset: auto;
 
   cursor: pointer;
 
@@ -85,4 +109,53 @@
 
 .authArea button:hover {
   color: #ffffff;
+}
+
+/* =========================
+   로그인 후
+========================= */
+
+.workspaceActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+}
+
+.createWorkspaceButton,
+.joinWorkspaceButton {
+  height: 35px;
+
+  padding: 10px 16px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 110%;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+/* 새 워크스페이스 만들기 */
+
+.createWorkspaceButton {
+  border: none;
+
+  background-color: #ffffff;
+
+  color: #1f254d;
+}
+
+/* 초대받은 워크스페이스 참여하기 */
+
+.joinWorkspaceButton {
+  border: none;
+
+  background-color: #ffffff;
+
+  color: #1f254d;
 }

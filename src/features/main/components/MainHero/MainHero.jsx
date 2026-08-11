@@ -1,9 +1,14 @@
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../../../router/routes.constant";
 import styles from "./MainHero.module.css";
 
-function MainHero() {
+function MainHero({ onLoginClick, onSignupClick }) {
+  const navigate = useNavigate();
+
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
   return (
     <section className={styles.hero}>
-
       <h2 className={styles.title}>
         글로벌 협업, 끊김 없이 이어가보세요
       </h2>
@@ -13,14 +18,50 @@ function MainHero() {
         워크스페이스에서 관리하세요.
       </p>
 
-      <button className={styles.workspaceButton}>
-        워크스페이스 만들기
-      </button>
+      {isLoggedIn ? (
+        <div className={styles.workspaceActions}>
+          <button
+            type="button"
+            className={styles.createWorkspaceButton}
+            onClick={() => navigate(ROUTES.CREATE_WORKSPACE)}
+          >
+            새 워크스페이스 만들기
+          </button>
 
-      <div className={styles.authArea}>
-        <button>로그인</button>
-        <button>회원가입</button>
-      </div>
+          <button
+            type="button"
+            className={styles.joinWorkspaceButton}
+            onClick={() => navigate(ROUTES.JOIN_WORKSPACE)}
+          >
+            초대받은 워크스페이스 참여하기
+          </button>
+        </div>
+      ) : (
+        <>
+          <button
+            type="button"
+            className={styles.workspaceButton}
+          >
+            워크스페이스 만들기
+          </button>
+
+          <div className={styles.authArea}>
+            <button
+              type="button"
+              onClick={onLoginClick}
+            >
+              로그인
+            </button>
+
+            <button
+              type="button"
+              onClick={onSignupClick}
+            >
+              회원가입
+            </button>
+          </div>
+        </>
+      )}
     </section>
   );
 }
