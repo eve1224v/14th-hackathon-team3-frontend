@@ -1,6 +1,10 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import MainPage from "../features/main/pages/MainPage/MainPage";
+import CreateWorkspacePage from "../features/workspace/pages/CreateWorkspacePage/CreateWorkspacePage";
+import JoinWorkspacePage from "../features/workspace/pages/JoinWorkspacePage/JoinWorkspacePage";
+import CreateProjectPage from "../features/project/pages/CreateProjectPage/CreateProjectPage";
+import ProjectSettingsPage from "../features/project/pages/ProjectSettingsPage/ProjectSettingsPage";
 
 import { ROUTES } from "./routes.constant";
 
@@ -8,9 +12,26 @@ function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path={ROUTES.HOME} element={<MainPage />} />
+
         <Route
-          path={ROUTES.MAIN}
-          element={<MainPage />}
+          path={ROUTES.CREATE_WORKSPACE}
+          element={<CreateWorkspacePage />}
+        />
+
+        <Route
+          path={ROUTES.JOIN_WORKSPACE}
+          element={<JoinWorkspacePage />}
+        />
+
+        <Route
+          path={ROUTES.CREATE_PROJECT}
+          element={<CreateProjectPage />}
+        />
+
+        <Route
+          path={ROUTES.PROJECT_SETTINGS}
+          element={<ProjectSettingsPage />}
         />
       </Routes>
     </BrowserRouter>

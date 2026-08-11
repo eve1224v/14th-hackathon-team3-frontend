@@ -1,10 +1,7 @@
 export const ROUTES = {
-  MAIN: "/",
-
-  LOGIN: "/login",
-  SIGNUP: "/signup",
-
-  WORKSPACE: "/workspace",
-
-  MYPAGE: "/mypage",
+  HOME: "/",
+  CREATE_WORKSPACE: "/workspace/create",
+  JOIN_WORKSPACE: "/workspace/join",
+  CREATE_PROJECT: "/project/create",
+  PROJECT_SETTINGS: "/project/settings",
 };
