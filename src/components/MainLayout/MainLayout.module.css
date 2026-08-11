@@ -1,0 +1,77 @@
+.layout {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+
+  overflow: hidden;
+
+  background-color: #0d1021;
+}
+
+/* =========================
+   오른쪽의 실제 보이는 영역
+   → 이 부분만 스크롤됨
+========================= */
+
+.mainViewport {
+  width: calc(100vw - 234px);
+  height: 100vh;
+
+  flex: 0 0 calc(100vw - 234px);
+
+  overflow: auto;
+
+  background-color: #0d1021;
+}
+
+/* =========================
+   Figma 기준 고정 화면
+
+   전체 1440
+   Sidebar 234
+   Main 1206
+========================= */
+
+.mainCanvas {
+  position: relative;
+
+  width: 1206px;
+  min-width: 1206px;
+
+  height: 1024px;
+  min-height: 1024px;
+
+  background-color: #0d1021;
+}
+
+/* =========================
+   공통 Chat 버튼
+========================= */
+
+.chatButton {
+  position: fixed;
+
+  right: 68px;
+  bottom: 53px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+
+  z-index: 1000;
+}
+
+.chatButton img {
+  display: block;
+
+  width: 48px;
+  height: 48px;
+}
