@@ -24,7 +24,6 @@
   overflow: hidden;
 }
 
-
 /* 왼쪽 타원 */
 .glowSmall {
   position: absolute;
@@ -53,7 +52,6 @@
   z-index: 0;
 }
 
-
 /* 오른쪽 타원 */
 .glowLarge {
   position: absolute;
@@ -80,4 +78,31 @@
   pointer-events: none;
 
   z-index: 0;
+}
+
+.chatButton {
+  position: absolute;
+
+  right: 68px;
+  bottom: 53px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+
+  z-index: 10;
+}
+
+.chatButton img {
+  display: block;
+
+  width: 59px;
+  height: 59px;
 }
