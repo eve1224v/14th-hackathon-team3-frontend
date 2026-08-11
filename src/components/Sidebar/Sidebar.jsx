@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import styles from "./Sidebar.module.css";
 
 import homeIcon from "../../assets/icons/homeIcon.svg";
@@ -15,19 +17,53 @@ import dropdownIcon from "../../assets/icons/dropdownIcon.svg";
 function Sidebar() {
   const navigate = useNavigate();
 
-  // 임시 로그인 상태
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
   const userName = "김메리";
 
+  /* =========================
+     현재 시간
+  ========================= */
+
+  const getTime = (timeZone) => {
+    return new Intl.DateTimeFormat("en-GB", {
+      timeZone,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(new Date());
+  };
+
+  const [seoulTime, setSeoulTime] = useState(getTime("Asia/Seoul"));
+
+  const [londonTime, setLondonTime] = useState(getTime("Europe/London"));
+
+  useEffect(() => {
+    const updateTime = () => {
+      setSeoulTime(getTime("Asia/Seoul"));
+      setLondonTime(getTime("Europe/London"));
+    };
+
+    // 컴포넌트가 열렸을 때 즉시 한 번 갱신
+    updateTime();
+
+    // 1분마다 갱신
+    const timer = setInterval(updateTime, 60 * 1000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
+  /* =========================
+     로그아웃
+  ========================= */
+
   const handleLogout = () => {
-    // 로그인 상태 제거
     localStorage.removeItem("isLoggedIn");
 
-    // 처음 화면으로 이동
     navigate("/");
 
-    // Sidebar / MainHero가 바로 다시 렌더링되도록
     window.location.reload();
   };
 
@@ -63,11 +99,7 @@ function Sidebar() {
                 <option value="workspace1">Workspace1</option>
               </select>
 
-              <img
-                className={styles.dropdownIcon}
-                src={dropdownIcon}
-                alt=""
-              />
+              <img className={styles.dropdownIcon} src={dropdownIcon} alt="" />
             </div>
           </>
         ) : (
@@ -100,25 +132,33 @@ function Sidebar() {
           {isLoggedIn ? (
             <>
               <button type="button">Create Issue</button>
+
               <button type="button">Create Project</button>
             </>
           ) : (
             <>
               <button type="button">Create Team</button>
+
               <button type="button">Create Issue</button>
             </>
           )}
         </div>
 
+        {/* =========================
+            실제 현재 시간
+        ========================= */}
+
         <div className={styles.timeSection}>
           <div>
             <p>[KR] Seoul, Korea</p>
-            <strong>13:00</strong>
+
+            <strong>{seoulTime}</strong>
           </div>
 
           <div>
             <p>[UK] London, United Kingdom</p>
-            <strong>05:00</strong>
+
+            <strong>{londonTime}</strong>
           </div>
         </div>
 
@@ -135,6 +175,7 @@ function Sidebar() {
             {isLoggedIn && (
               <label className={styles.toggle}>
                 <input type="checkbox" aria-label="알림 켜기" />
+
                 <span className={styles.toggleSlider} />
               </label>
             )}
