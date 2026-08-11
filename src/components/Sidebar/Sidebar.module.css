@@ -35,6 +35,10 @@
   padding-bottom: 35px;
 }
 
+/* =========================
+   로그인 전
+========================= */
+
 .loginText {
   margin: 0 0 38px;
   margin-left: 36px;
@@ -42,6 +46,102 @@
   font-size: 20px;
   font-weight: 500;
 }
+
+/* =========================
+   로그인 후 사용자 영역
+========================= */
+
+.userArea {
+  margin-left: 33px;
+  margin-right: 21px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.greeting {
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 400;
+
+  white-space: nowrap;
+}
+
+.greeting strong {
+  font-weight: 700;
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.logoutButton img {
+  width: 24px;
+  height: 24px;
+}
+
+/* =========================
+   Workspace Select
+========================= */
+
+.workspaceSelectWrapper {
+  position: relative;
+
+  width: 100px;
+  height: 24px;
+
+  margin-top: 13px;
+  margin-left: 36px;
+  margin-bottom: 18px;
+}
+
+.workspaceSelect {
+  width: 100%;
+  height: 100%;
+
+  padding: 5.47px 30px 5.47px 11.96px;
+
+  border: 0.827px solid #d7d7d7;
+  border-radius: 8.639px;
+
+  background-color: #ffffff;
+  color: #151936;
+
+  font-size: 8.639px;
+  font-weight: 600;
+
+  outline: none;
+  cursor: pointer;
+
+  appearance: none;
+}
+
+.dropdownIcon {
+  position: absolute;
+
+  top: 5.52px;
+  right: 6.97px;
+
+  width: 17.622px;
+  height: 17.622px;
+
+  pointer-events: none;
+}
+
+/* =========================
+   Home / Cycle / Issue / Project
+========================= */
 
 .menu {
   display: flex;
@@ -80,6 +180,10 @@
   height: 18.165px;
 }
 
+/* =========================
+   Create Menu
+========================= */
+
 .actionMenu {
   margin-top: clamp(30px, 6vh, 73.13px);
 
@@ -111,6 +215,10 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* =========================
+   Time
+========================= */
+
 .timeSection {
   margin-top: clamp(35px, 8vh, 125.32px);
   margin-left: 27px;
@@ -133,11 +241,11 @@
   line-height: 110%;
 }
 
+/* =========================
+   Bottom Menu
+========================= */
+
 .bottomMenu {
-  /*
-    남은 공간을 전부 위쪽에 배치해서
-    bottomMenu를 아래쪽으로 밀어줌
-  */
   margin-top: auto;
   margin-left: 34px;
 
@@ -151,7 +259,14 @@
   flex-shrink: 0;
 }
 
-.bottomMenu button {
+.notifyRow {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+.bottomButton {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -164,7 +279,69 @@
   cursor: pointer;
 }
 
-.bottomMenu img {
+.bottomButton img {
   width: 24px;
   height: 24px;
+}
+
+/* =========================
+   Notify Toggle
+========================= */
+
+.toggle {
+  position: relative;
+
+  display: inline-block;
+
+  width: 30px;
+  height: 17px;
+
+  cursor: pointer;
+}
+
+.toggle input {
+  width: 0;
+  height: 0;
+
+  opacity: 0;
+}
+
+.toggleSlider {
+  position: absolute;
+
+  inset: 0;
+
+  border-radius: 20px;
+
+  background-color: rgba(255, 255, 255, 0.55);
+
+  transition: 0.2s;
+}
+
+.toggleSlider::before {
+  content: "";
+
+  position: absolute;
+
+  width: 13px;
+  height: 13px;
+
+  top: 2px;
+  left: 2px;
+
+  border-radius: 50%;
+
+  background-color: #ffffff;
+
+  transition: 0.2s;
+}
+
+.toggle input:checked + .toggleSlider {
+  background-color: #ffffff;
+}
+
+.toggle input:checked + .toggleSlider::before {
+  transform: translateX(13px);
+
+  background-color: #151936;
 }
