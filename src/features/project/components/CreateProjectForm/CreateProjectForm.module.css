@@ -1,0 +1,625 @@
+.container {
+  position: relative;
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding-top: 140px;
+  padding-left: 90px;
+  padding-bottom: 70px;
+
+  color: #ffffff;
+}
+
+/* =========================
+   Title
+========================= */
+
+.title {
+  margin: 0 0 28px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+/* =========================
+   Card
+========================= */
+
+.card {
+  width: 690px;
+
+  box-sizing: border-box;
+
+  margin-bottom: 32px;
+
+  padding: 24px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background-color: #1b1f35;
+}
+
+.cardTitle {
+  margin: 0 0 20px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+/* =========================
+   기본 정보
+========================= */
+
+.field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-bottom: 18px;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+.field label {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background-color: #252a44;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+
+  outline: none;
+}
+
+.field input {
+  height: 39px;
+
+  padding: 0 12px;
+}
+
+.field textarea {
+  height: 74px;
+
+  padding: 12px;
+
+  resize: none;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: #4d67ff;
+}
+
+/* =========================
+   프로젝트 기간
+========================= */
+
+.periodCard {
+  position: relative;
+}
+
+.periodTitleRow {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 20px;
+}
+
+.periodTitleRow .cardTitle {
+  margin: 0;
+}
+
+.calendarButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.calendarIcon {
+  display: block;
+
+  width: 24px;
+  height: 24px;
+
+  object-fit: contain;
+}
+
+/* =========================
+   날짜 입력
+========================= */
+
+.dateRow {
+  display: flex;
+  align-items: flex-end;
+
+  gap: 26px;
+}
+
+.dateField {
+  width: 260px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.dateField label {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+.dateField input {
+  width: 100%;
+  height: 43px;
+
+  box-sizing: border-box;
+
+  padding: 0 14px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background-color: #252a44;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+
+  outline: none;
+}
+
+.dateField input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.dateField input:focus {
+  border-color: #4d67ff;
+}
+
+/* =========================
+   Calendar
+========================= */
+
+.calendarPopup {
+  position: absolute;
+
+  top: 72px;
+  left: 24px;
+
+  width: 330px;
+
+  box-sizing: border-box;
+
+  padding: 18px 22px 22px;
+
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+
+  background-color: #ffffff;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+
+  z-index: 100;
+}
+
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calendarHeader strong {
+  color: #888888;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.monthButton {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.calendarDivider {
+  width: 100%;
+  height: 1px;
+
+  margin: 14px 0 16px;
+
+  background-color: #dddddd;
+}
+
+/* 요일 */
+
+.weekRow {
+  display: grid;
+
+  grid-template-columns: repeat(7, 1fr);
+
+  margin-bottom: 10px;
+
+  text-align: center;
+}
+
+.weekRow span {
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+/* 날짜 */
+
+.calendarGrid {
+  display: grid;
+
+  grid-template-columns: repeat(7, 1fr);
+
+  row-gap: 5px;
+
+  justify-items: center;
+}
+
+.dayButton {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+
+  cursor: pointer;
+}
+
+/* 이번 달 일반 날짜 hover */
+
+.dayButton:hover {
+  background: rgba(25, 152, 238, 0.08);
+}
+
+/* =========================
+   이전 / 다음 달 날짜
+========================= */
+
+.otherMonthDay {
+  color: #c9c9c9;
+}
+
+/* =========================
+   시작~마감 사이 날짜
+   예: 5 ~ 7이면 6
+========================= */
+
+.rangeDay {
+  background: rgba(25, 152, 238, 0.1);
+
+  color: #2f7fe8;
+}
+
+/* =========================
+   시작일 / 마감일
+   예: 5, 7
+========================= */
+
+.selectedDay {
+  background: #1998ee;
+
+  color: #ffffff;
+
+  font-weight: 500;
+}
+
+.selectedDay:hover {
+  background: #1998ee;
+}
+
+/* =========================
+   참여 기업
+========================= */
+
+.companyCard {
+  margin-bottom: 0;
+}
+
+/* =========================
+   기업 검색
+========================= */
+
+.searchWrapper {
+  width: 100%;
+  height: 43px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 0 16px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background: rgba(166, 180, 255, 0.51);
+}
+
+.searchIcon {
+  display: block;
+
+  width: 20px;
+  height: 20px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+
+  pointer-events: none;
+}
+
+.searchInput {
+  flex: 1;
+
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* =========================
+   기업 목록
+========================= */
+
+.companyList {
+  margin-top: 12px;
+
+  padding: 0 20px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background-color: #252a44;
+}
+
+.companyItem {
+  min-height: 72px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  border-bottom: 1px solid #31364e;
+}
+
+.companyItem:last-child {
+  border-bottom: none;
+}
+
+.companyCircle {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background-color: #d9d9d9;
+}
+
+.companyInfo {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.companyNameRow {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+}
+
+.companyInfo strong {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.companyInfo p {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.badge {
+  padding: 7.5px;
+
+  border-radius: 6px;
+
+  background-color: rgba(57, 87, 255, 0.74);
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+/* =========================
+   기업 추가
+========================= */
+
+.addCompanyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 31px;
+
+  margin-top: 11px;
+
+  padding: 5px;
+
+  border: 1px solid #4d67ff;
+  border-radius: 8px;
+
+  background-color: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+/* =========================
+   Bottom Actions
+========================= */
+
+.bottomActions {
+  width: 690px;
+
+  margin-top: 40px;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.cancelButton,
+.createButton {
+  height: 33px;
+
+  padding: 10px;
+
+  border-radius: 8px;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 110%;
+
+  cursor: pointer;
+}
+
+.cancelButton {
+  border: 1px solid #4d67ff;
+
+  background-color: transparent;
+
+  color: #ffffff;
+}
+
+.createButton {
+  border: none;
+
+  background-color: #4d67ff;
+
+  color: #ffffff;
+}

@@ -1,0 +1,137 @@
+.container {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  padding-top: 140px;
+  padding-left: 88px;
+
+  color: #ffffff;
+}
+
+.title {
+  margin: 0 0 40px;
+
+  font-size: 28px;
+  font-weight: 700;
+
+  line-height: 110%;
+}
+
+.formGrid {
+  display: flex;
+
+  gap: 128px;
+}
+
+.leftColumn,
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.leftColumn {
+  gap: 40px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 400;
+
+  line-height: 110%;
+}
+
+.field input {
+  width: 330px;
+  height: 43px;
+
+  padding: 0 12px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background: #1b1f35;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  outline: none;
+}
+
+.field input:focus {
+  border-color: #4f6bff;
+}
+
+.inviteArea {
+  margin-top: 80px;
+
+  display: flex;
+  align-items: center;
+}
+
+.inviteButton {
+  width: 89px;
+  height: 33px;
+
+  border: none;
+  border-radius: 6px 0 0 6px;
+
+  background-color: #ffffff;
+
+  color: #151936;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.inviteCodeInput {
+  width: 400px;
+  height: 33px;
+
+  padding: 0 12px;
+
+  border: 1px solid #252a44;
+  border-left: none;
+
+  border-radius: 0 6px 6px 0;
+
+  background: rgba(86, 112, 255, 0.2);
+
+  color: #ffffff;
+
+  outline: none;
+}
+
+.createButton {
+  position: absolute;
+
+  right: 329px;
+  bottom: 250px;
+
+  height: 35px;
+
+  padding: 10px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  line-height: 110%;
+
+  white-space: nowrap;
+}

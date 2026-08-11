@@ -1,0 +1,227 @@
+.container {
+  position: relative;
+
+  width: 1206px;
+  min-width: 1206px;
+
+  height: 1024px;
+  min-height: 1024px;
+
+  box-sizing: border-box;
+
+  padding-top: 140px;
+  padding-left: 90px;
+
+  background-color: #0d1021;
+
+  color: #ffffff;
+}
+
+.title {
+  margin: 0 0 22px;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+/* 상단 */
+
+.topArea {
+  display: flex;
+
+  gap: 20px;
+}
+
+.inviteCard {
+  width: 690px;
+
+  box-sizing: border-box;
+
+  padding: 23px 16px;
+
+  border-radius: 8px;
+
+  border: 1px solid var(--border-color, #252a44);
+  background: var(--background-color, #1b1f35);
+}
+
+.inviteCard h2,
+.guideCard h2,
+.profileCard h2 {
+  margin: 0 0 12px;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.inviteCard p,
+.profileCard > p {
+  margin: 0 0 16px;
+
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+.inviteCard label {
+  display: block;
+
+  margin-bottom: 9px;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.inviteCard input {
+  width: 100%;
+  height: 39px;
+
+  box-sizing: border-box;
+
+  padding: 0 16px;
+
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #252a44);
+  background: var(--background-color, #1b1f35);
+
+  color: #ffffff;
+
+  outline: none;
+}
+
+.checkButton {
+  margin-top: 16px;
+
+  height: 33px;
+
+  padding: 5px 10px;
+
+  border: none;
+  border-radius: 8px;
+
+  background-color: #4d67ff;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* 오른쪽 안내 카드 */
+
+.guideCard {
+  width: 269px;
+
+  box-sizing: border-box;
+
+  padding: 20px;
+
+  border-radius: 8px;
+
+  border: 1px solid var(--border-color, #252a44);
+  background: var(--background-color, #1b1f35);
+}
+
+.guideCard ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.guideCard li {
+  margin-bottom: 14px;
+
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+/* 기본 프로필 */
+
+.profileCard {
+  width: 690px;
+
+  margin-top: 32px;
+
+  box-sizing: border-box;
+
+  padding: 20px;
+
+  border-radius: 8px;
+
+  border: 1px solid var(--border-color, #252a44);
+  background: var(--background-color, #1b1f35);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+
+  margin-top: 16px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+.field input {
+  width: 100%;
+  height: 39px;
+
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #252a44);
+  background: var(--background-color, #1b1f35);
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  outline: none;
+}
+
+.field input:focus,
+.inviteCard input:focus {
+  border-color: #4f6bff;
+}
+
+/* 참여 버튼 */
+
+.joinButton {
+  margin-top: 11px;
+  margin-left: 578px;
+
+  height: 33px;
+
+  padding: 10px;
+
+  border: none;
+  border-radius: 8px;
+
+  background-color: #4d67ff;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 110%;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
