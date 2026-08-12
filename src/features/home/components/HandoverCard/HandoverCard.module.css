@@ -1,0 +1,190 @@
+.handoverCard {
+  position: relative;
+
+  width: 312px;
+  height: 222px;
+
+  box-sizing: border-box;
+
+  margin-top: 17px;
+
+  padding: 16px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background-color: #15192f;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+/* =========================
+   팀 이동
+========================= */
+
+.teamRow {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  color: rgba(255, 255, 255, 0.93);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+.teamRow img {
+  display: block;
+
+  width: 15px;
+  height: 16px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}
+
+
+/* =========================
+   프로젝트명
+========================= */
+
+.handoverCard h3 {
+  margin: 8px 0 0;
+
+  color: rgba(255, 255, 255, 0.93);
+
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 98%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   업무 요약
+========================= */
+
+.handoverSummary {
+  width: 268px;
+  height: 96px;
+
+  box-sizing: border-box;
+
+  margin-top: 16px;
+
+  padding: 15px 20px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background-color: #232845;
+}
+
+
+.handoverSummary div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  color: rgba(255, 255, 255, 0.93);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 100%;
+
+  letter-spacing: 0;
+}
+
+
+.handoverSummary div + div {
+  margin-top: 4px;
+}
+
+
+.handoverSummary span {
+  font-weight: 400;
+}
+
+
+.handoverSummary strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* =========================
+   AI 업데이트 문구
+========================= */
+
+.handoverNotice {
+  margin: 10px 0 0;
+
+  color: rgba(255, 255, 255, 0.3);
+
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 100%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   내용 확인 버튼
+========================= */
+
+.detailButton {
+  position: absolute;
+
+  right: 18px;
+  bottom: 10px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.detailButton img {
+  display: block;
+
+  width: 7px;
+  height: 13px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}

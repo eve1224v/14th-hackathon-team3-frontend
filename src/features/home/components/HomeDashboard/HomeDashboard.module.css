@@ -1,0 +1,401 @@
+.dashboard {
+  position: relative;
+
+  width: 100%;
+  min-height: 1024px;
+
+  box-sizing: border-box;
+
+  padding-top: 76px;
+  padding-left: 57px;
+  padding-right: 57px;
+  padding-bottom: 70px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+/* =========================
+   상단 인사 영역
+========================= */
+
+.hero {
+  position: relative;
+
+  width: 100%;
+  height: 164px;
+}
+
+
+.heroText {
+  width: 500px;
+}
+
+
+/* 대한민국 · 서울 · 09:14 */
+
+.location {
+  width: auto;
+
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* 좋은 아침이에요, 예티님 */
+
+.hero h1 {
+  margin: 5px 0 0;
+
+  color: #ffffff;
+
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* London 팀이 업무를 마쳤어요 */
+
+.heroDescription {
+  margin: 31px 0 0;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  /* 두 줄 사이 간격 */
+  line-height: 125%;
+
+  letter-spacing: 0;
+}
+
+
+.heroDescription strong {
+  font-weight: 600;
+}
+
+
+/* =========================
+   상단 버튼
+========================= */
+
+.heroButtons {
+  position: absolute;
+
+  top: 82px;
+  left: 530px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.refreshButton,
+.issueButton {
+  height: 31px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px;
+
+  border-radius: 8px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 110%;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.refreshButton {
+  width: 67px;
+
+  border: 1px solid #4d67ff;
+
+  background: transparent;
+}
+
+
+.issueButton {
+  width: 78px;
+
+  border: none;
+
+  background-color: #4d67ff;
+}
+
+
+/* =========================
+   본문 전체
+========================= */
+
+.contentGrid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns: 690px 312px;
+
+  column-gap: 77px;
+
+  align-items: start;
+}
+
+
+/* =========================
+   왼쪽 영역
+========================= */
+
+.leftColumn {
+  width: 690px;
+}
+
+
+/* =========================
+   오른쪽 영역
+========================= */
+
+.rightColumn {
+  width: 312px;
+}
+
+
+/* =========================
+   공통 섹션 제목
+========================= */
+
+.sectionTitle {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+.sectionHeader {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 12px;
+}
+
+
+/* =========================
+   나의 업무 요약
+========================= */
+
+.summaryList {
+  display: grid;
+
+  grid-template-columns: repeat(4, 160px);
+
+  column-gap: 10px;
+
+  margin-top: 17px;
+}
+
+
+/* =========================
+   이어서 할 일
+========================= */
+
+.todoSection {
+  margin-top: 28px;
+}
+
+
+.todoList {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+
+/* =========================
+   진행 중인 프로젝트
+========================= */
+
+.projectSection {
+  margin-top: 48px;
+}
+
+
+.projectList {
+  display: grid;
+
+  grid-template-columns: repeat(3, 224px);
+
+  column-gap: 8px;
+}
+
+
+/* =========================
+   전체 보기 / 모든 프로젝트
+========================= */
+
+.arrowButton {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.arrowButton img {
+  display: block;
+
+  width: 7px;
+  height: 13px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}
+
+
+/* =========================
+   최근 활동
+========================= */
+
+.activitySection {
+  margin-top: 42px;
+}
+
+
+.activityHeader {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.activityRefresh {
+  width: 19px;
+  height: 19px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+
+.activityRefresh img {
+  display: block;
+
+  width: 19px;
+  height: 19px;
+}
+
+
+.activityList {
+  margin-top: 17px;
+
+  display: flex;
+  flex-direction: column;
+
+  /* 각 활동 사이 간격 */
+  gap: 4px;
+}
+
+
+.activityItem {
+  display: grid;
+
+  grid-template-columns: 37px 1fr;
+
+  column-gap: 12px;
+}
+
+
+.activityItem strong {
+  color: rgba(255, 255, 255, 0.9);
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 120%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+.activityItem p {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 120%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
