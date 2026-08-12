@@ -1,0 +1,366 @@
+.overlay {
+  position: fixed;
+
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  z-index: 2000;
+}
+
+.modal {
+  width: 520px;
+
+  box-sizing: border-box;
+
+  padding: 42px 46px;
+
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+}
+
+.title {
+  margin: 0 0 10px;
+
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+.description {
+  margin: 0 0 28px;
+
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 140%;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 9px;
+
+  margin-bottom: 18px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.field > input {
+  width: 100%;
+  height: 56px;
+
+  box-sizing: border-box;
+
+  padding: 0 16px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: #f5f5f5;
+
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 13px;
+
+  outline: none;
+}
+
+.dateInputWrapper {
+  position: relative;
+
+  width: 100%;
+}
+
+.dateInputWrapper input {
+  width: 100%;
+  height: 56px;
+
+  box-sizing: border-box;
+
+  padding: 0 55px 0 16px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: #f5f5f5;
+
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 13px;
+
+  outline: none;
+}
+
+.dateInputWrapper input::placeholder {
+  color: #111111;
+}
+
+.calendarButton {
+  position: absolute;
+
+  top: 50%;
+  right: 16px;
+
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  transform: translateY(-50%);
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.calendarButton img {
+  width: 18px;
+  height: 18px;
+
+  display: block;
+
+  object-fit: contain;
+}
+
+.buttonArea {
+  margin-top: 26px;
+
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 8px;
+}
+
+.cancelButton,
+.saveButton {
+  height: 38px;
+
+  padding: 0 14px;
+
+  border-radius: 10px;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.cancelButton {
+  border: 1px solid #ff4d4f;
+
+  background: #ffffff;
+
+  color: #ff4d4f;
+}
+
+.saveButton {
+  border: none;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+}
+
+.calendarPopup {
+  position: absolute;
+
+  top: 64px;
+  right: 0;
+
+  width: 330px;
+
+  box-sizing: border-box;
+
+  padding: 18px 22px 20px;
+
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+
+  z-index: 3000;
+}
+
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calendarHeader strong {
+  color: #888888;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.monthButton {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #111111;
+
+  font-size: 28px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.calendarDivider {
+  width: 100%;
+  height: 1px;
+
+  margin: 14px 0 16px;
+
+  background: #dddddd;
+}
+
+.weekRow {
+  display: grid;
+
+  grid-template-columns: repeat(7, 1fr);
+
+  margin-bottom: 10px;
+
+  text-align: center;
+}
+
+.weekRow span {
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.calendarGrid {
+  display: grid;
+
+  grid-template-columns: repeat(7, 1fr);
+
+  row-gap: 5px;
+
+  justify-items: center;
+}
+
+.dayButton {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+
+  cursor: pointer;
+}
+
+.dayButton:hover {
+  background: rgba(25, 152, 238, 0.08);
+}
+
+.otherMonthDay {
+  color: #c9c9c9;
+}
+
+.rangeDay {
+  background: rgba(25, 152, 238, 0.1);
+
+  color: #2f7fe8;
+}
+
+.selectedDay {
+  background: #1998ee;
+
+  color: #ffffff;
+
+  font-weight: 500;
+}
+
+.selectedDay:hover {
+  background: #1998ee;
+}
+
+.calendarActions {
+  margin-top: 14px;
+
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 8px;
+}
+
+.resetButton,
+.calendarDoneButton {
+  height: 30px;
+
+  padding: 0 10px;
+
+  border-radius: 7px;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 11px;
+
+  cursor: pointer;
+}
+
+.resetButton {
+  border: 1px solid #d3d3d3;
+
+  background: #ffffff;
+
+  color: #525252;
+}
+
+.calendarDoneButton {
+  border: none;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+}
