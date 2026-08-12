@@ -1,0 +1,141 @@
+.overlay {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  z-index: 1000;
+}
+
+.modal {
+  position: relative;
+
+  width: 644px;
+  height: 720px;
+
+  box-sizing: border-box;
+
+  border-radius: 14px;
+
+  background: linear-gradient(180deg, #fff 66.35%, #f0f2ff 100%);
+
+  font-family: Pretendard, sans-serif;
+}
+
+.content {
+  width: 460px;
+
+  margin: 0 auto;
+  padding-top: 92px;
+}
+
+.title {
+  margin: 0;
+
+  color: #111111;
+
+  text-align: center;
+
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+.description {
+  margin: 14px 0 32px;
+
+  color: #111111;
+
+  text-align: center;
+
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+.formArea {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.formArea label {
+  margin-bottom: 8px;
+
+  color: #111111;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+.formArea input {
+  width: 460px;
+  height: 58px;
+
+  box-sizing: border-box;
+
+  padding: 0 16px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: rgba(217, 217, 217, 0.26);
+
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 14px;
+
+  outline: none;
+}
+
+.formArea input:focus {
+  outline: 1px solid #4d67ff;
+}
+
+.enterButton {
+  align-self: flex-end;
+
+  margin-top: 16px;
+
+  height: 28px;
+
+  padding: 0 12px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.logo {
+  position: absolute;
+
+  left: 50%;
+  bottom: 78px;
+
+  width: 88px;
+  height: auto;
+
+  transform: translateX(-50%);
+
+  object-fit: contain;
+}
