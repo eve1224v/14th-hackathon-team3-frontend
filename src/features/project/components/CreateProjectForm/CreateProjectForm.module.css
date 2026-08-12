@@ -12,10 +12,6 @@
   color: #ffffff;
 }
 
-/* =========================
-   Title
-========================= */
-
 .title {
   margin: 0 0 28px;
 
@@ -26,10 +22,6 @@
   font-weight: 700;
   line-height: 110%;
 }
-
-/* =========================
-   Card
-========================= */
 
 .card {
   width: 690px;
@@ -56,10 +48,6 @@
   font-weight: 600;
   line-height: 110%;
 }
-
-/* =========================
-   기본 정보
-========================= */
 
 .field {
   display: flex;
@@ -120,10 +108,6 @@
   border-color: #4d67ff;
 }
 
-/* =========================
-   프로젝트 기간
-========================= */
-
 .periodCard {
   position: relative;
 }
@@ -162,10 +146,6 @@
 
   object-fit: contain;
 }
-
-/* =========================
-   날짜 입력
-========================= */
 
 .dateRow {
   display: flex;
@@ -219,10 +199,6 @@
 .dateField input:focus {
   border-color: #4d67ff;
 }
-
-/* =========================
-   Calendar
-========================= */
 
 .calendarPopup {
   position: absolute;
@@ -293,8 +269,6 @@
   background-color: #dddddd;
 }
 
-/* 요일 */
-
 .weekRow {
   display: grid;
 
@@ -312,8 +286,6 @@
   font-size: 9px;
   font-weight: 500;
 }
-
-/* 날짜 */
 
 .calendarGrid {
   display: grid;
@@ -349,35 +321,19 @@
   cursor: pointer;
 }
 
-/* 이번 달 일반 날짜 hover */
-
 .dayButton:hover {
   background: rgba(25, 152, 238, 0.08);
 }
 
-/* =========================
-   이전 / 다음 달 날짜
-========================= */
-
 .otherMonthDay {
   color: #c9c9c9;
 }
-
-/* =========================
-   시작~마감 사이 날짜
-   예: 5 ~ 7이면 6
-========================= */
 
 .rangeDay {
   background: rgba(25, 152, 238, 0.1);
 
   color: #2f7fe8;
 }
-
-/* =========================
-   시작일 / 마감일
-   예: 5, 7
-========================= */
 
 .selectedDay {
   background: #1998ee;
@@ -391,17 +347,9 @@
   background: #1998ee;
 }
 
-/* =========================
-   참여 기업
-========================= */
-
 .companyCard {
   margin-bottom: 0;
 }
-
-/* =========================
-   기업 검색
-========================= */
 
 .searchWrapper {
   width: 100%;
@@ -419,7 +367,7 @@
   border: 1px solid #252a44;
   border-radius: 8px;
 
-  background: rgba(166, 180, 255, 0.51);
+  background-color: #252a44;
 }
 
 .searchIcon {
@@ -461,10 +409,6 @@
 .searchInput::placeholder {
   color: rgba(255, 255, 255, 0.2);
 }
-
-/* =========================
-   기업 목록
-========================= */
 
 .companyList {
   margin-top: 12px;
@@ -547,9 +491,17 @@
   line-height: 110%;
 }
 
-/* =========================
-   기업 추가
-========================= */
+.noCompany {
+  margin: 20px 0;
+
+  color: rgba(255, 255, 255, 0.5);
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+
+  text-align: center;
+}
 
 .addCompanyButton {
   display: inline-flex;
@@ -575,10 +527,6 @@
 
   cursor: pointer;
 }
-
-/* =========================
-   Bottom Actions
-========================= */
 
 .bottomActions {
   width: 690px;

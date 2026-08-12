@@ -10,27 +10,27 @@
 }
 
 /* =========================
-   오른쪽의 실제 보이는 영역
-   → 이 부분만 스크롤됨
+   사이드바 제외 실제 화면
+   여기에서만 스크롤
 ========================= */
 
 .mainViewport {
+  flex: 1;
+
   width: calc(100vw - 234px);
   height: 100vh;
 
-  flex: 0 0 calc(100vw - 234px);
+  min-width: 0;
+  min-height: 0;
 
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: auto;
 
   background-color: #0d1021;
 }
 
 /* =========================
-   Figma 기준 고정 화면
-
-   전체 1440
-   Sidebar 234
-   Main 1206
+   실제 콘텐츠 영역
 ========================= */
 
 .mainCanvas {
@@ -39,14 +39,21 @@
   width: 1206px;
   min-width: 1206px;
 
-  height: 1024px;
   min-height: 1024px;
+
+  /* fit-content 사용하지 않음 */
+  height: auto;
+
+  /* 자식 높이를 확실하게 포함 */
+  display: flow-root;
+
+  box-sizing: border-box;
 
   background-color: #0d1021;
 }
 
 /* =========================
-   공통 Chat 버튼
+   Chat Button
 ========================= */
 
 .chatButton {

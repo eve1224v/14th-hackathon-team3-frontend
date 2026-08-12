@@ -1,0 +1,563 @@
+.container {
+  position: relative;
+
+  width: 1206px;
+  min-width: 1206px;
+
+  height: auto;
+  min-height: 1024px;
+
+  box-sizing: border-box;
+
+  padding-top: 95px;
+  padding-left: 90px;
+  padding-bottom: 112px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+/* =========================
+   Title
+========================= */
+
+.title {
+  margin: 0 0 28px;
+
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+/* =========================
+   Card
+========================= */
+
+.card {
+  position: relative;
+
+  width: 690px;
+
+  box-sizing: border-box;
+
+  margin-bottom: 28px;
+  padding: 20px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background: #13172b;
+
+  overflow: visible;
+}
+
+.card h2 {
+  margin: 0 0 16px;
+
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* =========================
+   Field
+========================= */
+
+.field,
+.smallField,
+.timeField,
+.languageField {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.field label,
+.smallField label,
+.timeField label,
+.languageField label {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* =========================
+   일반 Input
+========================= */
+
+.smallField input,
+.timeField input {
+  height: 39px;
+
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background: #1b1f35;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+
+  outline: none;
+}
+
+.smallField input:focus,
+.timeField input:focus {
+  border-color: #4d67ff;
+}
+
+/* =========================
+   Custom Dropdown
+========================= */
+
+.customSelect {
+  position: relative;
+
+  width: 100%;
+
+  z-index: 100;
+}
+
+/* 현재 선택된 영역 */
+
+.customSelectButton {
+  width: 100%;
+  height: 43px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+
+  padding: 0 14px 0 16px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background: #252a44;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+/* 현재 선택 영역 hover */
+
+.customSelectButton:hover {
+  background: #7f88a8;
+
+  border-color: #7f88a8;
+}
+
+.customSelectButton span {
+  display: block;
+
+  overflow: hidden;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* =========================
+   Dropdown Icon
+========================= */
+
+.dropdownIcon {
+  width: 24px;
+  height: 24px;
+
+  display: block;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+
+  pointer-events: none;
+
+  transition: transform 0.15s ease;
+}
+
+.dropdownIconOpen {
+  transform: rotate(180deg);
+}
+
+/* =========================
+   Dropdown Menu
+========================= */
+
+.customSelectMenu {
+  position: absolute;
+
+  top: calc(100% + 6px);
+  left: 0;
+
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+
+  padding: 5px 0;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+
+  overflow: hidden;
+
+  z-index: 1000;
+}
+
+/* option */
+
+.customSelectOption {
+  width: 100%;
+  height: 36px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+
+  padding: 0 16px;
+
+  border: none;
+
+  background: #ffffff;
+
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+/* option hover */
+
+.customSelectOption:hover {
+  background: #d9d9d9;
+
+  color: #111111;
+}
+
+/* =========================
+   국가 / 시간대
+========================= */
+
+.countryRow {
+  display: flex;
+  align-items: flex-end;
+
+  gap: 17px;
+}
+
+.smallField {
+  width: 148px;
+}
+
+/* =========================
+   언어
+========================= */
+
+.languageField {
+  position: relative;
+
+  width: 305px;
+
+  margin-top: 15px;
+
+  z-index: 100;
+}
+
+/* =========================
+   Outline Button
+========================= */
+
+.outlineButton {
+  height: 31px;
+
+  padding: 0 10px;
+
+  border: 1px solid #4d67ff;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* =========================
+   근무 시간
+========================= */
+
+.timeRow {
+  display: flex;
+
+  gap: 28px;
+}
+
+.timeField {
+  width: 260px;
+}
+
+/* =========================
+   근무 요일
+========================= */
+
+.workDayArea {
+  margin-top: 20px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 13px;
+}
+
+.workDayArea > span {
+  font-size: 12px;
+}
+
+.workDays {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+}
+
+.workDayButton {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 10px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.selectedWorkDay {
+  background: #4359d7;
+
+  color: #ffffff;
+}
+
+/* =========================
+   공휴일 Header
+========================= */
+
+.holidayHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.holidayHeader h2 {
+  margin-bottom: 17px;
+}
+
+.holidayHeader p {
+  margin: 5px 0;
+
+  font-size: 11px;
+}
+
+/* =========================
+   Toggle
+========================= */
+
+.toggle {
+  position: relative;
+
+  width: 36px;
+  height: 20px;
+
+  flex-shrink: 0;
+
+  cursor: pointer;
+}
+
+.toggle input {
+  width: 0;
+  height: 0;
+
+  opacity: 0;
+}
+
+.toggleSlider {
+  position: absolute;
+
+  inset: 0;
+
+  border-radius: 20px;
+
+  background: #d1d5db;
+
+  transition: background-color 0.2s ease;
+}
+
+.toggleSlider::before {
+  content: "";
+
+  position: absolute;
+
+  top: 2px;
+  left: 2px;
+
+  width: 16px;
+  height: 16px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  transition: transform 0.2s ease;
+}
+
+.toggle input:checked + .toggleSlider {
+  background: #4d67ff;
+}
+
+.toggle input:checked + .toggleSlider::before {
+  transform: translateX(16px);
+}
+
+/* =========================
+   공휴일 Table
+========================= */
+
+.holidayTable {
+  margin-top: 14px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  overflow: hidden;
+}
+
+.tableHeader,
+.tableRow {
+  display: grid;
+
+  grid-template-columns:
+    1fr
+    1fr
+    2fr
+    1fr;
+
+  padding: 12px 15px;
+}
+
+.tableHeader {
+  border-bottom: 1px solid #31364e;
+
+  color: #ffffff;
+
+  font-size: 12px;
+}
+
+.tableRow {
+  border-bottom: 1px solid #31364e;
+
+  color: #ffffff;
+
+  font-size: 12px;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+/* =========================
+   공휴일 추가
+========================= */
+
+.holidayButtonArea {
+  margin-top: 16px;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* =========================
+   저장
+========================= */
+
+.saveArea {
+  width: 690px;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+.saveButton {
+  height: 33px;
+
+  padding: 0 10px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}

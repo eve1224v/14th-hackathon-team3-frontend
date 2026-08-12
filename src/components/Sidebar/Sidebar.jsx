@@ -14,12 +14,34 @@ import settingIcon from "../../assets/icons/settingIcon.svg";
 import logoutIcon from "../../assets/icons/logoutIcon.svg";
 import dropdownIcon from "../../assets/icons/dropdownIcon.svg";
 
+import { ROUTES } from "../../router/routes.constant";
+
 function Sidebar() {
   const navigate = useNavigate();
 
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
   const userName = "김메리";
+
+  /* =========================
+     Workspace Dropdown
+  ========================= */
+
+  const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(false);
+
+  const [selectedWorkspace, setSelectedWorkspace] = useState("Workspace 1");
+
+  const workspaces = [
+    "Workspace 1",
+    "Workspace 2",
+    "Workspace 3",
+    "Workspace 4",
+  ];
+
+  const handleWorkspaceSelect = (workspace) => {
+    setSelectedWorkspace(workspace);
+    setIsWorkspaceOpen(false);
+  };
 
   /* =========================
      현재 시간
@@ -44,10 +66,8 @@ function Sidebar() {
       setLondonTime(getTime("Europe/London"));
     };
 
-    // 컴포넌트가 열렸을 때 즉시 한 번 갱신
     updateTime();
 
-    // 1분마다 갱신
     const timer = setInterval(updateTime, 60 * 1000);
 
     return () => {
@@ -69,11 +89,19 @@ function Sidebar() {
 
   return (
     <aside className={styles.sidebar}>
+      {/* =========================
+          Logo
+      ========================= */}
+
       <div className={styles.logoArea}>
         <img className={styles.logo} src={logoIcon} alt="RelAi" />
       </div>
 
       <div className={styles.sidebarContent}>
+        {/* =========================
+            사용자 영역
+        ========================= */}
+
         {isLoggedIn ? (
           <>
             <div className={styles.userArea}>
@@ -91,23 +119,59 @@ function Sidebar() {
               </button>
             </div>
 
-            <div className={styles.workspaceSelectWrapper}>
-              <select
-                className={styles.workspaceSelect}
-                defaultValue="workspace1"
-              >
-                <option value="workspace1">Workspace1</option>
-              </select>
+            {/* =========================
+                Workspace Dropdown
+            ========================= */}
 
-              <img className={styles.dropdownIcon} src={dropdownIcon} alt="" />
+            <div className={styles.workspaceDropdown}>
+              <button
+                type="button"
+                className={styles.workspaceButton}
+                onClick={() => setIsWorkspaceOpen((prev) => !prev)}
+              >
+                <span>{selectedWorkspace}</span>
+
+                <img
+                  src={dropdownIcon}
+                  alt=""
+                  className={`${styles.workspaceDropdownIcon} ${
+                    isWorkspaceOpen ? styles.workspaceDropdownIconOpen : ""
+                  }`}
+                />
+              </button>
+
+              {isWorkspaceOpen && (
+                <div className={styles.workspaceMenu}>
+                  {workspaces
+                    .filter((workspace) => workspace !== selectedWorkspace)
+                    .map((workspace) => (
+                      <button
+                        key={workspace}
+                        type="button"
+                        className={styles.workspaceOption}
+                        onClick={() => handleWorkspaceSelect(workspace)}
+                      >
+                        {workspace}
+                      </button>
+                    ))}
+                </div>
+              )}
             </div>
           </>
         ) : (
           <p className={styles.loginText}>로그인이 필요해요.</p>
         )}
 
+        {/* =========================
+            Main Menu
+        ========================= */}
+
         <nav className={styles.menu}>
-          <button type="button" className={styles.menuItem}>
+          <button
+            type="button"
+            className={styles.menuItem}
+            onClick={() => navigate(ROUTES.HOME)}
+          >
             <img src={homeIcon} alt="" />
             <span>Home</span>
           </button>
@@ -128,12 +192,21 @@ function Sidebar() {
           </button>
         </nav>
 
+        {/* =========================
+            Create Menu
+        ========================= */}
+
         <div className={styles.actionMenu}>
           {isLoggedIn ? (
             <>
               <button type="button">Create Issue</button>
 
-              <button type="button">Create Project</button>
+              <button
+                type="button"
+                onClick={() => navigate(ROUTES.CREATE_PROJECT)}
+              >
+                Create Project
+              </button>
             </>
           ) : (
             <>
@@ -145,22 +218,24 @@ function Sidebar() {
         </div>
 
         {/* =========================
-            실제 현재 시간
+            현재 시간
         ========================= */}
 
         <div className={styles.timeSection}>
           <div>
             <p>[KR] Seoul, Korea</p>
-
             <strong>{seoulTime}</strong>
           </div>
 
           <div>
             <p>[UK] London, United Kingdom</p>
-
             <strong>{londonTime}</strong>
           </div>
         </div>
+
+        {/* =========================
+            Bottom Menu
+        ========================= */}
 
         <div className={styles.bottomMenu}>
           <div className={styles.notifyRow}>

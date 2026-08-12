@@ -1,0 +1,208 @@
+.container {
+  position: relative;
+
+  width: 1206px;
+  min-width: 1206px;
+
+  min-height: 1024px;
+
+  box-sizing: border-box;
+
+  padding-top: 95px;
+  padding-left: 90px;
+  padding-bottom: 120px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+.card {
+  width: 690px;
+
+  box-sizing: border-box;
+}
+
+.title {
+  margin: 0 0 16px;
+
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.description {
+  width: 690px;
+
+  margin: 0 0 31px;
+
+  color: #fff;
+
+  font-size: 12px;
+  line-height: 110%;
+}
+
+.sectionHeader {
+  width: 690px;
+
+  margin-bottom: 23px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.addServiceButton {
+  height: 33px;
+
+  padding: 0 10px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.serviceList {
+  width: 690px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.serviceCard {
+  min-height: 81px;
+
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 34px 1fr 150px 65px 48px;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 22px 15px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background: #1b1f35;
+}
+
+.serviceIcon {
+  width: 32px;
+  height: 32px;
+
+  object-fit: contain;
+}
+
+.serviceInfo strong {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.serviceInfo p {
+  margin: 6px 0 0;
+
+  color: #fff;
+
+  font-size: 12px;
+}
+
+.syncInfo {
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-end;
+
+  gap: 6px;
+}
+
+.connectedStatus {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.errorStatus {
+  color: #eb4335;
+
+  font-size: 12px;
+}
+
+.syncInfo span {
+  color: #fff;
+
+  font-size: 12px;
+}
+
+.scopeButton {
+  height: 31px;
+
+  padding: 0 10px;
+
+  border: 1px solid #4d67ff;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.disconnectButton {
+  height: 31px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #ff514b;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.guideArea {
+  margin-top: 45px;
+}
+
+.guideArea h2 {
+  margin: 0 0 16px;
+
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.guideArea p {
+  margin: 5px 0;
+
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 110%;
+}

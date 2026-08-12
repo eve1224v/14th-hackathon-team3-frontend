@@ -124,9 +124,10 @@
   display: flex;
   align-items: center;
 
-  gap: 8px;
+  gap: 6px;
 
   font-size: 11px;
+  color: rgba(0, 0, 0, 0.8);
 }
 
 .findPassword {
@@ -183,6 +184,7 @@
 .socialButton img {
   width: 22px;
   height: 22px;
+  align-items: center;
 
   object-fit: contain;
 }
@@ -195,7 +197,7 @@
 
   gap: 8px;
 
-  color: #aaa;
+  color: rgba(0, 0, 0, 0.4);
 
   font-size: 11px;
 }
@@ -206,7 +208,7 @@
   border: none;
   background: none;
 
-  color: #777;
+  color: rgba(0, 0, 0, 0.8);
 
   text-decoration: underline;
 }
