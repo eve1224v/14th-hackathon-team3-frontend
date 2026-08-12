@@ -87,7 +87,7 @@
 
   border-radius: 8px;
   border: 1px solid var(--border-color, #252a44);
-  background: var(--background-color, #1b1f35);
+  background: var(--background-color, #252a44);
 
   color: #ffffff;
 
@@ -186,7 +186,7 @@
 
   border-radius: 8px;
   border: 1px solid var(--border-color, #252a44);
-  background: var(--background-color, #1b1f35);
+  background: var(--background-color, #252a44);
 
   color: #ffffff;
 

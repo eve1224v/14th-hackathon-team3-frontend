@@ -11,6 +11,10 @@ import searchIcon from "../../../../assets/icons/searchIcon.svg";
 function CreateProjectForm() {
   const navigate = useNavigate();
 
+  /* =========================
+     Calendar State
+  ========================= */
+
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const [startDate, setStartDate] = useState("");
@@ -22,6 +26,35 @@ function CreateProjectForm() {
 
   // 처음 보여줄 달력: 2026년 8월
   const [currentDate, setCurrentDate] = useState(new Date(2026, 7, 1));
+
+  /* =========================
+     Company Search State
+  ========================= */
+
+  const [searchCompany, setSearchCompany] = useState("");
+
+  const companies = [
+    {
+      id: 1,
+      name: "기업 A",
+      role: "주관사",
+      isMine: true,
+    },
+    {
+      id: 2,
+      name: "기업 B",
+      role: "파트너사",
+      isMine: false,
+    },
+  ];
+
+  const filteredCompanies = companies.filter((company) =>
+    company.name.toLowerCase().includes(searchCompany.trim().toLowerCase()),
+  );
+
+  /* =========================
+     Navigation
+  ========================= */
 
   const handleCreateProject = () => {
     navigate(ROUTES.PROJECT_SETTINGS);
@@ -36,29 +69,36 @@ function CreateProjectForm() {
   ========================= */
 
   const formatDate = (date) => {
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
 
-    return `${day}/${month}/${year}`;
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}/${month}/${day}`;
   };
 
   const parseDate = (value) => {
-    if (!value) return null;
+    if (!value) {
+      return null;
+    }
 
     const parts = value.split("/");
 
-    if (parts.length !== 3) return null;
+    if (parts.length !== 3) {
+      return null;
+    }
 
-    const day = Number(parts[0]);
+    const year = Number(parts[0]);
     const month = Number(parts[1]);
-    const year = Number(parts[2]);
+    const day = Number(parts[2]);
 
-    if (!day || !month || !year) return null;
+    if (!year || !month || !day) {
+      return null;
+    }
 
     const date = new Date(year, month - 1, day);
 
-    // 32/08/2026 같은 잘못된 날짜 방지
+    // 잘못된 날짜 방지
     if (
       date.getFullYear() !== year ||
       date.getMonth() !== month - 1 ||
@@ -71,7 +111,9 @@ function CreateProjectForm() {
   };
 
   const isSameDate = (date1, date2) => {
-    if (!date1 || !date2) return false;
+    if (!date1 || !date2) {
+      return false;
+    }
 
     return (
       date1.getFullYear() === date2.getFullYear() &&
@@ -81,6 +123,7 @@ function CreateProjectForm() {
   };
 
   const selectedStartDate = parseDate(startDate);
+
   const selectedEndDate = parseDate(endDate);
 
   const isBetweenDates = (date) => {
@@ -114,8 +157,8 @@ function CreateProjectForm() {
     // 마감 날짜 선택
     const start = parseDate(startDate);
 
-    // 시작 날짜보다 이전 날짜를 두 번째로 누르면
-    // 해당 날짜를 새로운 시작 날짜로 처리
+    // 시작 날짜보다 이전 날짜를
+    // 두 번째로 누르면 새로운 시작 날짜로 설정
     if (start && date.getTime() < start.getTime()) {
       setStartDate(formattedDate);
       setEndDate("");
@@ -128,9 +171,6 @@ function CreateProjectForm() {
     setEndDate(formattedDate);
 
     setSelectingStart(true);
-
-    // 선택 결과를 달력에서 볼 수 있도록
-    // 자동으로 닫지 않음
   };
 
   const handlePreviousMonth = () => {
@@ -150,6 +190,7 @@ function CreateProjectForm() {
   ========================= */
 
   const year = currentDate.getFullYear();
+
   const month = currentDate.getMonth();
 
   const firstDay = new Date(year, month, 1).getDay();
@@ -160,33 +201,42 @@ function CreateProjectForm() {
 
   const calendarDays = [];
 
-  // 이전 달 날짜
+  /* 이전 달 */
+
   for (let i = firstDay - 1; i >= 0; i--) {
     const day = previousMonthLastDate - i;
 
     calendarDays.push({
       day,
+
       date: new Date(year, month - 1, day),
+
       currentMonth: false,
     });
   }
 
-  // 이번 달 날짜
+  /* 이번 달 */
+
   for (let day = 1; day <= lastDate; day++) {
     calendarDays.push({
       day,
+
       date: new Date(year, month, day),
+
       currentMonth: true,
     });
   }
 
-  // 다음 달 날짜
+  /* 다음 달 */
+
   let nextMonthDay = 1;
 
   while (calendarDays.length < 42) {
     calendarDays.push({
       day: nextMonthDay,
+
       date: new Date(year, month + 1, nextMonthDay),
+
       currentMonth: false,
     });
 
@@ -249,10 +299,8 @@ function CreateProjectForm() {
               id="startDate"
               type="text"
               value={startDate}
-              placeholder="06/08/2026"
-              onChange={(e) => {
-                setStartDate(e.target.value);
-              }}
+              placeholder="2026/08/06"
+              onChange={(e) => setStartDate(e.target.value)}
             />
           </div>
 
@@ -263,10 +311,8 @@ function CreateProjectForm() {
               id="endDate"
               type="text"
               value={endDate}
-              placeholder="24/08/2026"
-              onChange={(e) => {
-                setEndDate(e.target.value);
-              }}
+              placeholder="2026/08/24"
+              onChange={(e) => setEndDate(e.target.value)}
             />
           </div>
         </div>
@@ -308,7 +354,7 @@ function CreateProjectForm() {
               <span>SUN</span>
               <span>MON</span>
               <span>TUE</span>
-              <span>WEN</span>
+              <span>WED</span>
               <span>THU</span>
               <span>FRI</span>
               <span>SAT</span>
@@ -357,6 +403,8 @@ function CreateProjectForm() {
       <section className={`${styles.card} ${styles.companyCard}`}>
         <h2 className={styles.cardTitle}>참여 기업</h2>
 
+        {/* 검색 */}
+
         <div className={styles.searchWrapper}>
           <img src={searchIcon} className={styles.searchIcon} alt="" />
 
@@ -364,35 +412,35 @@ function CreateProjectForm() {
             type="text"
             className={styles.searchInput}
             placeholder="기업명 검색"
+            value={searchCompany}
+            onChange={(e) => setSearchCompany(e.target.value)}
           />
         </div>
 
+        {/* 기업 목록 */}
+
         <div className={styles.companyList}>
-          {/* 기업 A */}
-          <div className={styles.companyItem}>
-            <div className={styles.companyCircle} />
+          {filteredCompanies.length > 0 ? (
+            filteredCompanies.map((company) => (
+              <div className={styles.companyItem} key={company.id}>
+                <div className={styles.companyCircle} />
 
-            <div className={styles.companyInfo}>
-              <div className={styles.companyNameRow}>
-                <strong>기업 A</strong>
+                <div className={styles.companyInfo}>
+                  <div className={styles.companyNameRow}>
+                    <strong>{company.name}</strong>
 
-                <span className={styles.badge}>내 소속</span>
+                    {company.isMine && (
+                      <span className={styles.badge}>내 소속</span>
+                    )}
+                  </div>
+
+                  <p>{company.role}</p>
+                </div>
               </div>
-
-              <p>주관사</p>
-            </div>
-          </div>
-
-          {/* 기업 B */}
-          <div className={styles.companyItem}>
-            <div className={styles.companyCircle} />
-
-            <div className={styles.companyInfo}>
-              <strong>기업 B</strong>
-
-              <p>파트너사</p>
-            </div>
-          </div>
+            ))
+          ) : (
+            <p className={styles.noCompany}>검색 결과가 없습니다.</p>
+          )}
         </div>
 
         <button type="button" className={styles.addCompanyButton}>

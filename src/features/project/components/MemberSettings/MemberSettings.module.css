@@ -1,0 +1,515 @@
+.container {
+  position: relative;
+
+  width: 1206px;
+  min-width: 1206px;
+
+  min-height: 1024px;
+
+  box-sizing: border-box;
+
+  padding-top: 95px;
+  padding-left: 90px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+/* =========================
+   공통 카드
+========================= */
+
+.inviteCard,
+.memberCard {
+  width: 690px;
+
+  box-sizing: border-box;
+
+  padding: 20px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background: #13172b;
+}
+
+/* =========================
+   Title
+========================= */
+
+.title {
+  margin: 0 0 22px;
+
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* =========================
+   초대 카드
+========================= */
+
+.inviteCard {
+  margin-bottom: 21px;
+}
+
+.inviteCard h2,
+.memberCard h2 {
+  margin: 0 0 16px;
+
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.inviteCard label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  font-size: 12px;
+}
+
+/* =========================
+   이메일 초대
+========================= */
+
+.emailRow {
+  display: flex;
+
+  gap: 11px;
+}
+
+.emailRow input {
+  flex: 1;
+
+  height: 39px;
+
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background: #1b1f35;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+
+  outline: none;
+}
+
+.emailRow input:focus {
+  border-color: #4d67ff;
+}
+
+.inviteButton {
+  width: 41px;
+  height: 33px;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+
+  cursor: pointer;
+}
+
+/* =========================
+   초대 코드
+========================= */
+
+.inviteLinkRow {
+  margin-top: 19px;
+
+  display: flex;
+  align-items: center;
+}
+
+.copyButton {
+  height: 33px;
+
+  padding: 0 10px;
+
+  border: none;
+  border-radius: 8px 0 0 8px;
+
+  background: #ffffff;
+
+  color: #000000;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+
+  cursor: pointer;
+}
+
+.inviteLink {
+  width: 414px;
+  height: 33px;
+
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  border-radius: 0 6px 6px 0;
+
+  background: rgba(86, 112, 255, 0.2);
+
+  color: #ffffff;
+
+  font-size: 12px;
+}
+
+/* =========================
+   멤버 카드 Header
+========================= */
+
+.memberTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.helpWrapper {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+}
+
+.helpButton {
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.helpIcon {
+  display: block;
+
+  width: 24px;
+  height: 24px;
+
+  object-fit: contain;
+}
+
+/* =========================
+   역할 설명 Tooltip
+========================= */
+
+.roleTooltip {
+  position: absolute;
+
+  /*
+    help 아이콘 오른쪽에 표시
+  */
+  top: -24px;
+  left: calc(100% + 24px);
+
+  width: 375px;
+
+  box-sizing: border-box;
+
+  padding: 20px;
+
+  border: 1px solid #3b425f;
+  border-radius: 8px;
+
+  background: #303751;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+
+  /*
+    기본 상태에서는 숨김
+  */
+  opacity: 0;
+  visibility: hidden;
+
+  transform: translateX(-5px);
+
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s ease;
+
+  pointer-events: none;
+
+  z-index: 200;
+}
+
+/* help 아이콘 hover 시 표시 */
+
+.helpWrapper:hover .roleTooltip {
+  opacity: 1;
+  visibility: visible;
+
+  transform: translateX(0);
+}
+
+/* =========================
+   Tooltip 제목
+========================= */
+
+.tooltipTitle {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 18px;
+}
+
+.tooltipTitle img {
+  display: block;
+
+  width: 20px;
+  height: 20px;
+
+  object-fit: contain;
+}
+
+.tooltipTitle strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================
+   Tooltip 내용
+========================= */
+
+.tooltipContent {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.tooltipItem {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.tooltipItem strong {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tooltipItem p {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%;
+}
+
+/* =========================
+   멤버 Row
+========================= */
+
+.memberRow {
+  min-height: 62px;
+
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.memberRow:last-child {
+  border-bottom: none;
+}
+
+/* =========================
+   Avatar
+========================= */
+
+.avatar {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #d9d9d9;
+}
+
+/* =========================
+   멤버 정보
+========================= */
+
+.memberInfo {
+  margin-left: 17px;
+
+  flex: 1;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+.nameRow strong {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ownerBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 20px;
+
+  box-sizing: border-box;
+
+  padding: 0 7.5px;
+
+  border-radius: 6px;
+
+  background: rgba(57, 87, 255, 0.74);
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 400;
+}
+
+.memberInfo p {
+  margin: 4px 0 0;
+
+  color: #ffffff;
+
+  font-size: 12px;
+}
+
+/* =========================
+   역할 Select
+========================= */
+
+.roleSelectWrapper {
+  position: relative;
+
+  width: 80px;
+  height: 32px;
+
+  flex-shrink: 0;
+}
+
+.roleSelect {
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+
+  padding: 0 30px 0 10px;
+
+  border: none;
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+
+  outline: none;
+  cursor: pointer;
+
+  /* 기본 select 화살표 제거 */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.roleSelect option {
+  color: #111111;
+
+  background: #ffffff;
+}
+
+.dropdownIcon {
+  position: absolute;
+
+  top: 50%;
+  right: 7px;
+
+  width: 16px;
+  height: 16px;
+
+  transform: translateY(-50%);
+
+  display: block;
+
+  object-fit: contain;
+
+  pointer-events: none;
+}
+
+/* =========================
+   초대 대기 Row
+========================= */
+
+.pendingRow {
+  min-height: 62px;
+
+  display: flex;
+  align-items: center;
+}
+
+.pendingAvatar {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  border: 1px dashed #ffffff;
+  border-radius: 50%;
+}
+
+.pendingEmail {
+  margin-left: 17px;
+
+  font-size: 12px;
+}
+
+.pendingText {
+  margin-left: auto;
+
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 12px;
+}
