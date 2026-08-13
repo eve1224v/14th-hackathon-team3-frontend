@@ -4,8 +4,6 @@ import styles from "./LoginModal.module.css";
 
 import logoIcon2 from "../../../../assets/icons/logo2.svg";
 import eyeIcon from "../../../../assets/icons/eyeIcon.svg";
-import googleIcon from "../../../../assets/icons/googleIcon.svg";
-import microsoftIcon from "../../../../assets/icons/microsoftIcon.svg";
 
 function LoginModal({ onClose, onSignupClick }) {
   const navigate = useNavigate();
@@ -23,11 +21,7 @@ function LoginModal({ onClose, onSignupClick }) {
         className={styles.modal}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <img
-          className={styles.logo}
-          src={logoIcon2}
-          alt="RelAi"
-        />
+        <img className={styles.logo} src={logoIcon2} alt="RelAi" />
 
         <h2>다시 오신 것을 환영합니다</h2>
 
@@ -57,15 +51,7 @@ function LoginModal({ onClose, onSignupClick }) {
         </div>
 
         <div className={styles.optionRow}>
-          <label className={styles.keepLogin}>
-            <input type="checkbox" />
-            <span>로그인 상태 유지하기</span>
-          </label>
-
-          <button
-            type="button"
-            className={styles.findPassword}
-          >
+          <button type="button" className={styles.findPassword}>
             비밀번호를 잊으셨나요?
           </button>
         </div>
@@ -78,29 +64,10 @@ function LoginModal({ onClose, onSignupClick }) {
           로그인
         </button>
 
-        <button
-          type="button"
-          className={styles.socialButton}
-        >
-          <img src={googleIcon} alt="" />
-          <span>Google로 계속하기</span>
-        </button>
-
-        <button
-          type="button"
-          className={styles.socialButton}
-        >
-          <img src={microsoftIcon} alt="" />
-          <span>Microsoft로 계속하기</span>
-        </button>
-
         <div className={styles.signupArea}>
           <span>아직 계정이 없으신가요?</span>
 
-          <button
-            type="button"
-            onClick={onSignupClick}
-          >
+          <button type="button" onClick={onSignupClick}>
             회원가입
           </button>
         </div>
