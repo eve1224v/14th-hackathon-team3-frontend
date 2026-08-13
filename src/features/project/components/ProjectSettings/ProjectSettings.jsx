@@ -20,7 +20,7 @@ function ProjectSettings() {
   };
 
   const handleProjectHome = () => {
-    navigate(ROUTES.HOME);
+    navigate(ROUTES.DASHBOARD);
   };
 
   return (
