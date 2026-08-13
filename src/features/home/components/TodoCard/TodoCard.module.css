@@ -1,0 +1,129 @@
+.todoCard {
+  width: 690px;
+  height: 83px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  padding-top: 15px;
+  padding-right: 33px;
+  padding-bottom: 14px;
+  padding-left: 38px;
+
+  border-radius: 8px;
+
+  background-color: #15192f;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+/* =========================
+   왼쪽 정보
+========================= */
+
+.todoLeft {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+
+.todoTitle {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  height: 13px;
+}
+
+
+.todoDot {
+  position: absolute;
+
+  left: -25px;
+
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background-color: #4d67ff;
+}
+
+
+.todoTitle strong {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+.todoLeft p {
+  margin: 6px 0 0;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   오른쪽 날짜
+========================= */
+
+.todoRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+
+.todoRight > strong {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+.todoDates {
+  margin-top: 14px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-size: 10px;
+  font-weight: 300;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}

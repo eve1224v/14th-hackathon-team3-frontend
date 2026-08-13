@@ -1,0 +1,145 @@
+.projectCard {
+  width: 224px;
+  height: 223px;
+
+  box-sizing: border-box;
+
+  padding-top: 26px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+  padding-left: 20px;
+
+  border-radius: 8px;
+
+  background-color: #15192f;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+/* =========================
+   프로젝트 이름
+========================= */
+
+.projectCard h3 {
+  width: 150px;
+
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.93);
+
+  font-size: 16px;
+  font-weight: 600;
+
+  /* 두 줄 사이 간격 */
+  line-height: 115%;
+
+  letter-spacing: 0;
+}
+
+
+/* =========================
+   참여 기업
+========================= */
+
+.projectCompany {
+  margin: 13px 0 0;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 100%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   Cycle
+========================= */
+
+.projectCycle {
+  margin: 37px 0 0;
+
+  color: rgba(255, 255, 255, 0.93);
+
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 98%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   진행률
+========================= */
+
+.progressRow {
+  display: flex;
+  align-items: center;
+
+  margin-top: 9px;
+}
+
+
+.progressTrack {
+  width: 148px;
+  height: 25px;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  border-radius: 7.12px;
+
+  background-color: #1b1f35;
+}
+
+
+.progressFill {
+  height: 100%;
+
+  border-radius: 7.12px;
+
+  background-color: #6b76b5;
+}
+
+
+.progressText {
+  margin-left: 10px;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 98%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   이슈 / 완료
+========================= */
+
+.projectMeta {
+  margin: 24px 0 0;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 100%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}

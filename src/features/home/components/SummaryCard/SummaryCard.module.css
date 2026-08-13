@@ -1,0 +1,71 @@
+.summaryCard {
+  position: relative;
+
+  width: 160px;
+  height: 76px;
+
+  box-sizing: border-box;
+
+  border-radius: 8px;
+
+  background-color: #15192f;
+}
+
+
+/* =========================
+   상태 이름
+========================= */
+
+.summaryLabel {
+  position: absolute;
+
+  top: 11px;
+  left: 13px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+.statusDot {
+  width: 9px;
+  height: 9px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+
+/* =========================
+   숫자
+========================= */
+
+.summaryCount {
+  position: absolute;
+
+  right: 18px;
+  bottom: 12px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 110%;
+
+  letter-spacing: 0;
+}
