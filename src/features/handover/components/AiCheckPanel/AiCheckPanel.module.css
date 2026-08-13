@@ -1,0 +1,180 @@
+.panel {
+  width: 312px;
+  height: 216px;
+
+  box-sizing: border-box;
+
+  padding: 20px 23px;
+
+  border-radius: 8px;
+
+  background: #15192f;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+.header {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.header h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.totalBadge {
+  min-width: 21px;
+  height: 16.5px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 6px;
+
+  border-radius: 6px;
+
+  background: rgba(57, 87, 255, 0.3);
+
+  color: #ffffff;
+
+  font-size: 9px;
+}
+
+
+/* 첫 항목 */
+
+.firstItem,
+.secondItem {
+  position: relative;
+
+  width: 266px;
+
+  display: flex;
+
+  box-sizing: border-box;
+}
+
+
+.firstItem {
+  margin-top: 21px;
+}
+
+
+.secondItem {
+  margin-top: 19px;
+}
+
+
+.itemIcon {
+  width: 24px;
+  height: 24px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}
+
+
+.textArea {
+  margin-left: 12px;
+}
+
+
+.textArea strong {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.textArea p {
+  margin: 16px 0 0;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.countBadge {
+  position: absolute;
+
+  top: 0;
+  right: 7px;
+
+  min-width: 21px;
+  height: 16.5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 6px;
+
+  box-sizing: border-box;
+
+  border-radius: 6px;
+
+  background: rgba(57, 87, 255, 0.3);
+
+  color: #ffffff;
+
+  font-size: 9px;
+}
+
+
+.arrowIcon {
+  position: absolute;
+
+  right: 0;
+  bottom: -3px;
+
+  width: 24px;
+  height: 24px;
+
+  box-sizing: border-box;
+
+  padding: 6px 8px;
+
+  object-fit: contain;
+
+  opacity: 0.55;
+}
+
+
+.divider {
+  width: 266px;
+  height: 1px;
+
+  margin-top: 22px;
+
+  background: rgba(255, 255, 255, 0.08);
+}

@@ -1,0 +1,447 @@
+.dashboard {
+  position: relative;
+
+  width: 100%;
+  min-height: 1530px;
+
+  box-sizing: border-box;
+
+  padding-top: 93px;
+  padding-left: 57px;
+  padding-right: 52px;
+  padding-bottom: 100px;
+
+  background-color: #0d1021;
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.pageHeader {
+  position: relative;
+
+  width: 100%;
+}
+
+
+.headerText {
+  width: 500px;
+}
+
+
+.pageHeader h1 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* 프로젝트명 + Cycle */
+
+.projectRow {
+  display: flex;
+  align-items: center;
+
+  gap: 17px;
+
+  margin-top: 13px;
+}
+
+
+.projectRow strong {
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 98%;
+
+  white-space: nowrap;
+}
+
+
+.cycleBadge {
+  width: 46px;
+  height: 16.5px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  background-color: rgba(57, 87, 255, 0.74);
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* AI 업데이트 문구 */
+
+.aiNotice {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  margin-top: 29px;
+
+  color: rgba(255, 255, 255, 0.5);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 120%;
+
+  white-space: nowrap;
+}
+
+
+.aiNotice img {
+  width: 12px;
+  height: 12px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}
+
+
+/* =========================
+   상단 버튼
+========================= */
+
+.headerButtons {
+  position: absolute;
+
+  top: 57px;
+  left: 530px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+
+.refreshButton,
+.issueButton {
+  height: 31px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.refreshButton {
+  width: 67px;
+
+  border: 1px solid #4d67ff;
+
+  background: transparent;
+}
+
+
+.issueButton {
+  width: 78px;
+
+  border: 1px solid #4d67ff;
+
+  background: #4d67ff;
+}
+
+
+/* =========================
+   메인 2열
+========================= */
+
+.contentGrid {
+  display: grid;
+
+  grid-template-columns: 690px 312px;
+
+  column-gap: 61px;
+
+  align-items: start;
+
+  margin-top: 26px;
+}
+
+
+.mainColumn {
+  width: 690px;
+}
+
+
+.sideColumn {
+  width: 312px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+
+  margin-top: 32px;
+}
+
+
+/*
+  전달 정보가 기존보다 조금 위로 오도록
+  오른쪽 패널 사이 간격을 18px → 14px로 수정
+*/
+
+
+/* =========================
+   공통 제목
+========================= */
+
+.sectionTitle {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   AI 검토 결과
+========================= */
+
+.reviewSection {
+  width: 690px;
+}
+
+
+.summaryGrid {
+  display: grid;
+
+  grid-template-columns: repeat(4, 160px);
+
+  gap: 10px;
+
+  margin-top: 14px;
+}
+
+
+/* =========================
+   할 일
+========================= */
+
+.todoSection {
+  position: relative;
+
+  width: 690px;
+
+  margin-top: 25px;
+}
+
+
+.todoHeader {
+  width: 690px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.viewAllButton {
+  width: 65px;
+  height: 24px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 5px;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  font-family: Pretendard, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+
+  cursor: pointer;
+}
+
+
+.viewAllButton img {
+  width: 6px;
+  height: 11px;
+
+  object-fit: contain;
+
+  opacity: 0.6;
+}
+
+
+/* =========================
+   업무 전체 영역
+========================= */
+
+.taskBoard {
+  position: relative;
+
+  width: 690px;
+  height: 973px;
+
+  box-sizing: border-box;
+
+  margin-top: 17px;
+
+  padding: 24px 27px 0;
+
+  border: 1px solid rgba(37, 42, 68, 0.4);
+  border-radius: 8px;
+}
+
+
+.sectionList {
+  display: flex;
+  flex-direction: column;
+
+  gap: 27px;
+}
+
+
+/* =========================
+   하단 버튼
+========================= */
+
+.bottomActions {
+  position: relative;
+
+  width: 690px;
+  height: 31px;
+
+  box-sizing: border-box;
+
+  margin-top: 16px;
+}
+
+
+/* 임시 저장 */
+
+.saveButton {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 67px;
+  height: 31px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+/* 인수인계 전달 */
+
+.transferButton {
+  position: absolute;
+
+  top: 0;
+  right: 0;
+
+  width: 99px;
+  height: 31px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.transferArrow {
+  font-size: 15px;
+  line-height: 1;
+}

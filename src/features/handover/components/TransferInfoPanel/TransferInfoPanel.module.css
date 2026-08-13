@@ -1,0 +1,337 @@
+.panel {
+  width: 312px;
+  height: 353px;
+
+  box-sizing: border-box;
+
+  padding: 27px 23px 35px;
+
+  border-radius: 8px;
+
+  background: #15192f;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+
+.header h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.editButton {
+  width: 40px;
+  height: 27px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid #4d67ff;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+
+  cursor: pointer;
+}
+
+
+/* =========================
+   LABEL
+========================= */
+
+.label {
+  display: block;
+
+  color: rgba(255, 255, 255, 0.5);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   전달 대상
+========================= */
+
+.targetSection {
+  margin-top: 17px;
+}
+
+
+.targetRow {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 13px;
+}
+
+
+.targetRow strong {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.partnerBadge {
+  width: 47px;
+  height: 16.5px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  background: rgba(57, 87, 255, 0.3);
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.teamName {
+  margin: 5px 0 0;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   담당자
+========================= */
+
+.managerSection {
+  margin-top: 20px;
+}
+
+
+.managerRow {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  margin-top: 14px;
+}
+
+
+.avatar {
+  width: 24px;
+  height: 24px;
+
+  flex: 0 0 24px;
+
+  border-radius: 50%;
+
+  background: #e2e2e2;
+}
+
+
+.managerRow span {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   전달 시점
+========================= */
+
+.timeSection {
+  margin-top: 20px;
+}
+
+
+.radioRow {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  min-height: 16px;
+
+  margin-top: 14px;
+
+  cursor: pointer;
+}
+
+
+.radioRow + .radioRow {
+  margin-top: 7px;
+}
+
+
+.radioRow input {
+  position: absolute;
+
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+
+.customRadio {
+  position: relative;
+
+  width: 16px;
+  height: 16px;
+
+  flex: 0 0 16px;
+
+  box-sizing: border-box;
+
+  border: 2px solid #8a8e9d;
+  border-radius: 50%;
+
+  background: #c2c4cb;
+}
+
+
+.radioRow input:checked + .customRadio {
+  border-color: #3957ff;
+
+  background: transparent;
+}
+
+
+.radioRow input:checked + .customRadio::after {
+  content: "";
+
+  position: absolute;
+
+  top: 3px;
+  left: 3px;
+
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #3957ff;
+}
+
+
+.radioText {
+  margin-left: 12px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   날짜
+========================= */
+
+.dateBox {
+  width: 217px;
+  height: 33px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 12px;
+  margin-left: 5px;
+
+  padding: 0 9px 0 14px;
+
+  border-radius: 8px;
+
+  background: #343b5d;
+}
+
+
+.dateBox span {
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.dateBox img {
+  width: 18px;
+  height: 18px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(100%);
+
+  opacity: 0.7;
+}
