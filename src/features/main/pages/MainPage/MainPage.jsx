@@ -1,45 +1,144 @@
 import { useState } from "react";
 
 import MainLayout from "../../../../components/MainLayout/MainLayout";
+
 import MainHero from "../../components/MainHero/MainHero";
+
 import LoginModal from "../../components/LoginModal/LoginModal";
 import SignupModal from "../../components/SignupModal/SignupModal";
 import OnboardingModal from "../../components/OnboardingModal/OnboardingModal";
 
-import styles from "./MainPage.module.css";
+import JoinWorkspaceModal from "../../components/JoinWorkspaceModal/JoinWorkspaceModal";
 
 function MainPage() {
-  const [modal, setModal] = useState(null);
+  /* =========================
+     Modal State
+  ========================= */
+
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
+
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+
+  const [isJoinWorkspaceOpen, setIsJoinWorkspaceOpen] = useState(false);
+
+  /* =========================
+     회원가입 사용자 이름
+  ========================= */
+
+  const [signupUserName, setSignupUserName] = useState("");
+
+  /* =========================
+     로그인 Modal 열기
+  ========================= */
+
+  const handleLoginClick = () => {
+    setIsSignupOpen(false);
+    setIsLoginOpen(true);
+  };
+
+  /* =========================
+     회원가입 Modal 열기
+  ========================= */
+
+  const handleSignupClick = () => {
+    setIsLoginOpen(false);
+    setIsSignupOpen(true);
+  };
+
+  /* =========================
+     회원가입 완료
+  ========================= */
+
+  const handleSignupComplete = (name) => {
+    // SignupModal에서 입력한 사용자 이름 저장
+    setSignupUserName(name);
+
+    // 로그인 상태 저장
+    localStorage.setItem("isLoggedIn", "true");
+
+    // 회원가입 Modal 닫기
+    setIsSignupOpen(false);
+
+    // Onboarding Modal 열기
+    setIsOnboardingOpen(true);
+  };
+
+  /* =========================
+     Onboarding 닫기
+  ========================= */
+
+  const handleOnboardingClose = () => {
+    setIsOnboardingOpen(false);
+
+    /*
+      Sidebar와 MainHero가 localStorage의
+      로그인 상태를 다시 읽도록 갱신
+    */
+    window.location.reload();
+  };
+
+  /* =========================
+     초대받은 Workspace
+  ========================= */
+
+  const handleJoinWorkspaceClick = () => {
+    setIsJoinWorkspaceOpen(true);
+  };
 
   return (
     <MainLayout>
-      <div className={styles.glowSmall} />
-      <div className={styles.glowLarge} />
+      {/* =========================
+          Main Hero
+      ========================= */}
 
       <MainHero
-        onLoginClick={() => setModal("login")}
-        onSignupClick={() => setModal("signup")}
+        onLoginClick={handleLoginClick}
+        onSignupClick={handleSignupClick}
+        onJoinWorkspaceClick={handleJoinWorkspaceClick}
       />
 
-      {modal === "login" && (
+      {/* =========================
+          Login Modal
+      ========================= */}
+
+      {isLoginOpen && (
         <LoginModal
-          onClose={() => setModal(null)}
-          onSignupClick={() => setModal("signup")}
+          onClose={() => setIsLoginOpen(false)}
+          onSignupClick={handleSignupClick}
         />
       )}
 
-      {modal === "signup" && (
+      {/* =========================
+          Signup Modal
+      ========================= */}
+
+      {isSignupOpen && (
         <SignupModal
-          onClose={() => setModal(null)}
-          onLoginClick={() => setModal("login")}
-          onSignupComplete={() => setModal("onboarding")}
+          onClose={() => setIsSignupOpen(false)}
+          onLoginClick={handleLoginClick}
+          onSignupComplete={handleSignupComplete}
         />
       )}
 
-      {modal === "onboarding" && (
+      {/* =========================
+          Onboarding Modal
+      ========================= */}
+
+      {isOnboardingOpen && (
         <OnboardingModal
-          onClose={() => setModal(null)}
+          userName={signupUserName}
+          onClose={handleOnboardingClose}
         />
+      )}
+
+      {/* =========================
+          Join Workspace Modal
+      ========================= */}
+
+      {isJoinWorkspaceOpen && (
+        <JoinWorkspaceModal onClose={() => setIsJoinWorkspaceOpen(false)} />
       )}
     </MainLayout>
   );

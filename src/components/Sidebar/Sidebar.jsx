@@ -170,7 +170,7 @@ function Sidebar() {
           <button
             type="button"
             className={styles.menuItem}
-            onClick={() => navigate(ROUTES.HOME)}
+            onClick={() => navigate(ROUTES.DASHBOARD)}
           >
             <img src={homeIcon} alt="" />
             <span>Home</span>

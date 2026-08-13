@@ -2,56 +2,97 @@
   position: relative;
 
   width: 100%;
-  height: 100%;
+  min-height: 100%;
+
+  box-sizing: border-box;
 
   padding-top: 140px;
-  padding-left: 88px;
+  padding-left: 90px;
+  padding-bottom: 80px;
 
   color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
 }
 
+/* =========================
+   Title
+========================= */
+
 .title {
-  margin: 0 0 40px;
+  margin: 0 0 34px;
+
+  color: #ffffff;
 
   font-size: 28px;
   font-weight: 700;
-
   line-height: 110%;
 }
 
-.formGrid {
-  display: flex;
+/* =========================
+   Form Grid
+========================= */
 
-  gap: 128px;
+.formGrid {
+  width: 660px;
+
+  display: grid;
+
+  grid-template-columns: 280px 280px;
+
+  column-gap: 100px;
+
+  align-items: flex-start;
 }
+
+/* =========================
+   Column
+========================= */
 
 .leftColumn,
 .rightColumn {
+  width: 280px;
+
   display: flex;
   flex-direction: column;
 }
 
-.leftColumn {
-  gap: 40px;
+.rightColumn {
+  position: relative;
 }
+
+/* =========================
+   Field
+========================= */
 
 .field {
+  width: 100%;
+
   display: flex;
   flex-direction: column;
 
-  gap: 7px;
+  gap: 8px;
+
+  margin-bottom: 22px;
 }
 
 .field label {
+  color: #ffffff;
+
   font-size: 12px;
   font-weight: 400;
-
   line-height: 110%;
 }
 
-.field input {
-  width: 330px;
-  height: 43px;
+/* =========================
+   Input 공통
+========================= */
+
+.field > input {
+  width: 100%;
+  height: 39px;
+
+  box-sizing: border-box;
 
   padding: 0 12px;
 
@@ -62,64 +103,168 @@
 
   color: #ffffff;
 
+  font-family: Pretendard, sans-serif;
   font-size: 12px;
 
   outline: none;
 }
 
-.field input:focus {
-  border-color: #4f6bff;
+.field > input:focus {
+  border-color: #4d67ff;
 }
 
+/* =========================
+   팀원 Email List
+========================= */
+
+.memberEmailList {
+  width: 280px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.memberEmailList input {
+  width: 280px;
+  height: 39px;
+
+  flex-shrink: 0;
+
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background: #1b1f35;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+
+  outline: none;
+}
+
+.memberEmailList input:focus {
+  border-color: #4d67ff;
+}
+
+.memberEmailList input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* =========================
+   팀원 추가 버튼 영역
+========================= */
+
+.plusMemberArea {
+  width: 280px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 8px;
+}
+
+/* 실제 + 아이콘 버튼 */
+
+.plusMemberButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.plusMemberIcon {
+  display: block;
+
+  width: 24px;
+  height: 24px;
+
+  object-fit: contain;
+}
+
+/* =========================
+   초대 코드
+========================= */
+
 .inviteArea {
-  margin-top: 80px;
+  width: 660px;
+
+  margin-top: 28px;
 
   display: flex;
   align-items: center;
 }
 
 .inviteButton {
-  width: 89px;
-  height: 33px;
+  height: 31px;
+
+  flex-shrink: 0;
+
+  padding: 0 10px;
 
   border: none;
-  border-radius: 6px 0 0 6px;
+  border-radius: 8px 0 0 8px;
 
-  background-color: #ffffff;
+  background: #ffffff;
 
-  color: #000;
+  color: #111111;
 
+  font-family: Pretendard, sans-serif;
   font-size: 12px;
-  font-weight: 400;
+  font-weight: 500;
+
+  cursor: pointer;
 }
 
 .inviteCodeInput {
-  width: 400px;
-  height: 33px;
+  width: 414px;
+  height: 31px;
+
+  box-sizing: border-box;
 
   padding: 0 12px;
 
-  border: 1px solid #252a44;
-  border-left: none;
-
+  border: none;
   border-radius: 0 6px 6px 0;
 
   background: rgba(86, 112, 255, 0.2);
 
   color: #ffffff;
 
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+
   outline: none;
 }
 
+/* =========================
+   워크스페이스 생성 버튼
+========================= */
+
 .createButton {
-  position: absolute;
+  position: relative;
 
-  right: 329px;
-  bottom: 250px;
+  display: block;
 
-  height: 35px;
+  height: 33px;
 
-  padding: 10px;
+  margin-top: 40px;
+  margin-left: 570px;
+
+  padding: 0 10px;
 
   border: none;
   border-radius: 8px;
@@ -128,10 +273,13 @@
 
   color: #ffffff;
 
+  font-family: Pretendard, sans-serif;
   font-size: 12px;
   font-weight: 700;
 
-  line-height: 110%;
+  cursor: pointer;
+}
 
-  white-space: nowrap;
+.createButton:hover {
+  background: #4359e8;
 }

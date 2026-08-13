@@ -24,7 +24,7 @@ function MemberSettings() {
       company: "기업 A",
       team: "Design",
       position: "Product Designer",
-      role: "협업자",
+      role: "승인자",
       owner: false,
     },
     {
@@ -66,8 +66,12 @@ function MemberSettings() {
   ]);
 
   /* =========================
-     역할 변경
+     역할 Dropdown
   ========================= */
+
+  const roleOptions = ["담당자", "검토자", "승인자", "참조자"];
+
+  const [openRoleMemberId, setOpenRoleMemberId] = useState(null);
 
   const handleRoleChange = (memberId, newRole) => {
     setMembers((prev) =>
@@ -80,6 +84,16 @@ function MemberSettings() {
           : member,
       ),
     );
+  };
+
+  const handleRoleSelect = (memberId, newRole) => {
+    handleRoleChange(memberId, newRole);
+
+    setOpenRoleMemberId(null);
+  };
+
+  const handleRoleDropdown = (memberId) => {
+    setOpenRoleMemberId((prev) => (prev === memberId ? null : memberId));
   };
 
   return (
@@ -107,8 +121,6 @@ function MemberSettings() {
             초대
           </button>
         </div>
-
-        {/* 초대 코드 */}
 
         <div className={styles.inviteLinkRow}>
           <button type="button" className={styles.copyButton}>
@@ -141,12 +153,14 @@ function MemberSettings() {
             <div className={styles.roleTooltip}>
               <div className={styles.tooltipTitle}>
                 <img src={helpIcon} alt="" />
+
                 <strong>역할 설정</strong>
               </div>
 
               <div className={styles.tooltipContent}>
                 <div className={styles.tooltipItem}>
                   <strong>담당자</strong>
+
                   <p>
                     업무 작성·편집, 파일 업로드, 메시지 전송 및 인수인계 작성이
                     가능합니다.
@@ -155,6 +169,7 @@ function MemberSettings() {
 
                 <div className={styles.tooltipItem}>
                   <strong>검토자</strong>
+
                   <p>
                     업무 내용을 열람하고 댓글·질문을 남기며 수정 요청을 전달할
                     수 있습니다.
@@ -163,6 +178,7 @@ function MemberSettings() {
 
                 <div className={styles.tooltipItem}>
                   <strong>승인자</strong>
+
                   <p>
                     승인 요청을 검토하고 승인·반려 처리 및 승인 상태를 변경할 수
                     있습니다.
@@ -171,6 +187,7 @@ function MemberSettings() {
 
                 <div className={styles.tooltipItem}>
                   <strong>참조자</strong>
+
                   <p>
                     프로젝트 진행 상황과 승인 결과를 열람할 수 있으며 편집
                     권한은 없습니다.
@@ -181,54 +198,84 @@ function MemberSettings() {
           </div>
         </div>
 
+        {/* =========================
+            멤버 목록
+        ========================= */}
+
         <div className={styles.memberList}>
-          {members.map((member) => (
-            <div className={styles.memberRow} key={member.id}>
-              {/* 프로필 */}
-              <div className={styles.avatar} />
+          {members.map((member) => {
+            const isRoleOpen = openRoleMemberId === member.id;
 
-              {/* 멤버 정보 */}
-              <div className={styles.memberInfo}>
-                <div className={styles.nameRow}>
-                  <strong>{member.name}</strong>
+            const availableRoles = roleOptions.filter(
+              (role) => role !== member.role,
+            );
 
-                  {member.owner && (
-                    <span className={styles.ownerBadge}>소유자</span>
-                  )}
+            return (
+              <div
+                key={member.id}
+                className={`${styles.memberRow} ${
+                  isRoleOpen ? styles.activeMemberRow : ""
+                }`}
+              >
+                {/* 프로필 */}
+
+                <div className={styles.avatar} />
+
+                {/* 멤버 정보 */}
+
+                <div className={styles.memberInfo}>
+                  <div className={styles.nameRow}>
+                    <strong>{member.name}</strong>
+
+                    {member.owner && (
+                      <span className={styles.ownerBadge}>소유자</span>
+                    )}
+                  </div>
+
+                  <p>
+                    {member.company} · {member.team} · {member.position}
+                  </p>
                 </div>
 
-                <p>
-                  {member.company} · {member.team} · {member.position}
-                </p>
+                {/* =========================
+                    역할 Dropdown
+                ========================= */}
+
+                <div className={styles.roleDropdown}>
+                  <button
+                    type="button"
+                    className={styles.roleButton}
+                    onClick={() => handleRoleDropdown(member.id)}
+                  >
+                    <span>{member.role}</span>
+
+                    <img
+                      src={dropdownIcon}
+                      alt=""
+                      className={`${styles.dropdownIcon} ${
+                        isRoleOpen ? styles.dropdownIconOpen : ""
+                      }`}
+                    />
+                  </button>
+
+                  {isRoleOpen && (
+                    <div className={styles.roleMenu}>
+                      {availableRoles.map((role) => (
+                        <button
+                          key={role}
+                          type="button"
+                          className={styles.roleOption}
+                          onClick={() => handleRoleSelect(member.id, role)}
+                        >
+                          {role}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-
-              {/* =========================
-                  역할 선택
-              ========================= */}
-
-              <div className={styles.roleSelectWrapper}>
-                <select
-                  className={styles.roleSelect}
-                  value={member.role}
-                  onChange={(e) => handleRoleChange(member.id, e.target.value)}
-                >
-                  <option value="담당자">담당자</option>
-
-                  <option value="협업자">협업자</option>
-
-                  <option value="검토자">검토자</option>
-
-                  <option value="참조자">참조자</option>
-                </select>
-
-                <img
-                  src={dropdownIcon}
-                  alt=""
-                  className={styles.dropdownIcon}
-                />
-              </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* =========================
               초대 대기
