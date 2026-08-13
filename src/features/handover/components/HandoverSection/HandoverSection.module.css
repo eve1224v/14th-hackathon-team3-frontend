@@ -1,0 +1,110 @@
+.section {
+  width: 636px;
+}
+
+
+.header {
+  width: 636px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+}
+
+
+.titleArea {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+
+.titleArea strong {
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.countBadge {
+  min-width: 29px;
+  height: 16.5px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 7.5px;
+
+  border-radius: 6px;
+
+  background: rgba(57, 87, 255, 0.3);
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.addButton {
+  width: 71px;
+  height: 24px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 5px;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: rgba(166, 180, 255, 0.79);
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.plus {
+  color: rgba(166, 180, 255, 0.79);
+
+  font-family: Pretendard, sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}

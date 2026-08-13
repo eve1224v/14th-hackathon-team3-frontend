@@ -12,6 +12,8 @@ import TimezoneSettingsPage from "../features/project/pages/TimezoneSettingsPage
 import MemberSettingsPage from "../features/project/pages/MemberSettingsPage/MemberSettingsPage";
 import IntegrationSettingsPage from "../features/project/pages/IntegrationSettingsPage/IntegrationSettingsPage";
 
+import HandoverPage from "../features/handover/pages/HandoverPage/HandoverPage";
+
 import { ROUTES } from "./routes.constant";
 
 function AppRouter() {
@@ -55,6 +57,11 @@ function AppRouter() {
         <Route
           path={ROUTES.INTEGRATION_SETTINGS}
           element={<IntegrationSettingsPage />}
+        />
+
+        <Route
+          path={ROUTES.HANDOVER}
+          element={<HandoverPage />}
         />
       </Routes>
     </BrowserRouter>

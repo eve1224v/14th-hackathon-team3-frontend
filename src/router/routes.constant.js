@@ -11,4 +11,6 @@ export const ROUTES = {
   TIMEZONE_SETTINGS: "/project/settings/timezone",
   MEMBER_SETTINGS: "/project/settings/members",
   INTEGRATION_SETTINGS: "/project/settings/integrations",
+
+  HANDOVER: "/handover",
 };
