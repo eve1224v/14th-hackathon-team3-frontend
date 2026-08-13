@@ -13,6 +13,7 @@ import MemberSettingsPage from "../features/project/pages/MemberSettingsPage/Mem
 import IntegrationSettingsPage from "../features/project/pages/IntegrationSettingsPage/IntegrationSettingsPage";
 
 import HandoverPage from "../features/handover/pages/HandoverPage/HandoverPage";
+import CyclePage from "../features/cycle/pages/CyclePage/CyclePage";
 
 import { ROUTES } from "./routes.constant";
 
@@ -62,6 +63,11 @@ function AppRouter() {
         <Route
           path={ROUTES.HANDOVER}
           element={<HandoverPage />}
+        />
+
+        <Route
+          path={ROUTES.CYCLE}
+          element={<CyclePage />}
         />
       </Routes>
     </BrowserRouter>
