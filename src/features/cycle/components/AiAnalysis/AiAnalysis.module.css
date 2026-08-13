@@ -1,0 +1,398 @@
+.analysis {
+  width: 1057px;
+
+  margin-top: 26px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+/* =========================
+   AI 사이클 분석
+========================= */
+
+.analysisHeader {
+  width: 1057px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.analysisHeader h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+
+.analysisHeader span {
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+/* =========================
+   요약 카드
+========================= */
+
+.summaryCard {
+  width: 1057px;
+  height: 145px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  gap: 25px;
+
+  margin-top: 22px;
+
+  padding: 0 38px;
+
+  border-radius: 8px;
+
+  background: #4b4f5e;
+}
+
+
+.summaryAiIcon {
+  width: 35px;
+  height: 37px;
+
+  flex-shrink: 0;
+
+  display: block;
+
+  object-fit: contain;
+}
+
+
+.summaryText {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.summaryText strong {
+  color: #ffffff;
+
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+
+.summaryText p {
+  margin: 14px 0 0;
+
+  color: rgba(255, 255, 255, 0.85);
+
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 160%;
+}
+
+
+/* =========================
+   진행 속도 추이
+========================= */
+
+.speedSection {
+  margin-top: 42px;
+}
+
+
+.speedHeader {
+  width: 1057px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.speedHeader h3 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+
+/* =========================
+   범례
+========================= */
+
+.legend {
+  display: flex;
+  align-items: center;
+
+  gap: 28px;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 11px;
+  font-weight: 400;
+}
+
+
+.legend span {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  white-space: nowrap;
+}
+
+
+.expectedLine {
+  display: block;
+
+  width: 28px;
+  height: 0;
+
+  border-top: 3px dashed #d9d9d9;
+}
+
+
+.actualLine {
+  display: block;
+
+  width: 28px;
+  height: 0;
+
+  border-top: 7px solid #4d67ff;
+}
+
+
+/* =========================
+   전체 그래프
+========================= */
+
+.chart {
+  position: relative;
+
+  width: 1010px;
+  height: 330px;
+
+  margin-top: 24px;
+  margin-left: 20px;
+}
+
+
+/* =========================
+   Y축 글자
+========================= */
+
+.yAxis {
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 42px;
+  height: 250px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 11px;
+  font-weight: 400;
+}
+
+
+.yAxis span {
+  transform: translateY(-50%);
+}
+
+
+/* =========================
+   그래프 영역
+========================= */
+
+.graphArea {
+  position: absolute;
+
+  left: 55px;
+  top: 0;
+
+  width: 850px;
+  height: 250px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================
+   왼쪽 세로축
+========================= */
+
+.leftAxis {
+  position: absolute;
+
+  left: 0;
+  bottom: 0;
+
+  width: 3px;
+  height: 250px;
+
+  border-radius: 11.91px;
+
+  background: rgba(166, 180, 255, 0.2);
+
+  z-index: 1;
+}
+
+
+/* =========================
+   아래 가로축
+========================= */
+
+.bottomAxis {
+  position: absolute;
+
+  left: 0;
+  bottom: 0;
+
+  width: 769px;
+  height: 3px;
+
+  border-radius: 11.91px;
+
+  background: rgba(166, 180, 255, 0.2);
+
+  z-index: 1;
+}
+
+
+/* =========================
+   그래프 선
+========================= */
+
+.chartSvg {
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 850px;
+  height: 250px;
+
+  overflow: visible;
+
+  z-index: 2;
+}
+
+
+/* 예상 진행률 */
+
+.expectedPath {
+  fill: none;
+
+  stroke: #d9d9d9;
+
+  stroke-width: 3px;
+
+  stroke-dasharray: 7 7;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+/* 실제 진행률 */
+
+.actualPath {
+  fill: none;
+
+  stroke: #4d67ff;
+
+  stroke-width: 7px;
+
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+/* 현재 점 */
+
+.currentDot {
+  fill: #4d67ff;
+}
+
+
+/* =========================
+   78%
+========================= */
+
+.percentLabel {
+  position: absolute;
+
+  left: 490px;
+  top: 68px;
+
+  color: #4d67ff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 110%;
+  letter-spacing: 0;
+
+  white-space: nowrap;
+
+  z-index: 3;
+}
+
+
+/* =========================
+   Cycle 1 ~ 5
+========================= */
+
+.xAxis {
+  position: absolute;
+
+  left: 0;
+  top: 270px;
+
+  width: 769px;
+
+  display: flex;
+  justify-content: space-between;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+
+.xAxis span {
+  white-space: nowrap;
+}
+
+
+.activeCycle {
+  color: #4d67ff;
+
+  font-weight: 700;
+}

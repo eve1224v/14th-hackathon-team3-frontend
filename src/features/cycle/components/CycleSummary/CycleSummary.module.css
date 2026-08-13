@@ -1,0 +1,288 @@
+.summary {
+  width: 1057px;
+  height: 191px;
+
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 215px 579px 263px;
+
+  margin-top: 48px;
+
+  border-radius: 8px;
+
+  background: #15192f;
+}
+
+/* =========================
+   Progress
+========================= */
+
+.progressArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progressCircle {
+  position: relative;
+
+  width: 153px;
+  height: 153px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progressSvg {
+  position: absolute;
+
+  left: 0;
+  top: 0;
+}
+
+.progressInner {
+  position: relative;
+
+  width: 124px;
+  height: 124px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #15192f;
+}
+
+.progressInner strong {
+  color: #ffffff;
+
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 98%;
+}
+
+.progressInner span {
+  margin-top: 8px;
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+/* =========================
+   Current Cycle
+========================= */
+
+.currentCycle {
+  box-sizing: border-box;
+
+  padding: 32px 0 0 20px;
+}
+
+.cycleTitle {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.blueDot {
+  width: 12px;
+  height: 12px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #4d67ff;
+}
+
+.cycleTitle strong {
+  color: #ffffff;
+
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+.periodRow {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 13px;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.dayBadge {
+  width: 33px;
+  height: 16.5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border-radius: 6px;
+
+  background: rgba(77, 103, 255, 0.55);
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 400;
+}
+
+.statistics {
+  display: flex;
+
+  margin-top: 29px;
+}
+
+.statItem {
+  position: relative;
+
+  width: 123px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+
+  padding-left: 24px;
+}
+
+.statItem::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 3px;
+  height: 50px;
+
+  border-radius: 3px;
+
+  background: rgba(166, 180, 255, 0.28);
+}
+
+.statItem span {
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+.statItem strong {
+  margin-top: 10px;
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+/* =========================
+   Next Cycle
+========================= */
+
+.nextCycle {
+  position: relative;
+
+  box-sizing: border-box;
+
+  padding: 31px 0 0 50px;
+}
+
+.nextCycle::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 31px;
+
+  width: 2px;
+  height: 131px;
+
+  background: rgba(166, 180, 255, 0.2);
+}
+
+.nextTitleRow {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+}
+
+.nextTitleRow > span:first-child {
+  color: #ffffff;
+
+  font-size: 18px;
+  font-weight: 400;
+
+  white-space: nowrap;
+}
+
+.nextBadge {
+  min-width: 65.68px;
+  height: 23.85px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 10px;
+
+  border-radius: 8.67px;
+
+  background: #3957ff;
+
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.expected {
+  display: block;
+
+  margin-top: 18px;
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.nextDate {
+  display: block;
+
+  margin-top: 12px;
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+}
