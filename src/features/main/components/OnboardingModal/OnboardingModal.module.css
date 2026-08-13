@@ -1,5 +1,6 @@
 .overlay {
   position: fixed;
+
   inset: 0;
 
   display: flex;
@@ -10,6 +11,10 @@
 
   z-index: 10000;
 }
+
+/* =========================
+   Modal
+========================= */
 
 .modal {
   position: relative;
@@ -23,17 +28,14 @@
 
   border-radius: 14px;
 
-  background: linear-gradient(
-    180deg,
-    #fff 66.35%,
-    #f0f2ff 100%
-  );
+  background: linear-gradient(180deg, #ffffff 66.35%, #f0f2ff 100%);
 
   color: #111111;
 
   font-family: Pretendard, sans-serif;
-}
 
+  overflow: visible;
+}
 
 /* =========================
    Header
@@ -82,7 +84,6 @@
   object-fit: contain;
 }
 
-
 /* =========================
    Progress
 ========================= */
@@ -99,13 +100,31 @@
   gap: 18px;
 }
 
-.progress img {
+.progressButton {
+  width: 100%;
+
+  display: block;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.progressButton img {
   width: 100%;
   height: auto;
 
   display: block;
+
+  pointer-events: none;
 }
 
+.disabledProgress {
+  cursor: default;
+}
 
 /* =========================
    Step Layout
@@ -131,6 +150,8 @@
 }
 
 .field {
+  position: relative;
+
   display: flex;
   flex-direction: column;
 
@@ -142,8 +163,11 @@
   font-weight: 500;
 }
 
-.field input,
-.field select {
+/* =========================
+   Input
+========================= */
+
+.field input {
   width: 100%;
   height: 50px;
 
@@ -158,18 +182,163 @@
 
   color: #111111;
 
+  font-family: Pretendard, sans-serif;
   font-size: 11px;
 
   outline: none;
 }
 
 .field input::placeholder {
-  color: #c2c2c2;
+  color: rgba(0, 0, 0, 0.3);
 }
 
+/* =========================================================
+   Custom Dropdown
+   언어 / 국가 공통
+========================================================= */
+
+.customDropdown {
+  position: relative;
+
+  width: 100%;
+
+  z-index: 100;
+}
+
+/* 선택창 */
+
+.dropdownButton {
+  width: 100%;
+  height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+
+  padding: 0 16px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #f5f5f5;
+
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+/* placeholder */
+
+.dropdownPlaceholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+/* 선택된 값 */
+
+.selectedDropdownText {
+  color: #111111;
+}
 
 /* =========================
-   Step 2
+   Dropdown Icon
+========================= */
+
+.dropdownIcon {
+  width: 20px;
+  height: 20px;
+
+  display: block;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+
+  pointer-events: none;
+
+  transition: transform 0.15s ease;
+}
+
+.dropdownIconOpen {
+  transform: rotate(180deg);
+}
+
+/* =========================
+   Dropdown Menu
+========================= */
+
+.dropdownMenu {
+  position: absolute;
+
+  top: calc(100% + 10px);
+  left: 0;
+
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+
+  padding: 7px 0;
+
+  border: 1px solid #eeeeee;
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+
+  overflow: hidden;
+
+  z-index: 1000;
+}
+
+/* =========================
+   Dropdown Option
+========================= */
+
+.dropdownOption {
+  width: 100%;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+
+  padding: 0 30px;
+
+  border: none;
+
+  background: #ffffff;
+
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: background-color 0.15s ease;
+}
+
+.dropdownOption:hover {
+  background: #f2f2f2;
+}
+
+/* =========================
+   Checkbox
 ========================= */
 
 .checkboxRow {
@@ -179,28 +348,64 @@
   gap: 8px;
 
   font-size: 10px;
+
+  cursor: pointer;
 }
+
+/* =========================
+   근무 요일
+========================= */
 
 .weekDays {
   display: flex;
   align-items: center;
 
-  gap: 15px;
+  gap: 7px;
 }
 
-.weekDays button {
+.weekDayButton {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
   padding: 0;
 
   border: none;
+  border-radius: 10px;
+
   background: transparent;
 
   color: #111111;
 
-  font-size: 11px;
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
 
   cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
+/* 선택 */
+
+.selectedWeekDay {
+  background: #4d67ff;
+
+  color: #ffffff;
+}
+
+/* 선택 안 된 상태 hover */
+
+.weekDayButton:not(.selectedWeekDay):hover {
+  background: #f1f1f1;
+}
 
 /* =========================
    Step 3
@@ -225,6 +430,7 @@
 
   color: #111111;
 
+  font-family: Pretendard, sans-serif;
   font-size: 11px;
 
   cursor: pointer;
@@ -239,7 +445,6 @@
 
   transform: translateY(-2px);
 }
-
 
 /* =========================
    Bottom Button
@@ -264,6 +469,7 @@
 
   color: #ffffff;
 
+  font-family: Pretendard, sans-serif;
   font-size: 15px;
   font-weight: 700;
 
