@@ -23,12 +23,7 @@ function Sidebar() {
 
   const userName = "김메리";
 
-  /* =========================
-     Workspace Dropdown
-  ========================= */
-
   const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(false);
-
   const [selectedWorkspace, setSelectedWorkspace] = useState("Workspace 1");
 
   const workspaces = [
@@ -43,10 +38,6 @@ function Sidebar() {
     setIsWorkspaceOpen(false);
   };
 
-  /* =========================
-     현재 시간
-  ========================= */
-
   const getTime = (timeZone) => {
     return new Intl.DateTimeFormat("en-GB", {
       timeZone,
@@ -57,7 +48,6 @@ function Sidebar() {
   };
 
   const [seoulTime, setSeoulTime] = useState(getTime("Asia/Seoul"));
-
   const [londonTime, setLondonTime] = useState(getTime("Europe/London"));
 
   useEffect(() => {
@@ -75,10 +65,6 @@ function Sidebar() {
     };
   }, []);
 
-  /* =========================
-     로그아웃
-  ========================= */
-
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
 
@@ -89,19 +75,11 @@ function Sidebar() {
 
   return (
     <aside className={styles.sidebar}>
-      {/* =========================
-          Logo
-      ========================= */}
-
       <div className={styles.logoArea}>
         <img className={styles.logo} src={logoIcon} alt="RelAi" />
       </div>
 
       <div className={styles.sidebarContent}>
-        {/* =========================
-            사용자 영역
-        ========================= */}
-
         {isLoggedIn ? (
           <>
             <div className={styles.userArea}>
@@ -118,10 +96,6 @@ function Sidebar() {
                 <img src={logoutIcon} alt="" />
               </button>
             </div>
-
-            {/* =========================
-                Workspace Dropdown
-            ========================= */}
 
             <div className={styles.workspaceDropdown}>
               <button
@@ -162,10 +136,6 @@ function Sidebar() {
           <p className={styles.loginText}>로그인이 필요해요.</p>
         )}
 
-        {/* =========================
-            Main Menu
-        ========================= */}
-
         <nav className={styles.menu}>
           <button
             type="button"
@@ -176,7 +146,11 @@ function Sidebar() {
             <span>Home</span>
           </button>
 
-          <button type="button" className={styles.menuItem}>
+          <button
+            type="button"
+            className={styles.menuItem}
+            onClick={() => navigate(ROUTES.CYCLE)}
+          >
             <img src={cycleIcon} alt="" />
             <span>Cycle</span>
           </button>
@@ -191,10 +165,6 @@ function Sidebar() {
             <span>Project</span>
           </button>
         </nav>
-
-        {/* =========================
-            Create Menu
-        ========================= */}
 
         <div className={styles.actionMenu}>
           {isLoggedIn ? (
@@ -211,15 +181,10 @@ function Sidebar() {
           ) : (
             <>
               <button type="button">Create Team</button>
-
               <button type="button">Create Issue</button>
             </>
           )}
         </div>
-
-        {/* =========================
-            현재 시간
-        ========================= */}
 
         <div className={styles.timeSection}>
           <div>
@@ -232,10 +197,6 @@ function Sidebar() {
             <strong>{londonTime}</strong>
           </div>
         </div>
-
-        {/* =========================
-            Bottom Menu
-        ========================= */}
 
         <div className={styles.bottomMenu}>
           <div className={styles.notifyRow}>
@@ -250,7 +211,6 @@ function Sidebar() {
             {isLoggedIn && (
               <label className={styles.toggle}>
                 <input type="checkbox" aria-label="알림 켜기" />
-
                 <span className={styles.toggleSlider} />
               </label>
             )}
