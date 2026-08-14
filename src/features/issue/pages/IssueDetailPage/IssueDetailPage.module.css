@@ -1,0 +1,597 @@
+.page {
+  width: 659px;
+  box-sizing: border-box;
+
+  margin-left: 57px;
+
+  padding-top: 65px;
+  padding-bottom: 100px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+/* ==================================================
+   상단
+================================================== */
+
+.header {
+  width: 659px;
+}
+
+
+.issueLabel {
+  display: block;
+
+  width: 25px;
+  height: 17px;
+
+  margin-bottom: 8px;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+}
+
+
+.title {
+  width: 617px;
+  height: 31px;
+
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+.metaRow {
+  display: flex;
+  align-items: center;
+
+  margin-top: 13px;
+}
+
+
+.cycleBadge {
+  width: 64.02px;
+  height: 23.12px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 10.51px;
+
+  border-radius: 8.41px;
+
+  background: rgba(57, 87, 255, 0.74);
+
+  color: #ffffff;
+
+  font-size: 12.61px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.priority {
+  margin-left: 18px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.urgent {
+  color: #eb4335;
+}
+
+
+/* ==================================================
+   담당자 / 처리 일자
+================================================== */
+
+.infoRow {
+  width: 659px;
+
+  display: grid;
+
+  grid-template-columns: 335px 1fr;
+
+  margin-top: 36px;
+}
+
+
+.managerArea {
+  width: 300px;
+}
+
+
+.dateArea {
+  width: 200px;
+}
+
+
+.infoLabel {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+.managerContent {
+  display: flex;
+  align-items: center;
+
+  margin-top: 13px;
+}
+
+
+.avatar {
+  width: 41px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: rgba(217, 217, 217, 0.7);
+}
+
+
+.managerText {
+  display: flex;
+  flex-direction: column;
+
+  margin-left: 12px;
+
+  gap: 3px;
+}
+
+
+.managerText strong {
+  width: fit-content;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.managerText span {
+  width: 181px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.dateText {
+  display: block;
+
+  margin-top: 18px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================================
+   공통 섹션
+================================================== */
+
+.sectionLabel {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.sectionTitleRow {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.countBadge {
+  min-width: 29px;
+  height: 16.5px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 7.5px;
+
+  border-radius: 6px;
+
+  background: rgba(57, 87, 255, 0.3);
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================================
+   내용
+================================================== */
+
+.contentSection {
+  width: 659px;
+
+  margin-top: 36px;
+}
+
+
+.contentBox {
+  width: 659px;
+  height: 217px;
+
+  box-sizing: border-box;
+
+  margin-top: 11px;
+
+  padding: 15px 16px 21px;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  background: #1b2038;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 140%;
+
+  letter-spacing: 0;
+}
+
+
+.contentBox p {
+  margin: 0;
+}
+
+
+.contentBox p + p {
+  margin-top: 18px;
+}
+
+
+/* ==================================================
+   완료 조건
+================================================== */
+
+.conditionSection {
+  width: 636px;
+
+  margin-top: 34px;
+}
+
+
+.conditionList {
+  width: 636px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  margin-top: 10px;
+}
+
+
+.conditionItem {
+  width: 636px;
+  height: 35px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 17px;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  background: #1b2038;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+.checkbox {
+  display: block;
+
+  width: 16px;
+  height: 16px;
+
+  flex-shrink: 0;
+
+  margin-right: 17px;
+
+  object-fit: contain;
+}
+
+
+/* ==================================================
+   첨부 파일
+================================================== */
+
+.fileSection {
+  width: 427px;
+
+  margin-top: 34px;
+}
+
+
+.fileList {
+  width: 427px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+
+  margin-top: 10px;
+}
+
+
+.fileItem {
+  width: 427px;
+  height: 29px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-left: 6px;
+  padding-right: 8px;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  background: #1b2038;
+}
+
+
+.fileNameArea {
+  display: flex;
+  align-items: center;
+}
+
+
+.documentIcon {
+  display: block;
+
+  width: 17px;
+  height: 17px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}
+
+
+.fileName {
+  width: 153px;
+
+  margin-left: 15px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.fileRight {
+  display: flex;
+  align-items: center;
+}
+
+
+.fileSize {
+  width: 43px;
+
+  margin-right: 44px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  text-align: right;
+
+  white-space: nowrap;
+}
+
+
+.fileRemoveButton {
+  width: 13px;
+  height: 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  opacity: 0.5;
+
+  cursor: pointer;
+}
+
+
+.fileRemoveButton img {
+  display: block;
+
+  width: 13px;
+  height: 13px;
+
+  object-fit: contain;
+}
+
+
+/* ==================================================
+   하단 버튼
+================================================== */
+
+.actions {
+  width: 659px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 31px;
+}
+
+
+/* 삭제 */
+
+.deleteButton {
+  width: 43px;
+  height: 31px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid #eb4335;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #eb4335;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 110%;
+
+  cursor: pointer;
+}
+
+
+/* 수정 */
+
+.editButton {
+  width: 61px;
+  height: 31px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6.5px;
+
+  padding: 0;
+
+  border: 1px solid #4d67ff;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 110%;
+
+  cursor: pointer;
+}
+
+
+.editButton img {
+  display: block;
+
+  width: 15.33px;
+  height: 15.33px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}

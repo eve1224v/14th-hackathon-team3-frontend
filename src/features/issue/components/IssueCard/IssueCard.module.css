@@ -1,0 +1,399 @@
+.card {
+  position: relative;
+
+  width: 224px;
+  height: 200px;
+
+  box-sizing: border-box;
+
+  border-radius: 12px;
+
+  background: #1b2038;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+
+  cursor: pointer;
+
+  overflow: hidden;
+}
+
+
+/* =========================
+   상태별 왼쪽 선
+========================= */
+
+.card::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 4px;
+  height: 100%;
+
+  border-radius: 12px 0 0 12px;
+}
+
+
+.todo::before {
+  background: #828282;
+}
+
+
+.progress::before {
+  background: #4d67ff;
+}
+
+
+.check::before {
+  background: #febc2e;
+}
+
+
+.complete::before {
+  background: #28c840;
+}
+
+
+/* =========================
+   제목
+========================= */
+
+.title {
+  position: absolute;
+
+  left: 19px;
+  top: 14px;
+
+  width: 89px;
+  height: 13px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   수정 아이콘
+========================= */
+
+.editButton {
+  position: absolute;
+
+  left: 195px;
+  top: 9px;
+
+  width: 18px;
+  height: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  opacity: 0.8;
+
+  cursor: pointer;
+}
+
+
+.editButton img {
+  display: block;
+
+  width: 18px;
+  height: 18px;
+
+  object-fit: contain;
+}
+
+
+/* =========================
+   설명
+========================= */
+
+.description {
+  position: absolute;
+
+  left: 18px;
+  top: 34px;
+
+  width: 177px;
+  height: 22px;
+
+  margin: 0;
+
+  overflow: hidden;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+}
+
+
+/* =========================
+   우선순위
+========================= */
+
+.priority {
+  position: absolute;
+
+  left: 18px;
+  top: 65px;
+
+  width: 55px;
+  height: 16px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 3px 5px;
+
+  border: 0.5px solid rgba(166, 180, 255, 0.2);
+
+  border-radius: 8px;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 8px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   담당자
+========================= */
+
+.memberRow {
+  position: absolute;
+
+  left: 18px;
+  top: 95px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+}
+
+
+.avatar {
+  width: 26px;
+  height: 26px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #d9d9d9;
+}
+
+
+.memberText {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+
+.memberText strong {
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.memberText span {
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   날짜
+========================= */
+
+.dateItem {
+  position: absolute;
+
+  left: 23px;
+  top: 134px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color: rgba(255, 255, 255, 0.75);
+
+  font-size: 10px;
+  font-weight: 400;
+
+  white-space: nowrap;
+}
+
+
+.dateItem img {
+  display: block;
+
+  width: 14px;
+  height: 14px;
+
+  object-fit: contain;
+}
+
+
+/* 지연 상태 */
+
+.delayed {
+  color: #fe6057;
+}
+
+
+.delayed img {
+  filter: brightness(0) saturate(100%) invert(49%) sepia(99%)
+    saturate(1992%) hue-rotate(331deg) brightness(102%) contrast(102%);
+}
+
+
+/* =========================
+   댓글
+========================= */
+
+.commentItem {
+  position: absolute;
+
+  left: 144px;
+  top: 134px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color: rgba(255, 255, 255, 0.75);
+
+  font-size: 10px;
+  font-weight: 400;
+
+  white-space: nowrap;
+}
+
+
+.commentItem img {
+  display: block;
+
+  width: 14px;
+  height: 14px;
+
+  object-fit: contain;
+}
+
+
+/* =========================
+   AI 감지 박스
+========================= */
+
+.aiBox {
+  position: absolute;
+
+  left: 18px;
+  bottom: 10px;
+
+  width: 191px;
+  height: 32px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 9px;
+
+  border: 1px solid rgba(166, 180, 255, 0.12);
+
+  border-radius: 8px;
+
+  color: #4d67ff;
+}
+
+
+.aiTitle {
+  display: flex;
+  align-items: center;
+
+  flex-shrink: 0;
+
+  gap: 7px;
+}
+
+
+.aiTitle img {
+  display: block;
+
+  width: 14px;
+  height: 14px;
+
+  object-fit: contain;
+}
+
+
+.aiTitle strong {
+  color: #4d67ff;
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.aiDescription {
+  margin-left: 18px;
+
+  color: #4d67ff;
+
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
