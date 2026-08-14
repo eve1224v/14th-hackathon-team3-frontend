@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import styles from "./HomeDashboard.module.css";
 
 import refreshIcon from "../../../../assets/icons/refreshIcon.svg";
@@ -7,6 +9,8 @@ import SummaryCard from "../SummaryCard/SummaryCard";
 import TodoCard from "../TodoCard/TodoCard";
 import ProjectCard from "../ProjectCard/ProjectCard";
 import HandoverCard from "../HandoverCard/HandoverCard";
+
+import { ROUTES } from "../../../../router/routes.constant";
 
 
 const summaryItems = [
@@ -123,11 +127,12 @@ const activities = [
 ];
 
 
-function ArrowButton({ children }) {
+function ArrowButton({ children, onClick }) {
   return (
     <button
       type="button"
       className={styles.arrowButton}
+      onClick={onClick}
     >
       <span>
         {children}
@@ -143,6 +148,9 @@ function ArrowButton({ children }) {
 
 
 function HomeDashboard() {
+  const navigate = useNavigate();
+
+
   const handleRefresh = () => {
     window.location.reload();
   };
@@ -184,6 +192,7 @@ function HomeDashboard() {
           <button
             type="button"
             className={styles.issueButton}
+            onClick={() => navigate(ROUTES.CREATE_ISSUE)}
           >
             새 이슈 등록
           </button>
@@ -227,7 +236,9 @@ function HomeDashboard() {
                 이어서 할 일
               </h2>
 
-              <ArrowButton>
+              <ArrowButton
+                onClick={() => navigate(ROUTES.HANDOVER)}
+              >
                 전체 보기
               </ArrowButton>
             </div>

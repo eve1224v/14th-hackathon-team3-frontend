@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import styles from "./HandoverDashboard.module.css";
 
 import rightArrowIcon from "../../../../assets/icons/rightArrowIcon.svg";
@@ -8,6 +10,9 @@ import HandoverSection from "../HandoverSection/HandoverSection";
 import SourcePanel from "../SourcePanel/SourcePanel";
 import AiCheckPanel from "../AiCheckPanel/AiCheckPanel";
 import TransferInfoPanel from "../TransferInfoPanel/TransferInfoPanel";
+
+import { ROUTES } from "../../../../router/routes.constant";
+
 
 const reviewSummary = [
   {
@@ -27,6 +32,7 @@ const reviewSummary = [
     count: 15,
   },
 ];
+
 
 const handoverSections = [
   {
@@ -130,10 +136,15 @@ const handoverSections = [
   },
 ];
 
+
 function HandoverDashboard() {
+  const navigate = useNavigate();
+
+
   const handleRefresh = () => {
     window.location.reload();
   };
+
 
   return (
     <div className={styles.dashboard}>
@@ -143,14 +154,24 @@ function HandoverDashboard() {
 
           <div className={styles.projectRow}>
             <strong>Global Payment Integration</strong>
-            <span className={styles.cycleBadge}>Cycle 3</span>
+
+            <span className={styles.cycleBadge}>
+              Cycle 3
+            </span>
           </div>
 
           <div className={styles.aiNotice}>
-            <img src={infoCircleIcon} alt="" />
-            <span>AI가 8분 전에 최신 활동을 반영했습니다.</span>
+            <img
+              src={infoCircleIcon}
+              alt=""
+            />
+
+            <span>
+              AI가 8분 전에 최신 활동을 반영했습니다.
+            </span>
           </div>
         </div>
+
 
         <div className={styles.headerButtons}>
           <button
@@ -161,16 +182,23 @@ function HandoverDashboard() {
             새로 고침
           </button>
 
-          <button type="button" className={styles.issueButton}>
+          <button
+            type="button"
+            className={styles.issueButton}
+            onClick={() => navigate(ROUTES.CREATE_ISSUE)}
+          >
             새 이슈 등록
           </button>
         </div>
       </header>
 
+
       <div className={styles.contentGrid}>
         <main className={styles.mainColumn}>
           <section className={styles.reviewSection}>
-            <h2 className={styles.sectionTitle}>AI 검토 결과</h2>
+            <h2 className={styles.sectionTitle}>
+              AI 검토 결과
+            </h2>
 
             <div className={styles.summaryGrid}>
               {reviewSummary.map((item) => (
@@ -183,15 +211,28 @@ function HandoverDashboard() {
             </div>
           </section>
 
+
           <section className={styles.todoSection}>
             <div className={styles.todoHeader}>
-              <h2 className={styles.sectionTitle}>할 일</h2>
+              <h2 className={styles.sectionTitle}>
+                할 일
+              </h2>
 
-              <button type="button" className={styles.viewAllButton}>
-                <span>전체 보기</span>
-                <img src={rightArrowIcon} alt="" />
+              <button
+                type="button"
+                className={styles.viewAllButton}
+              >
+                <span>
+                  전체 보기
+                </span>
+
+                <img
+                  src={rightArrowIcon}
+                  alt=""
+                />
               </button>
             </div>
+
 
             <div className={styles.taskBoard}>
               <div className={styles.sectionList}>
@@ -207,18 +248,31 @@ function HandoverDashboard() {
               </div>
             </div>
 
+
             <div className={styles.bottomActions}>
-              <button type="button" className={styles.saveButton}>
+              <button
+                type="button"
+                className={styles.saveButton}
+              >
                 임시 저장
               </button>
 
-              <button type="button" className={styles.transferButton}>
-                <span>인수인계 전달</span>
-                <span className={styles.transferArrow}>→</span>
+              <button
+                type="button"
+                className={styles.transferButton}
+              >
+                <span>
+                  인수인계 전달
+                </span>
+
+                <span className={styles.transferArrow}>
+                  →
+                </span>
               </button>
             </div>
           </section>
         </main>
+
 
         <aside className={styles.sideColumn}>
           <SourcePanel />
@@ -229,5 +283,6 @@ function HandoverDashboard() {
     </div>
   );
 }
+
 
 export default HandoverDashboard;
