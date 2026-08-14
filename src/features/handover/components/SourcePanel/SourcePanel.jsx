@@ -3,7 +3,7 @@ import styles from "./SourcePanel.module.css";
 import slackIcon from "../../../../assets/icons/slackIcon.svg";
 import microsoftIcon from "../../../../assets/icons/microsoftIcon.svg";
 import notionIcon from "../../../../assets/icons/notionIcon.svg";
-import googleDriveIcon from "../../../../assets/icons/googleDriveIcon.svg";
+import googleDriveIcon from "../../../../assets/icons/googledriveIcon.svg";
 
 const sources = [
   {
@@ -44,31 +44,20 @@ function SourcePanel() {
       <div className={styles.header}>
         <h2>출처 및 근거</h2>
 
-        <span className={styles.totalBadge}>
-          21
-        </span>
+        <span className={styles.totalBadge}>21</span>
       </div>
 
       <div className={styles.list}>
         {sources.map((source, index) => (
-          <div
-            key={`${source.name}-${index}`}
-            className={styles.item}
-          >
-            <img
-              src={source.icon}
-              alt=""
-              className={styles.icon}
-            />
+          <div key={`${source.name}-${index}`} className={styles.item}>
+            <img src={source.icon} alt="" className={styles.icon} />
 
             <div className={styles.text}>
               <strong>{source.name}</strong>
               <p>{source.description}</p>
             </div>
 
-            <span className={styles.countBadge}>
-              {source.count}
-            </span>
+            <span className={styles.countBadge}>{source.count}</span>
           </div>
         ))}
       </div>
