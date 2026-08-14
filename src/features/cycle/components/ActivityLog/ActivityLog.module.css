@@ -1,0 +1,643 @@
+.activity {
+  width: 1057px;
+
+  margin-top: 26px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+/* =========================
+   활동 기록 상단
+========================= */
+
+.filterCard {
+  width: 1051px;
+  height: 148px;
+
+  box-sizing: border-box;
+
+  padding: 25px 39px;
+
+  border-radius: 8px;
+
+  background: #15192f;
+}
+
+.filterCard h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+.filterCard p {
+  margin: 11px 0 0;
+
+  color: rgba(255, 255, 255, 0.5);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+/* =========================
+   필터
+========================= */
+
+.filters {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  margin-top: 21px;
+}
+
+.filters button {
+  height: 35px;
+
+  box-sizing: border-box;
+
+  padding: 0 16px;
+
+  border: 1px solid rgba(166, 180, 255, 0.65);
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+.filters button:nth-child(1) {
+  min-width: 53px;
+}
+
+.filters button:nth-child(2) {
+  min-width: 84px;
+}
+
+.filters button:nth-child(3) {
+  min-width: 62px;
+}
+
+.filters button:nth-child(4) {
+  min-width: 62px;
+}
+
+.filters button:nth-child(5) {
+  min-width: 105px;
+}
+
+.filters .activeFilter {
+  border-color: #4d67ff;
+
+  background: #4d67ff;
+}
+
+/* =========================
+   날짜 영역
+========================= */
+
+.dateSection {
+  width: 1057px;
+}
+
+.dateTitle {
+  margin: 24px 0 37px;
+
+  color: #ffffff;
+
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+/* 어제는 오늘 타임라인과 조금 분리 */
+.dateSection + .dateSection .dateTitle {
+  margin-top: 38px;
+}
+
+/* =========================
+   타임라인
+========================= */
+
+.timeline {
+  position: relative;
+
+  width: 1057px;
+}
+
+/* 세로선 */
+.timeline::before {
+  content: "";
+
+  position: absolute;
+
+  left: 60px;
+  top: 16.755px;
+  bottom: 16.755px;
+
+  width: 2px;
+
+  background: rgba(77, 103, 255, 0.2);
+}
+
+.timelineRow {
+  position: relative;
+
+  width: 1057px;
+  min-height: 147px;
+
+  margin-bottom: 18px;
+}
+
+.timelineRow:last-child {
+  margin-bottom: 0;
+}
+
+/* =========================
+   시간
+========================= */
+
+.time {
+  position: absolute;
+
+  left: 0;
+  top: 13px;
+
+  color: rgba(166, 180, 255, 0.45);
+
+  font-size: 10px;
+  font-weight: 400;
+}
+
+/* =========================
+   타임라인 아이콘
+========================= */
+
+.iconColumn {
+  position: absolute;
+
+  /*
+    세로선 중심 = 60px
+    60 - (33.51 / 2)
+  */
+  left: 43.245px;
+  top: 0;
+
+  width: 33.51px;
+  height: 33.51px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 3;
+}
+
+.iconCircle {
+  width: 33.51px;
+  height: 33.51px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 3px solid;
+  border-radius: 50%;
+
+  background: #0d1021;
+}
+
+.statusCircle {
+  border-color: #28c840;
+}
+
+.aiCircle {
+  border-color: #4d67ff;
+}
+
+.commentCircle {
+  border-color: #4d67ff;
+}
+
+.fileCircle {
+  border-color: #ffffff;
+}
+
+.activityIcon {
+  display: block;
+
+  width: 14.11px;
+  height: 14.11px;
+
+  object-fit: contain;
+}
+
+/* =========================
+   활동 카드
+========================= */
+
+.activityCard {
+  position: relative;
+
+  margin-left: 105px;
+
+  width: 952px;
+  min-height: 147px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  justify-content: space-between;
+
+  padding: 27px 25px 22px 29px;
+
+  border-radius: 8px;
+
+  background: #15192f;
+}
+
+/* =========================
+   카드 왼쪽
+========================= */
+
+.contentRow {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 20px;
+
+  min-width: 0;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+/* =========================
+   프로필 원
+========================= */
+
+.profileCircle {
+  width: 39.68px;
+  height: 39.68px;
+
+  flex: 0 0 39.68px;
+
+  border-radius: 50%;
+
+  background: #d9d9d9;
+
+  transform: translateY(-3px);
+}
+
+/* =========================
+   AI / 댓글 내부 아이콘
+========================= */
+
+.cardIconWrap {
+  width: 39.68px;
+  height: 39.68px;
+
+  flex: 0 0 39.68px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform: translateY(-3px);
+}
+
+.cardActivityIcon {
+  display: block;
+
+  width: 30px;
+  height: 30px;
+
+  object-fit: contain;
+}
+
+/* =========================
+   텍스트
+========================= */
+
+.activityTitle {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 15.87px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+.activityTitle strong {
+  font-weight: 600;
+}
+
+.subject {
+  display: block;
+
+  margin-top: 16px;
+
+  color: #ffffff;
+
+  font-size: 15.87px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+/* =========================
+   카드 오른쪽
+========================= */
+
+.cardRight {
+  min-height: 98px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  margin-left: 30px;
+}
+
+.typeBadge {
+  height: 31px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 10px;
+
+  border: 1px solid rgba(166, 180, 255, 0.7);
+  border-radius: 8px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+.detailButton {
+  width: 118px;
+  height: 43px;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #10152e;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+/* =========================
+   이슈 상태
+========================= */
+
+.statusChange {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  margin-top: 14px;
+}
+
+.progressBadge {
+  width: 52px;
+  height: 27px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: rgba(77, 103, 255, 0.3);
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.completeBadge {
+  width: 39px;
+  height: 27px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: rgba(40, 200, 64, 0.3);
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.arrow {
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 15px;
+  font-weight: 400;
+}
+
+/* =========================
+   AI 업데이트
+========================= */
+
+.aiCard {
+  min-height: 218px;
+}
+
+.percentChange {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  margin-top: 19px;
+
+  color: rgba(255, 255, 255, 0.85);
+
+  font-size: 15.87px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+.percentChange strong {
+  color: #4d67ff;
+
+  font-size: 15.87px;
+  font-weight: 600;
+}
+
+.reasonBox {
+  width: 272px;
+  min-height: 91px;
+
+  box-sizing: border-box;
+
+  margin-top: 19px;
+
+  padding: 10px 13px 11px;
+
+  border-radius: 6px;
+
+  background: rgba(13, 16, 33, 0.42);
+}
+
+.reasonBox strong {
+  display: block;
+
+  color: rgba(255, 255, 255, 0.75);
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+.reasonBox ul {
+  margin: 8px 0 0;
+
+  padding-left: 16px;
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 150%;
+}
+
+/* =========================
+   댓글
+========================= */
+
+.commentBox {
+  width: 272px;
+  height: 29px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  margin-top: 18px;
+
+  padding: 0 13px;
+
+  border-radius: 6px;
+
+  background: rgba(13, 16, 33, 0.42);
+
+  color: rgba(255, 255, 255, 0.75);
+
+  font-size: 10px;
+  font-weight: 500;
+
+  white-space: nowrap;
+}
+
+/* =========================
+   파일
+========================= */
+
+.fileRow {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 16px;
+}
+
+.documentBox {
+  width: 40px;
+  height: 40px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 7px;
+
+  background: rgba(166, 180, 255, 0.12);
+}
+
+.documentBox img {
+  display: block;
+
+  width: 25px;
+  height: 29px;
+
+  object-fit: contain;
+}
+
+.fileInfo {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.fileInfo strong {
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.fileInfo span {
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 10px;
+  font-weight: 400;
+}

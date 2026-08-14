@@ -13,4 +13,5 @@ export const ROUTES = {
   INTEGRATION_SETTINGS: "/project/settings/integrations",
 
   HANDOVER: "/handover",
+  CYCLE: "/cycle",
 };

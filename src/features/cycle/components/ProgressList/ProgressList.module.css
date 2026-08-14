@@ -1,0 +1,351 @@
+.card {
+  width: 687px;
+  height: 529px;
+
+  box-sizing: border-box;
+
+  padding: 25px 35px 18px;
+
+  border-radius: 8px;
+
+  background: #15192f;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+.card h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+
+  margin-top: 20px;
+
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.list {
+  width: 617px;
+}
+
+.item {
+  width: 617px;
+  height: 82px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.statusDot {
+  width: 17px;
+  height: 17px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+.complete {
+  background: #28c840;
+}
+
+.progress {
+  background: #4d67ff;
+}
+
+.check {
+  background: #febc2e;
+}
+
+.delay {
+  background: #fe6057;
+}
+
+.text {
+  margin-left: 32px;
+}
+
+.text strong {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 110%;
+}
+
+.text p {
+  margin: 6px 0 0;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.text .progressDescription {
+  color: #8799ff;
+}
+
+.badge {
+  min-width: 44.68px;
+  height: 23.85px;
+
+  margin-left: auto;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 10.84px;
+
+  border-radius: 8.67px;
+
+  font-size: 12px;
+  font-weight: 400;
+
+  white-space: nowrap;
+}
+
+.completeBadge {
+  background: rgba(40, 200, 64, 0.3);
+  color: #ffffff;
+}
+
+.progressBadge {
+  min-width: 48.68px;
+
+  background: rgba(77, 103, 255, 0.4);
+  color: #ffffff;
+}
+
+.checkBadge {
+  min-width: 70.68px;
+
+  background: rgba(254, 188, 46, 0.3);
+  color: #ffffff;
+}
+
+.delayBadge {
+  min-width: 55.68px;
+
+  background: rgba(254, 96, 87, 0.3);
+  color: #ffffff;
+}
+
+.moreButton {
+  width: 617px;
+  height: 48px;
+
+  margin-top: 17px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background: #1b1f35;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+
+  cursor: pointer;
+}.card {
+  width: 687px;
+  height: 529px;
+
+  box-sizing: border-box;
+
+  padding: 25px 35px 18px;
+
+  border-radius: 8px;
+
+  background: #15192f;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+
+  overflow: hidden;
+}
+
+.card h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+
+  margin-top: 20px;
+
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.list {
+  width: 617px;
+}
+
+.item {
+  width: 617px;
+  height: 76px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.statusDot {
+  width: 17px;
+  height: 17px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+.complete {
+  background: #28c840;
+}
+
+.progress {
+  background: #4d67ff;
+}
+
+.check {
+  background: #febc2e;
+}
+
+.delay {
+  background: #fe6057;
+}
+
+.text {
+  margin-left: 32px;
+}
+
+.text strong {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+.text p {
+  margin: 6px 0 0;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 12px;
+  font-weight: 400;
+
+  white-space: nowrap;
+}
+
+.text .progressDescription {
+  color: #8799ff;
+}
+
+.badge {
+  min-width: 44.68px;
+  height: 23.85px;
+
+  margin-left: auto;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 10.84px;
+
+  border-radius: 8.67px;
+
+  font-size: 12px;
+  font-weight: 400;
+
+  white-space: nowrap;
+}
+
+.completeBadge {
+  background: rgba(40, 200, 64, 0.3);
+  color: #ffffff;
+}
+
+.progressBadge {
+  min-width: 48.68px;
+
+  background: rgba(77, 103, 255, 0.4);
+  color: #ffffff;
+}
+
+.checkBadge {
+  min-width: 70.68px;
+
+  background: rgba(254, 188, 46, 0.3);
+  color: #ffffff;
+}
+
+.delayBadge {
+  min-width: 55.68px;
+
+  background: rgba(254, 96, 87, 0.3);
+  color: #ffffff;
+}
+
+.moreButton {
+  width: 617px;
+  height: 48px;
+
+  margin-top: 17px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background: #1b1f35;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
