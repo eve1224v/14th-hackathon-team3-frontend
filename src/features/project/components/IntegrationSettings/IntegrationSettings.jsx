@@ -2,7 +2,7 @@ import styles from "./IntegrationSettings.module.css";
 
 import slackIcon from "../../../../assets/icons/slackIcon.svg";
 import microsoftIcon from "../../../../assets/icons/microsoftIcon.svg";
-import googleDriveIcon from "../../../../assets/icons/googleDriveIcon.svg";
+import googleDriveIcon from "../../../../assets/icons/googledriveIcon.svg";
 import notionIcon from "../../../../assets/icons/notionIcon.svg";
 import jiraIcon from "../../../../assets/icons/jiraIcon.svg";
 
