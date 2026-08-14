@@ -1,0 +1,908 @@
+/* =========================
+   Overlay
+========================= */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.42);
+
+  z-index: 5000;
+}
+
+/* =========================
+   Modal
+========================= */
+
+.modal {
+  position: relative;
+
+  width: 500px;
+
+  /* 사용자 화면보다 커지지 않도록 */
+  max-height: calc(100vh - 40px);
+
+  box-sizing: border-box;
+
+  padding: 48px 55px 30px;
+
+  border: 1px solid #252a44;
+  border-radius: 8px;
+
+  background: #10142d;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+
+  /* 모달 내부 전체 상하 스크롤 */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.modal::-webkit-scrollbar {
+  width: 5px;
+}
+
+.modal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+/* =========================
+   채팅 화면 Modal
+========================= */
+
+.chatModal {
+  width: 500px;
+
+  height: min(760px, calc(100vh - 40px));
+  max-height: calc(100vh - 40px);
+
+  padding: 42px 55px 26px;
+}
+
+/* =========================
+   Header
+========================= */
+
+.titleRow {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.titleRow h1 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+.titleIcon {
+  width: 28px;
+  height: 28px;
+
+  display: block;
+
+  object-fit: contain;
+}
+
+/* =========================
+   Description
+========================= */
+
+.description {
+  flex-shrink: 0;
+
+  margin: 20px 0 20px;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 400;
+}
+
+/* =========================
+   Search
+========================= */
+
+.searchBox {
+  flex-shrink: 0;
+
+  width: 100%;
+  height: 43px;
+
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+
+  padding: 0 14px;
+
+  border-radius: 8px;
+
+  background: #303857;
+}
+
+.searchIcon {
+  width: 23px;
+  height: 23px;
+
+  display: block;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}
+
+.searchBox input {
+  flex: 1;
+
+  height: 100%;
+
+  box-sizing: border-box;
+
+  padding: 0 10px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+
+  outline: none;
+}
+
+/* =========================================================
+   Filters
+========================================================= */
+
+.filters {
+  position: relative;
+
+  flex-shrink: 0;
+
+  margin-top: 24px;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  overflow: visible;
+
+  z-index: 500;
+}
+
+/* =========================
+   Filter Button
+========================= */
+
+.filterButton {
+  min-width: 62px;
+  height: 38px;
+
+  padding: 0 15px;
+
+  flex-shrink: 0;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition: background-color 0.15s ease;
+}
+
+.filterButton:hover {
+  background: #4059e9;
+}
+
+.activeFilter {
+  background: #4d67ff;
+}
+
+/* =========================
+   Filter Dropdown
+========================= */
+
+.filterDropdown {
+  position: relative;
+
+  flex-shrink: 0;
+}
+
+.filterMenu {
+  position: absolute;
+
+  top: calc(100% + 10px);
+  left: 0;
+
+  min-width: 155px;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+
+  padding: 7px 0;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+
+  overflow: hidden;
+
+  z-index: 9999;
+}
+
+.filterOption {
+  width: 100%;
+  height: 45px;
+
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+
+  padding: 0 22px;
+
+  border: none;
+
+  background: #ffffff;
+
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+
+  text-align: left;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition: background-color 0.15s ease;
+}
+
+.filterOption:hover {
+  background: #f1f1f1;
+}
+
+/* =========================================================
+   사람 선택 화면 스크롤 영역
+========================================================= */
+
+.section {
+  position: relative;
+
+  margin-top: 24px;
+
+  z-index: 1;
+}
+
+.section h2 {
+  margin: 0 0 13px;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.userList {
+  display: flex;
+  flex-direction: column;
+
+  gap: 13px;
+}
+
+/* =========================
+   User
+========================= */
+
+.userItem {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+
+  padding: 5px 8px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: background-color 0.15s ease;
+}
+
+.userItem:hover {
+  background: rgba(77, 103, 255, 0.1);
+}
+
+.selectedUser {
+  background: rgba(77, 103, 255, 0.18);
+}
+
+/* =========================
+   Avatar
+========================= */
+
+.avatar {
+  width: 47px;
+  height: 47px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #a9abb3;
+}
+
+/* =========================
+   User Info
+========================= */
+
+.userInfo {
+  margin-left: 14px;
+
+  min-width: 0;
+}
+
+.userNameRow {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+.userNameRow strong {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.userNameRow span {
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 10px;
+}
+
+.userInfo p {
+  margin: 4px 0 0;
+
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 400;
+
+  white-space: nowrap;
+}
+
+/* =========================
+   Selected Count
+========================= */
+
+.selectedCount {
+  flex-shrink: 0;
+
+  width: fit-content;
+
+  margin: 18px 0 0 auto;
+
+  padding: 7px 12px;
+
+  border-radius: 7px;
+
+  background: #24347a;
+
+  color: #ffffff;
+
+  font-size: 10px;
+}
+
+/* =========================
+   Complete Button
+========================= */
+
+.completeButton {
+  flex-shrink: 0;
+
+  width: 100%;
+  height: 50px;
+
+  margin-top: 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #2e3450;
+  border-radius: 8px;
+
+  background: #191e37;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.completeButton:not(:disabled):hover {
+  background: #202641;
+}
+
+.completeButton:disabled {
+  opacity: 0.65;
+
+  cursor: default;
+}
+
+.completeButton span {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* =========================================================
+   채팅 화면
+========================================================= */
+
+/* =========================
+   상대 정보
+========================= */
+
+.chatUserCard {
+  flex-shrink: 0;
+
+  margin-top: 22px;
+
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+
+  padding: 11px 18px;
+
+  border: 1px solid #1f2542;
+  border-radius: 8px;
+
+  background: #151a32;
+}
+
+.chatUserInfo {
+  margin-left: 16px;
+}
+
+.chatUserInfo > div {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.chatUserInfo strong {
+  font-size: 12px;
+}
+
+.chatUserInfo span {
+  font-size: 11px;
+}
+
+.chatUserInfo p {
+  margin: 5px 0 0;
+
+  font-size: 11px;
+}
+
+/* =========================
+   Chat Area
+
+   여기만 스크롤됨
+========================= */
+
+.chatArea {
+  margin-top: 24px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 26px;
+
+  box-sizing: border-box;
+
+  padding-right: 4px;
+  padding-bottom: 10px;
+
+  overflow: visible;
+}
+
+/* scrollbar */
+
+.chatArea::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chatArea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chatArea::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* =========================
+   Message Row
+========================= */
+
+.messageRow {
+  position: relative;
+
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  flex-shrink: 0;
+}
+
+.myMessageRow {
+  align-items: flex-end;
+}
+
+.otherMessageRow {
+  align-items: flex-start;
+}
+
+.senderName {
+  margin-bottom: 8px;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =========================
+   Message Bubble
+========================= */
+
+.messageBubble {
+  max-width: 86%;
+
+  box-sizing: border-box;
+
+  padding: 9px 12px;
+
+  border-radius: 9px;
+
+  font-size: 11px;
+  line-height: 145%;
+}
+
+.myBubble {
+  background: #4d67ff;
+
+  color: #ffffff;
+}
+
+.otherBubble {
+  border: 1px solid #4359d7;
+
+  background: transparent;
+
+  color: #ffffff;
+}
+
+/* =========================
+   Message Time
+========================= */
+
+.messageMeta {
+  margin-top: 5px;
+
+  display: flex;
+
+  gap: 7px;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 9px;
+}
+
+/* =========================================================
+   번역문 / 원문 보기
+========================================================= */
+
+.translationWrapper {
+  position: relative;
+
+  width: fit-content;
+
+  z-index: 30;
+}
+
+.myMessageRow .translationWrapper {
+  align-self: flex-end;
+}
+
+.otherMessageRow .translationWrapper {
+  align-self: flex-start;
+}
+
+/* =========================
+   번역 버튼
+========================= */
+
+.translationButton {
+  margin-top: 3px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 4px;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 9px;
+
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  cursor: pointer;
+}
+
+.translationButton img {
+  display: block;
+
+  width: 22px;
+  height: 12px;
+
+  object-fit: contain;
+}
+
+/* =========================
+   번역 Overlay Bubble
+========================= */
+
+.translationBubble {
+  position: absolute;
+
+  top: calc(100% + 8px);
+
+  width: 320px;
+
+  box-sizing: border-box;
+
+  padding: 12px 17px;
+
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #111111;
+
+  font-size: 11px;
+  line-height: 145%;
+
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+
+  z-index: 100;
+}
+
+.myTranslationBubble {
+  right: 0;
+}
+
+.otherTranslationBubble {
+  left: 0;
+}
+
+/* =========================
+   날짜 Divider
+========================= */
+
+.dateDivider {
+  width: 100%;
+
+  margin: 8px 0 22px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+}
+
+.dateDivider span {
+  flex: 1;
+
+  height: 1px;
+
+  background: #30408f;
+}
+
+.dateDivider p {
+  margin: 0;
+
+  color: #4d67ff;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   Message Composer
+========================================================= */
+
+.messageComposer {
+  flex-shrink: 0;
+
+  margin-top: 18px;
+
+  box-sizing: border-box;
+
+  padding: 13px;
+
+  border-radius: 8px;
+
+  background: #1b203c;
+}
+
+.messageComposer label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 11px;
+}
+
+.messageComposer textarea {
+  width: 100%;
+  height: 62px;
+
+  box-sizing: border-box;
+
+  padding: 10px 12px;
+
+  border: 1px solid #2b3151;
+  border-radius: 8px;
+
+  background: #1b203c;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 11px;
+
+  line-height: 145%;
+
+  resize: none;
+
+  outline: none;
+}
+
+.messageComposer textarea:focus {
+  border-color: #4d67ff;
+}
+
+/* =========================
+   AI Translation
+========================= */
+
+.aiLabel {
+  margin: 8px 0;
+
+  color: #4d67ff;
+
+  font-size: 11px;
+}
+
+.translationInput {
+  height: 55px !important;
+
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* =========================
+   Send Button
+========================= */
+
+.sendButton {
+  flex-shrink: 0;
+
+  width: 100%;
+  height: 44px;
+
+  margin-top: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.sendButton img {
+  display: block;
+
+  width: 16px;
+  height: 16px;
+
+  object-fit: contain;
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+
+  cursor: default;
+}
