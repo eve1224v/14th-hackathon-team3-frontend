@@ -1,0 +1,158 @@
+.column {
+  width: 255px;
+  height: 915px;
+
+  box-sizing: border-box;
+
+  padding: 0 14px;
+
+  border-radius: 8px;
+
+  background: #15192f;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+/* =========================
+   헤더
+========================= */
+
+.header {
+  width: 100%;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.titleArea {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+
+.statusDot {
+  width: 11px;
+  height: 11px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+
+.todo {
+  background: #828282;
+}
+
+
+.progress {
+  background: #4d67ff;
+}
+
+
+.check {
+  background: #febc2e;
+}
+
+
+.complete {
+  background: #28c840;
+}
+
+
+.titleArea strong {
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* 숫자 배지 */
+
+.countBadge {
+  min-width: 16px;
+  height: 16.5px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 5px;
+
+  border-radius: 6px;
+
+  background: rgba(57, 87, 255, 0.3);
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 400;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   오른쪽 아이콘
+========================= */
+
+.headerActions {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+}
+
+
+.headerActions button {
+  width: 21px;
+  height: 21px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+
+.headerActions img {
+  display: block;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: contain;
+}
+
+
+/* =========================
+   카드 리스트
+========================= */
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}

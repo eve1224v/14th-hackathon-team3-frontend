@@ -1,0 +1,12 @@
+.board {
+  width: 1072px;
+  height: 915px;
+
+  display: grid;
+
+  grid-template-columns: repeat(4, 255px);
+
+  column-gap: 19px;
+
+  margin-top: 25px;
+}

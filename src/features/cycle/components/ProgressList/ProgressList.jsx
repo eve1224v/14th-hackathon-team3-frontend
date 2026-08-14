@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 import styles from "./ProgressList.module.css";
+import { ROUTES } from "../../../../router/routes.constant";
 
 const progresses = [
   {
@@ -34,6 +37,8 @@ const progresses = [
 ];
 
 function ProgressList() {
+  const navigate = useNavigate();
+
   return (
     <section className={styles.card}>
       <h2>주요 진행 상황</h2>
@@ -47,9 +52,7 @@ function ProgressList() {
             className={styles.item}
           >
             <span
-              className={`${styles.statusDot} ${
-                styles[item.type]
-              }`}
+              className={`${styles.statusDot} ${styles[item.type]}`}
             />
 
             <div className={styles.text}>
@@ -80,6 +83,7 @@ function ProgressList() {
       <button
         type="button"
         className={styles.moreButton}
+        onClick={() => navigate(ROUTES.ISSUE)}
       >
         모든 이슈 보기 →
       </button>

@@ -1,0 +1,1223 @@
+.form {
+  width: 690px;
+  box-sizing: border-box;
+
+  margin-left: 57px;
+
+  padding-top: 93px;
+  padding-bottom: 100px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+/* ==================================================
+   편집 페이지 전용
+================================================== */
+
+.editForm {
+  padding-top: 65px;
+}
+
+
+/* ==================================================
+   상단
+================================================== */
+
+.pageHeader {
+  width: 690px;
+
+  margin-bottom: 39px;
+}
+
+
+.editPageHeader {
+  margin-bottom: 30px;
+}
+
+
+.pageTitle {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* 편집 페이지 제목 */
+
+.editPageTitle {
+  width: 617px;
+  height: 31px;
+
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.pageDescription {
+  margin: 9px 0 0;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+/* 편집 페이지 상단 '이슈' */
+
+.pageLabel {
+  display: block;
+
+  width: 25px;
+  height: 17px;
+
+  margin-bottom: 11px;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+/* 편집 페이지 Cycle 3 */
+
+.editCycleBadge {
+  width: 64.02px;
+  height: 23.12px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 10px;
+
+  padding: 0 10.51px;
+
+  border-radius: 8.41px;
+
+  background: rgba(57, 87, 255, 0.74);
+
+  color: #ffffff;
+
+  font-size: 12.61px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================================
+   공통
+================================================== */
+
+.section {
+  width: 690px;
+
+  box-sizing: border-box;
+
+  border-radius: 8px;
+
+  background: #15192f;
+}
+
+
+.section + .section {
+  margin-top: 16px;
+}
+
+
+.section h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 110%;
+
+  letter-spacing: 0;
+}
+
+
+.fieldLabel {
+  display: flex;
+  align-items: center;
+
+  width: fit-content;
+
+  gap: 4px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+.requiredDot {
+  width: 4px;
+  height: 4px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #eb4335;
+}
+
+
+/* ==================================================
+   이슈 기본 정보
+================================================== */
+
+.basicSection {
+  height: 254px;
+
+  padding: 23px 15px 15px 16px;
+}
+
+
+.basicSection h2 {
+  margin-bottom: 16px;
+}
+
+
+.basicSection .fieldLabel {
+  margin-bottom: 8px;
+}
+
+
+.titleInput {
+  width: 659px;
+  height: 39px;
+
+  box-sizing: border-box;
+
+  padding: 0 13px;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  outline: none;
+
+  background: #1b2038;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+/* ==================================================
+   우선순위
+================================================== */
+
+.priorityTitle {
+  display: block;
+
+  margin-top: 10px;
+  margin-bottom: 6px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+.priorityBox {
+  width: 659px;
+  height: 85px;
+
+  box-sizing: border-box;
+
+  display: grid;
+
+  grid-template-columns:
+    144px
+    213px
+    1fr;
+
+  grid-template-rows:
+    42px
+    42px;
+
+  align-items: center;
+
+  padding-left: 17px;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  background: #1b2038;
+}
+
+
+.priorityOption {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  color: rgba(255, 255, 255, 0.85);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  cursor: pointer;
+}
+
+
+.priorityOption input {
+  position: absolute;
+
+  width: 0;
+  height: 0;
+
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+
+/* 미선택 */
+
+.customRadio {
+  position: relative;
+
+  width: 16px;
+  height: 16px;
+
+  box-sizing: border-box;
+
+  flex-shrink: 0;
+
+  border: 1.5px solid #8d919e;
+  border-radius: 50%;
+
+  background: #d1d3d8;
+}
+
+
+/* 일반 선택 */
+
+.priorityOption input:checked + .customRadio {
+  border-color: #3957ff;
+
+  background: transparent;
+}
+
+
+.priorityOption input:checked + .customRadio::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 8px;
+  height: 8px;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background: #3957ff;
+}
+
+
+/* 긴급 */
+
+.urgentOption {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+
+.urgentOption input:checked + .customRadio {
+  border-color: #eb4335;
+
+  background: transparent;
+}
+
+
+.urgentOption input:checked + .customRadio::after {
+  background: #eb4335;
+}
+
+
+/* ==================================================
+   상세 내용
+================================================== */
+
+.detailSection {
+  height: 519px;
+
+  padding: 23px 15px 24px 16px;
+}
+
+
+.detailSection h2 {
+  margin-bottom: 14px;
+}
+
+
+.detailSection .fieldLabel {
+  margin-bottom: 8px;
+}
+
+
+.descriptionInput {
+  display: block;
+
+  width: 659px;
+  height: 217px;
+
+  box-sizing: border-box;
+
+  margin: 0;
+
+  padding: 15px 16px;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  outline: none;
+
+  resize: none;
+
+  background: #1b2038;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 165%;
+
+  letter-spacing: 0;
+
+  overflow-y: auto;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+
+.descriptionInput::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* ==================================================
+   완료 조건
+================================================== */
+
+.conditionHeader {
+  width: 636px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 16px;
+  margin-bottom: 10px;
+}
+
+
+.conditionTitleWrap {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.conditionTitle {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+.conditionCount {
+  width: 29px;
+  height: 16.5px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  background: rgba(57, 87, 255, 0.3);
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+.addConditionButton {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 3px;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #7f89c5;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.addConditionIcon {
+  display: block;
+
+  width: 19px;
+  height: 19px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(58%)
+    sepia(18%)
+    saturate(1013%)
+    hue-rotate(194deg)
+    brightness(91%)
+    contrast(88%);
+}
+
+
+.conditionList {
+  width: 636px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+
+.conditionItem {
+  width: 636px;
+  height: 35px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 16px;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  background: #1b2038;
+}
+
+
+.conditionText {
+  color: rgba(255, 255, 255, 0.9);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+.removeConditionButton {
+  width: 18px;
+  height: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  opacity: 0.65;
+
+  cursor: pointer;
+}
+
+
+.removeConditionButton img {
+  display: block;
+
+  width: 13px;
+  height: 13px;
+
+  object-fit: contain;
+}
+
+
+/* ==================================================
+   담당 및 일정
+================================================== */
+
+.scheduleSection {
+  position: relative;
+
+  height: 254px;
+
+  padding: 23px 16px;
+}
+
+
+.scheduleSection h2 {
+  margin-bottom: 18px;
+}
+
+
+.scheduleTop {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 26px;
+}
+
+
+.managerField {
+  width: 293px;
+}
+
+
+.dateColumn {
+  width: 260px;
+}
+
+
+.managerField .fieldLabel,
+.dateColumn .fieldLabel {
+  margin-bottom: 10px;
+}
+
+
+.managerField input {
+  width: 293px;
+  height: 39px;
+
+  box-sizing: border-box;
+
+  padding: 0 13px;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  outline: none;
+
+  background: #1b2038;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+/* ==================================================
+   처리 일자
+================================================== */
+
+.dateField {
+  width: 260px;
+  height: 39px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-left: 26px;
+  padding-right: 8px;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  background: #1b2038;
+}
+
+
+.dateField span {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+.dateField img {
+  display: block;
+
+  width: 24px;
+  height: 24px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}
+
+
+/* ==================================================
+   Cycle
+================================================== */
+
+.cycleField {
+  position: relative;
+
+  width: 281px;
+
+  margin-top: 14px;
+
+  z-index: 20;
+}
+
+
+.cycleField .fieldLabel {
+  margin-bottom: 10px;
+}
+
+
+.cycleDropdown {
+  position: relative;
+
+  width: 281px;
+}
+
+
+.cycleSelect {
+  width: 281px;
+  height: 47px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 17px;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  background: #1b2038;
+
+  cursor: pointer;
+}
+
+
+.cyclePlaceholder {
+  color: rgba(255, 255, 255, 0.3);
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 11.06px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+.cycleSelectedText {
+  color: rgba(255, 255, 255, 0.8);
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 11.06px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+.cycleDropdownIcon {
+  display: block;
+
+  width: 22.7px;
+  height: 22.7px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+
+  opacity: 0.5;
+
+  transition: transform 0.15s ease;
+}
+
+
+.cycleDropdownIconOpen {
+  transform: rotate(180deg);
+}
+
+
+.cycleMenu {
+  position: absolute;
+
+  left: 0;
+  top: 53px;
+
+  width: 281px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 5px 0;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.15);
+
+  overflow: hidden;
+
+  z-index: 100;
+}
+
+
+.cycleOption {
+  width: 100%;
+  height: 35px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 17px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #15192f;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 110%;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+
+.cycleOption:hover {
+  background: rgba(57, 87, 255, 0.08);
+}
+
+
+/* ==================================================
+   파일 및 참고 자료
+================================================== */
+
+.fileSection {
+  height: 321px;
+
+  padding: 23px 15px 15px 16px;
+}
+
+
+.fileSection h2 {
+  margin-bottom: 13px;
+}
+
+
+/* ==================================================
+   파일 검색
+================================================== */
+
+.fileSearch {
+  position: relative;
+
+  width: 659px;
+  height: 39px;
+
+  margin-bottom: 13px;
+}
+
+
+.fileSearch > img {
+  position: absolute;
+
+  left: 16px;
+  top: 50%;
+
+  width: 24px;
+  height: 24px;
+
+  transform: translateY(-50%);
+
+  object-fit: contain;
+
+  opacity: 0.25;
+
+  pointer-events: none;
+}
+
+
+.fileSearch input {
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+
+  padding: 0 15px 0 55px;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  outline: none;
+
+  background: #242a47;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+
+.fileSearch input::placeholder {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+
+.fileUploadLabel {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+/* ==================================================
+   파일 영역
+================================================== */
+
+.fileArea {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 26px;
+}
+
+
+/* ==================================================
+   업로드
+================================================== */
+
+.uploadBox {
+  width: 214px;
+  height: 158px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 25px;
+
+  padding: 0;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  background: #1b2038;
+
+  cursor: pointer;
+}
+
+
+.uploadIcon {
+  display: block;
+
+  width: 74px;
+  height: 74px;
+
+  object-fit: contain;
+}
+
+
+.uploadBox span {
+  color: rgba(255, 255, 255, 0.55);
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================================
+   파일 목록
+================================================== */
+
+.fileList {
+  width: 427px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+
+.fileItem {
+  width: 427px;
+  height: 29px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-left: 6px;
+  padding-right: 8px;
+
+  border: 1px solid rgba(166, 180, 255, 0.08);
+  border-radius: 8px;
+
+  background: #1b2038;
+}
+
+
+.fileNameWrap {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+}
+
+
+.fileNameWrap img {
+  display: block;
+
+  width: 17px;
+  height: 17px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}
+
+
+.fileNameWrap span {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.fileRight {
+  display: flex;
+  align-items: center;
+}
+
+
+.fileSize {
+  width: 43px;
+
+  margin-right: 44px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  text-align: right;
+
+  white-space: nowrap;
+}
+
+
+.fileRemoveButton {
+  width: 13px;
+  height: 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  opacity: 0.7;
+}
+
+
+.fileRemoveButton img {
+  display: block;
+
+  width: 13px;
+  height: 13px;
+
+  object-fit: contain;
+}
+
+
+/* ==================================================
+   하단 버튼
+================================================== */
+
+.actions {
+  width: 690px;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 17px;
+}
+
+
+.cancelButton {
+  width: 43px;
+  height: 33px;
+
+  box-sizing: border-box;
+
+  padding: 0;
+
+  border: 1px solid #4d67ff;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 110%;
+
+  cursor: pointer;
+}
+
+
+.submitButton {
+  width: 65px;
+  height: 33px;
+
+  box-sizing: border-box;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 110%;
+
+  cursor: pointer;
+}
+
+
+/* 편집 페이지 저장 버튼 */
+
+.saveButton {
+  width: 41px;
+}

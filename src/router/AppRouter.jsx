@@ -13,7 +13,13 @@ import MemberSettingsPage from "../features/project/pages/MemberSettingsPage/Mem
 import IntegrationSettingsPage from "../features/project/pages/IntegrationSettingsPage/IntegrationSettingsPage";
 
 import HandoverPage from "../features/handover/pages/HandoverPage/HandoverPage";
+
 import CyclePage from "../features/cycle/pages/CyclePage/CyclePage";
+
+import IssueListPage from "../features/issue/pages/IssueListPage/IssueListPage";
+import IssueDetailPage from "../features/issue/pages/IssueDetailPage/IssueDetailPage";
+import CreateIssuePage from "../features/issue/pages/CreateIssuePage/CreateIssuePage";
+import EditIssuePage from "../features/issue/pages/EditIssuePage/EditIssuePage";
 
 import { ROUTES } from "./routes.constant";
 
@@ -21,9 +27,15 @@ function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path={ROUTES.HOME} element={<MainPage />} />
+        <Route
+          path={ROUTES.HOME}
+          element={<MainPage />}
+        />
 
-        <Route path={ROUTES.DASHBOARD} element={<HomePage />} />
+        <Route
+          path={ROUTES.DASHBOARD}
+          element={<HomePage />}
+        />
 
         <Route
           path={ROUTES.CREATE_WORKSPACE}
@@ -68,6 +80,40 @@ function AppRouter() {
         <Route
           path={ROUTES.CYCLE}
           element={<CyclePage />}
+        />
+
+        {/* =========================
+            Issue
+        ========================= */}
+
+        <Route
+          path={ROUTES.ISSUE}
+          element={<IssueListPage />}
+        />
+
+        <Route
+          path={ROUTES.MY_ISSUE}
+          element={<IssueListPage type="my" />}
+        />
+
+        <Route
+          path={ROUTES.TEAM_ISSUE}
+          element={<IssueListPage type="team" />}
+        />
+
+        <Route
+          path={ROUTES.CREATE_ISSUE}
+          element={<CreateIssuePage />}
+        />
+
+        <Route
+          path={ROUTES.ISSUE_DETAIL}
+          element={<IssueDetailPage />}
+        />
+
+        <Route
+          path={ROUTES.ISSUE_EDIT}
+          element={<EditIssuePage />}
         />
       </Routes>
     </BrowserRouter>

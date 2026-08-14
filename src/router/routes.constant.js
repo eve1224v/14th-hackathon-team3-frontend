@@ -7,11 +7,18 @@ export const ROUTES = {
 
   CREATE_PROJECT: "/project/create",
   PROJECT_SETTINGS: "/project/settings",
-
   TIMEZONE_SETTINGS: "/project/settings/timezone",
   MEMBER_SETTINGS: "/project/settings/members",
   INTEGRATION_SETTINGS: "/project/settings/integrations",
 
   HANDOVER: "/handover",
+
   CYCLE: "/cycle",
+
+  ISSUE: "/issue",
+  MY_ISSUE: "/issue/my",
+  TEAM_ISSUE: "/issue/team",
+  CREATE_ISSUE: "/issue/create",
+  ISSUE_DETAIL: "/issue/:issueId",
+  ISSUE_EDIT: "/issue/:issueId/edit",
 };
