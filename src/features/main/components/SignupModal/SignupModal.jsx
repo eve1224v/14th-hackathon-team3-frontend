@@ -4,8 +4,6 @@ import styles from "./SignupModal.module.css";
 
 import logoIcon2 from "../../../../assets/icons/logo2.svg";
 import eyeIcon from "../../../../assets/icons/eyeIcon.svg";
-import googleIcon from "../../../../assets/icons/googleIcon.svg";
-import microsoftIcon from "../../../../assets/icons/microsoftIcon.svg";
 
 function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
   const [name, setName] = useState("");
@@ -141,20 +139,6 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
         {/* =========================
             Social
         ========================= */}
-
-        <div className={styles.socialArea}>
-          <button type="button">
-            <img src={googleIcon} alt="" />
-
-            <span>Google로 계속하기</span>
-          </button>
-
-          <button type="button">
-            <img src={microsoftIcon} alt="" />
-
-            <span>Microsoft로 계속하기</span>
-          </button>
-        </div>
 
         {/* =========================
             로그인
