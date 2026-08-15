@@ -371,3 +371,26 @@
 
   cursor: pointer;
 }
+
+.successMessage {
+  margin: 5px 0 0;
+
+  color: #6fa8ff;
+
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.errorMessage {
+  margin: 5px 0 0;
+
+  color: #ff5c5c;
+
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.inlineInput button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
