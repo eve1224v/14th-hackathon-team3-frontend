@@ -1,83 +1,79 @@
+/* ======================================== */
+/* SIDEBAR */
+/* ======================================== */
+
 .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+
   width: 234px;
-  min-width: 234px;
   height: 100vh;
 
-  display: flex;
-  flex-direction: column;
-
-  background-color: #151936;
-
+  background: #151936;
   color: #ffffff;
 
-  overflow: visible;
+  z-index: 100;
 
-  z-index: 500;
+  overflow: visible;
 }
 
-/* =========================
-   Logo
-========================= */
-
 .logoArea {
-  flex-shrink: 0;
-
-  padding-top: 26px;
-  padding-left: 23px;
+  padding: 24px 0 0 20px;
 }
 
 .logo {
+  width: 26px;
+  height: auto;
+
   display: block;
 }
 
-/* =========================
-   Sidebar Content
-========================= */
+/* ======================================== */
+/* SIDEBAR CONTENT */
+/* ======================================== */
 
 .sidebarContent {
   position: relative;
 
-  flex: 1;
+  height: calc(100vh - 58px);
 
-  display: flex;
-  flex-direction: column;
+  box-sizing: border-box;
 
-  min-height: 0;
-
-  padding-top: clamp(35px, 7vh, 83.94px);
-
-  padding-bottom: 35px;
+  padding-top: 58px;
 }
 
-/* =========================
-   로그인 전
-========================= */
+/* ======================================== */
+/* LOGIN */
+/* ======================================== */
 
 .loginText {
-  margin: 0 0 38px;
-  margin-left: 36px;
+  margin: 0 0 18px 33px;
 
-  font-size: 20px;
+  color: #ffffff;
+
+  font-size: 12px;
   font-weight: 500;
 }
 
-/* =========================
-   사용자 영역
-========================= */
+/* ======================================== */
+/* USER */
+/* ======================================== */
 
 .userArea {
-  margin-left: 33px;
-  margin-right: 21px;
-
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+
+  padding: 0 32px;
 }
 
 .greeting {
   margin: 0;
 
-  font-size: 14px;
+  color: #ffffff;
+
+  font-size: 12px;
   font-weight: 400;
 
   white-space: nowrap;
@@ -88,51 +84,24 @@
 }
 
 .logoutButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-
-  border: none;
-
-  background: transparent;
-
-  cursor: pointer;
+  display: none;
 }
 
-.logoutButton img {
-  width: 24px;
-  height: 24px;
-
-  display: block;
-}
-
-/* =========================
-   Workspace Dropdown
-========================= */
+/* ======================================== */
+/* WORKSPACE */
+/* ======================================== */
 
 .workspaceDropdown {
   position: relative;
 
-  width: 158px;
+  width: 94px;
 
-  margin-top: 13px;
-  margin-left: 36px;
-  margin-bottom: 18px;
-
-  z-index: 500;
+  margin: 15px 0 0 32px;
 }
 
-/* =========================
-   현재 선택된 Workspace
-========================= */
-
 .workspaceButton {
-  width: 158px;
-  height: 34px;
-
-  flex-shrink: 0;
+  width: 94px;
+  height: 20px;
 
   display: flex;
   align-items: center;
@@ -140,136 +109,80 @@
 
   box-sizing: border-box;
 
-  padding: 0 17px 0 20px;
+  padding: 0 10px;
 
-  border: 1px solid #d7d7d7;
-  border-radius: 13px;
+  border: none;
+  border-radius: 10px;
 
   background: #ffffff;
 
-  color: #111111;
+  color: #171b38;
 
-  font-family: Pretendard, sans-serif;
-  font-size: 12px;
+  font-size: 7px;
   font-weight: 600;
 
   cursor: pointer;
-
-  transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease;
 }
-
-/* Workspace 버튼 hover */
-
-.workspaceButton:hover {
-  background: #a7a7a7;
-
-  border-color: #d7d7d7;
-}
-
-/* =========================
-   Dropdown Icon
-========================= */
 
 .workspaceDropdownIcon {
-  width: 16px;
-  height: 16px;
-
-  display: block;
-
-  flex-shrink: 0;
-
-  object-fit: contain;
-
-  pointer-events: none;
+  width: 7px;
+  height: 7px;
 
   transition: transform 0.2s ease;
 }
-
-/* 열렸을 때 화살표 위쪽 */
 
 .workspaceDropdownIconOpen {
   transform: rotate(180deg);
 }
 
-/* =========================
-   Workspace Dropdown Menu
-========================= */
-
 .workspaceMenu {
   position: absolute;
 
-  top: calc(100% + 7px);
-  left: 4px;
+  top: 25px;
+  left: 0;
 
-  display: flex;
-
-  width: 150px;
-  height: 105px;
-
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-
-  flex-shrink: 0;
+  width: 94px;
 
   box-sizing: border-box;
 
-  padding: 0;
+  padding: 4px;
 
-  border-radius: 13px;
+  border-radius: 7px;
 
   background: #ffffff;
 
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  z-index: 300;
 
-  overflow: hidden;
-
-  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
 }
-
-/* =========================
-   Workspace 2 / 3 / 4
-========================= */
 
 .workspaceOption {
   width: 100%;
-  height: 30px;
+  height: 24px;
 
-  flex-shrink: 0;
-
-  display: flex;
-  align-items: center;
-
-  box-sizing: border-box;
-
-  padding: 0 24px;
+  padding: 0 6px;
 
   border: none;
+  border-radius: 5px;
 
-  background: #ffffff;
+  background: transparent;
 
-  color: #111111;
+  color: #171b38;
 
-  font-family: Pretendard, sans-serif;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 8px;
 
   text-align: left;
 
   cursor: pointer;
-
-  transition: background-color 0.15s ease;
 }
 
 .workspaceOption:hover {
-  background: #f3f3f3;
+  background: #f0f1f5;
 }
 
-/* =========================
-   Home / Cycle / Issue / Project
-========================= */
+/* ======================================== */
+/* MAIN MENU */
+/* ======================================== */
 
 .menu {
   display: flex;
@@ -277,7 +190,7 @@
 
   gap: 10px;
 
-  margin-left: 36px;
+  margin-top: 17px;
 }
 
 .menuItem {
@@ -288,7 +201,9 @@
 
   gap: 10px;
 
-  padding: 0;
+  box-sizing: border-box;
+
+  padding: 0 0 0 37px;
 
   border: none;
 
@@ -296,111 +211,136 @@
 
   color: #ffffff;
 
-  font-family: Pretendard, sans-serif;
   font-size: 12px;
-  font-weight: 600;
-
-  text-align: left;
+  font-weight: 500;
 
   cursor: pointer;
+
+  text-align: left;
 }
 
 .menuItem img {
-  width: 18.165px;
-  height: 18.165px;
+  width: 15px;
+  height: 15px;
 
-  display: block;
+  object-fit: contain;
 }
 
-/* =========================
-   Create Menu
-========================= */
+.menuItem span {
+  line-height: 16px;
+}
+
+.menuItem:hover {
+  opacity: 0.75;
+}
+
+/* ======================================== */
+/* CREATE MENU */
+/* ======================================== */
 
 .actionMenu {
-  margin-top: clamp(30px, 6vh, 73.13px);
+  width: 142px;
 
-  margin-left: 33px;
-  margin-right: 33px;
+  display: flex;
+  flex-direction: column;
+
+  gap: 0;
+
+  margin: 60px 0 0 32px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .actionMenu button {
   width: 100%;
+  height: 40px;
 
-  padding: 15px 0 15px 5px;
+  box-sizing: border-box;
+
+  padding: 0 4px;
 
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 
-  background: none;
+  background: transparent;
 
   color: #ffffff;
 
-  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
 
-  font-family: Pretendard, sans-serif;
-  font-size: 12px;
-  font-weight: 600;
+  text-align: left;
 
   cursor: pointer;
 }
 
-.actionMenu button:last-child {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+.actionMenu button:hover {
+  opacity: 0.75;
 }
 
-/* =========================
-   Time
-========================= */
+/* ======================================== */
+/* TIME */
+/* ======================================== */
 
 .timeSection {
-  margin-top: clamp(35px, 8vh, 125.32px);
+  position: absolute;
 
-  margin-left: 27px;
-}
-
-.timeSection > div + div {
-  margin-top: 25px;
-}
-
-.timeSection p {
-  margin: 0 0 0.76px;
-
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.timeSection strong {
-  font-size: 24px;
-  font-weight: 600;
-
-  line-height: 110%;
-}
-
-/* =========================
-   Bottom Menu
-========================= */
-
-.bottomMenu {
-  margin-top: auto;
-  margin-left: 34px;
+  left: 27px;
+  bottom: 285px;
 
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
 
-  gap: 13px;
-
-  flex-shrink: 0;
+  gap: 24px;
 }
 
-.notifyRow {
+.timeSection > div {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+}
 
-  gap: 8px;
+.timeSection p {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  line-height: 1.2;
+}
+
+.timeSection strong {
+  margin-top: 1px;
+
+  color: #ffffff;
+
+  font-size: 21px;
+  font-weight: 500;
+
+  line-height: 1;
+}
+
+/* ======================================== */
+/* BOTTOM MENU */
+/* ======================================== */
+
+.bottomMenu {
+  position: absolute;
+
+  left: 34px;
+  bottom: 27px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
 }
 
 .bottomButton {
+  width: 20px;
+  height: 20px;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -409,48 +349,53 @@
 
   border: none;
 
-  background: none;
+  background: transparent;
 
   cursor: pointer;
 }
 
 .bottomButton img {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
 
-  display: block;
+  object-fit: contain;
 }
 
-/* =========================
-   Notify Toggle
-========================= */
+.notifyRow {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+/* ======================================== */
+/* BOTTOM TOGGLE */
+/* ======================================== */
 
 .toggle {
   position: relative;
 
+  width: 34px;
+  height: 18px;
+
   display: inline-block;
 
-  width: 30px;
-  height: 17px;
-
-  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .toggle input {
-  width: 0;
-  height: 0;
-
-  opacity: 0;
+  display: none;
 }
 
 .toggleSlider {
   position: absolute;
-
   inset: 0;
 
   border-radius: 20px;
 
-  background-color: rgba(255, 255, 255, 0.55);
+  background: #d6d8de;
+
+  cursor: pointer;
 
   transition: 0.2s;
 }
@@ -463,22 +408,1084 @@
   top: 2px;
   left: 2px;
 
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
 
   border-radius: 50%;
 
-  background-color: #ffffff;
+  background: #ffffff;
 
   transition: 0.2s;
 }
 
 .toggle input:checked + .toggleSlider {
-  background-color: #ffffff;
+  background: #536cff;
 }
 
 .toggle input:checked + .toggleSlider::before {
-  transform: translateX(13px);
+  transform: translateX(16px);
+}
 
-  background-color: #151936;
+/* ======================================== */
+/* PROFILE POPUP */
+/* ======================================== */
+
+.profileWrapper {
+  position: relative;
+}
+
+.profilePopup {
+  position: absolute;
+
+  left: calc(100% + 14px);
+  bottom: 0;
+
+  width: 240px;
+
+  background: #171b38;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  z-index: 1000;
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.profileInfo {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 16px 18px 12px;
+}
+
+.profileImage {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #b5acb1;
+}
+
+.profileImage img {
+  width: 25px;
+  height: 25px;
+}
+
+.profileText {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+
+  min-width: 0;
+}
+
+.profileText strong {
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.profileText span {
+  color: #d4d5df;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.accountSection {
+  padding: 0 18px 12px;
+}
+
+.accountTitle {
+  margin: 4px 0 8px;
+
+  color: #b6b8c8;
+
+  font-size: 11px;
+}
+
+.profileMenuItem {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 7px 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  cursor: pointer;
+
+  text-align: left;
+}
+
+.profileMenuItem img {
+  width: 21px;
+  height: 21px;
+}
+
+.profileMenuItem:hover {
+  opacity: 0.75;
+}
+
+.profileDivider {
+  height: 1px;
+
+  margin: 0 16px;
+
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.profileLogoutButton {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 6px;
+
+  padding: 12px 18px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #e85656;
+
+  font-size: 12px;
+
+  cursor: pointer;
+}
+
+.profileLogoutButton img {
+  width: 16px;
+  height: 16px;
+
+  filter: brightness(0) saturate(100%) invert(42%) sepia(92%) saturate(1788%)
+    hue-rotate(328deg) brightness(94%) contrast(92%);
+}
+
+.profileLogoutButton:hover {
+  opacity: 0.8;
+}
+
+/* ======================================== */
+/* PROFILE SETTING MODAL */
+/* ======================================== */
+
+.profileModalOverlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.35);
+
+  z-index: 2000;
+}
+
+.profileModal {
+  width: min(760px, calc(100vw - 80px));
+  height: 610px;
+
+  box-sizing: border-box;
+
+  padding: 46px 52px;
+
+  border-radius: 10px;
+
+  background: #171b38;
+
+  color: #ffffff;
+}
+
+.profileModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profileModalHeader h2 {
+  margin: 0;
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.profileModalClose {
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.profileModalClose img {
+  width: 18px;
+  height: 18px;
+}
+
+.profileModalContent {
+  display: flex;
+
+  gap: 82px;
+
+  margin-top: 40px;
+}
+
+.profilePhotoArea {
+  position: relative;
+
+  width: 130px;
+  height: 130px;
+
+  flex-shrink: 0;
+}
+
+.profilePhotoCircle {
+  width: 125px;
+  height: 125px;
+
+  border-radius: 50%;
+
+  background: #d5d5d5;
+}
+
+.profilePhotoEditButton {
+  position: absolute;
+
+  right: 0;
+  bottom: 0;
+
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  cursor: pointer;
+}
+
+.profilePhotoEditButton img {
+  width: 22px;
+  height: 22px;
+}
+
+.profileForm {
+  width: 335px;
+}
+
+.profileField {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+
+  margin-bottom: 14px;
+}
+
+.profileField label {
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.profileField input {
+  width: 100%;
+  height: 44px;
+
+  box-sizing: border-box;
+
+  padding: 0 16px;
+
+  border: 1px solid #343b69;
+  border-radius: 10px;
+
+  outline: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-size: 11px;
+}
+
+.profileField input:focus {
+  border-color: #5b6cff;
+}
+
+.profileModalActions {
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  margin-top: 86px;
+}
+
+.profileCancelButton,
+.profileSaveButton {
+  height: 30px;
+
+  padding: 0 18px;
+
+  border-radius: 6px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.profileCancelButton {
+  border: 1px solid #6070ff;
+
+  background: transparent;
+
+  color: #ffffff;
+}
+
+.profileSaveButton {
+  border: 1px solid #6070ff;
+
+  background: #5364f5;
+
+  color: #ffffff;
+}
+
+/* ======================================== */
+/* SYSTEM SETTING MODAL */
+/* ======================================== */
+
+.systemModalOverlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.35);
+
+  z-index: 3000;
+}
+
+.systemModal {
+  width: min(760px, calc(100vw - 80px));
+  height: 610px;
+
+  display: flex;
+
+  box-sizing: border-box;
+
+  border-radius: 10px;
+
+  background: #171b38;
+
+  color: #ffffff;
+
+  overflow: hidden;
+}
+
+/* ======================================== */
+/* SYSTEM LEFT */
+/* ======================================== */
+
+.systemSidebar {
+  width: 190px;
+
+  flex-shrink: 0;
+
+  box-sizing: border-box;
+
+  padding: 46px 0 40px 48px;
+}
+
+.systemSidebar h2 {
+  margin: 0 0 32px;
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.systemNavigation {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.systemNavItem {
+  width: 140px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  text-align: left;
+
+  transition: color 0.2s ease;
+}
+
+.systemNavIcon {
+  display: block;
+
+  width: 18px;
+  height: 18px;
+
+  flex: 0 0 18px;
+
+  object-fit: contain;
+
+  transition: filter 0.2s ease;
+}
+
+.systemNavItemActive {
+  color: #536cff;
+}
+
+.systemNavItemActive .systemNavIcon {
+  filter: brightness(0) saturate(100%) invert(39%) sepia(99%) saturate(2435%)
+    hue-rotate(220deg) brightness(101%) contrast(101%);
+}
+
+/* ======================================== */
+/* SYSTEM RIGHT */
+/* ======================================== */
+
+.systemContent {
+  position: relative;
+
+  flex: 1;
+
+  box-sizing: border-box;
+
+  padding: 58px 58px 40px 32px;
+}
+
+.systemCloseButton {
+  position: absolute;
+
+  top: 45px;
+  right: 50px;
+
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.systemCloseButton img {
+  width: 18px;
+  height: 18px;
+}
+
+.systemPage {
+  width: 100%;
+}
+
+.systemPage h3 {
+  margin: 0 0 32px;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.systemPage h4 {
+  margin: 0 0 10px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ======================================== */
+/* SYSTEM GROUP */
+/* ======================================== */
+
+.systemGroup {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 7px;
+
+  overflow: hidden;
+}
+
+.systemSection {
+  margin-top: 34px;
+}
+
+.systemRow {
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  box-sizing: border-box;
+
+  padding: 9px 14px;
+}
+
+.systemRow + .systemRow {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.systemRow strong {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  line-height: 1.3;
+}
+
+.systemRow strong span {
+  color: #69708c;
+
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.systemRow p {
+  margin: 4px 0 0;
+
+  color: #737991;
+
+  font-size: 8px;
+  font-weight: 500;
+
+  line-height: 1.4;
+}
+
+.systemRow input,
+.systemRow select {
+  width: 190px;
+  height: 34px;
+
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+
+  outline: none;
+
+  background: #171b38;
+
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.systemRow input:focus,
+.systemRow select:focus {
+  border-color: #536cff;
+}
+
+.systemRow select {
+  background: #292e49;
+
+  cursor: pointer;
+}
+
+/* ======================================== */
+/* NOTIFICATION */
+/* ======================================== */
+
+.notificationList {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.notificationRow {
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+
+  padding: 9px 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 7px;
+}
+
+.notificationRow strong {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  line-height: 1.3;
+}
+
+.notificationRow p {
+  margin: 4px 0 0;
+
+  color: #737991;
+
+  font-size: 8px;
+  font-weight: 500;
+
+  line-height: 1.4;
+}
+
+/* ======================================== */
+/* SYSTEM TOGGLE */
+/* ======================================== */
+
+.systemToggle {
+  position: relative;
+
+  width: 30px;
+  height: 17px;
+
+  flex-shrink: 0;
+}
+
+.systemToggle input {
+  display: none;
+}
+
+.systemToggle span {
+  position: absolute;
+  inset: 0;
+
+  border-radius: 20px;
+
+  background: #444b67;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.systemToggle span::before {
+  content: "";
+
+  position: absolute;
+
+  width: 13px;
+  height: 13px;
+
+  top: 2px;
+  left: 2px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  transition: 0.2s;
+}
+
+.systemToggle input:checked + span {
+  background: #69aaff;
+}
+
+.systemToggle input:checked + span::before {
+  transform: translateX(13px);
+}
+
+/* ======================================== */
+/* ACCOUNT */
+/* ======================================== */
+
+.passwordArea {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+.passwordArea input {
+  width: 145px;
+}
+
+.passwordChangeButton {
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+
+  padding: 0 9px;
+
+  border: 1px solid #6876ff;
+  border-radius: 5px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.passwordChangeButton img {
+  width: 11px;
+  height: 11px;
+
+  object-fit: contain;
+}
+
+.passwordChangeButton:hover {
+  background: rgba(104, 118, 255, 0.1);
+}
+
+.dangerSection {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  margin-top: 70px;
+}
+
+.dangerRow {
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+
+  padding: 9px 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 7px;
+}
+
+.dangerRow strong {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.dangerRow p {
+  margin: 4px 0 0;
+
+  color: #737991;
+
+  font-size: 8px;
+  font-weight: 500;
+}
+
+.dangerRow button {
+  height: 28px;
+
+  padding: 0 10px;
+
+  border: 1px solid #ff4141;
+  border-radius: 5px;
+
+  background: transparent;
+
+  color: #ff4141;
+
+  font-size: 10px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+/* ======================================== */
+/* SYSTEM ACTIONS */
+/* ======================================== */
+
+.systemActions {
+  position: absolute;
+
+  right: 58px;
+  bottom: 48px;
+
+  display: flex;
+
+  gap: 8px;
+}
+
+.systemCancelButton,
+.systemSaveButton {
+  height: 30px;
+
+  padding: 0 17px;
+
+  border-radius: 6px;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.systemCancelButton {
+  border: 1px solid #6070ff;
+
+  background: transparent;
+
+  color: #ffffff;
+}
+
+.systemSaveButton {
+  border: 1px solid #5364f5;
+
+  background: #5364f5;
+
+  color: #ffffff;
+}
+
+.systemCancelButton:hover,
+.systemSaveButton:hover,
+.profileCancelButton:hover,
+.profileSaveButton:hover {
+  opacity: 0.85;
+}
+
+/* ======================================== */
+/* PASSWORD CHANGE MODAL */
+/* ======================================== */
+
+.passwordModalOverlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.35);
+
+  z-index: 4000;
+}
+
+.passwordModal {
+  width: 335px;
+
+  box-sizing: border-box;
+
+  padding: 24px 34px 20px;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  color: #111111;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.passwordModal h2 {
+  margin: 0 0 18px;
+
+  color: #111111;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ======================================== */
+/* PASSWORD FORM */
+/* ======================================== */
+
+.passwordModalForm {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.passwordModalField {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.passwordModalField label {
+  color: #222222;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.passwordModalField input {
+  width: 100%;
+  height: 32px;
+
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  border: none;
+  border-radius: 7px;
+
+  outline: none;
+
+  background: #f3f3f3;
+
+  color: #222222;
+
+  font-size: 9px;
+}
+
+.passwordModalField input::placeholder {
+  color: #b8b8b8;
+
+  font-size: 8px;
+}
+
+.passwordModalField input:focus {
+  box-shadow: 0 0 0 1px #536cff;
+}
+
+.passwordErrorMessage {
+  margin: 0;
+
+  color: #e85656;
+
+  font-size: 9px;
+  font-weight: 500;
+}
+
+/* ======================================== */
+/* PASSWORD ACTIONS */
+/* ======================================== */
+
+.passwordModalActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 7px;
+
+  margin-top: 14px;
+}
+
+.passwordCancelButton,
+.passwordSubmitButton {
+  min-width: 46px;
+  height: 26px;
+
+  padding: 0 13px;
+
+  border-radius: 6px;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.passwordCancelButton {
+  border: 1px solid #c6c6c6;
+
+  background: #ffffff;
+
+  color: #222222;
+}
+
+.passwordSubmitButton {
+  border: 1px solid #536cff;
+
+  background: #536cff;
+
+  color: #ffffff;
+}
+
+.passwordCancelButton:hover,
+.passwordSubmitButton:hover {
+  opacity: 0.85;
 }
