@@ -6,18 +6,20 @@ import styles from "./CreateWorkspaceForm.module.css";
 import plusmemberIcon from "../../../../assets/icons/plusmemberIcon.svg";
 import { ROUTES } from "../../../../router/routes.constant";
 
+import { createWorkspace } from "../../../../api/workspaceApi";
+
 function CreateWorkspaceForm() {
   const navigate = useNavigate();
 
-  /* =========================
-     초대할 팀원 이메일 목록
-  ========================= */
+  const [workspaceName, setWorkspaceName] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [companyCountryCode, setCompanyCountryCode] = useState("");
+  const [collaboratingCompanyName, setCollaboratingCompanyName] = useState("");
 
   const [memberEmails, setMemberEmails] = useState([""]);
 
-  /* =========================
-     이메일 입력
-  ========================= */
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleEmailChange = (index, value) => {
     setMemberEmails((prev) =>
@@ -25,20 +27,65 @@ function CreateWorkspaceForm() {
     );
   };
 
-  /* =========================
-     이메일 입력칸 추가
-  ========================= */
-
   const handleAddMember = () => {
     setMemberEmails((prev) => [...prev, ""]);
   };
 
-  /* =========================
-     워크스페이스 생성
-  ========================= */
+  const handleCreateWorkspace = async () => {
+    if (
+      !workspaceName.trim() ||
+      !companyName.trim() ||
+      !companyCountryCode.trim()
+    ) {
+      setErrorMessage("필수 항목을 모두 입력해주세요.");
+      return;
+    }
 
-  const handleCreateWorkspace = () => {
-    navigate(ROUTES.CREATE_PROJECT);
+    try {
+      setIsLoading(true);
+      setErrorMessage("");
+
+      const response = await createWorkspace({
+        name: workspaceName,
+        companyName,
+        companyCountryCode: companyCountryCode.toUpperCase(),
+
+        collaboratingCompanyNames: collaboratingCompanyName.trim()
+          ? [collaboratingCompanyName.trim()]
+          : [],
+
+        inviteeEmails: memberEmails
+          .map((email) => email.trim())
+          .filter((email) => email !== ""),
+      });
+
+      console.log("워크스페이스 생성 성공:", response);
+
+      const workspaceId = response.data.workspaceId;
+      const organizationCode = response.data.organizationCode;
+
+      localStorage.setItem("workspaceId", String(workspaceId));
+
+      localStorage.setItem("organizationCode", organizationCode);
+
+      navigate(ROUTES.CREATE_PROJECT);
+    } catch (error) {
+      console.error("워크스페이스 생성 실패:", error);
+
+      const errorCode = error.response?.data?.code;
+
+      if (errorCode === "400INVALID_WORKSPACE_INPUT") {
+        setErrorMessage("워크스페이스 정보를 올바르게 입력해주세요.");
+      } else if (errorCode === "409WORKSPACE_NAME_DUPLICATED") {
+        setErrorMessage("이미 사용 중인 워크스페이스 이름입니다.");
+      } else if (error.response?.status === 401) {
+        setErrorMessage("로그인이 필요합니다.");
+      } else {
+        setErrorMessage("워크스페이스 생성 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -46,37 +93,53 @@ function CreateWorkspaceForm() {
       <h1 className={styles.title}>새로운 워크스페이스</h1>
 
       <div className={styles.formGrid}>
-        {/* =========================
-            왼쪽 영역
-        ========================= */}
-
         <div className={styles.leftColumn}>
           <div className={styles.field}>
             <label htmlFor="workspaceName">워크스페이스 이름</label>
 
-            <input id="workspaceName" type="text" />
+            <input
+              id="workspaceName"
+              type="text"
+              value={workspaceName}
+              onChange={(e) => setWorkspaceName(e.target.value)}
+            />
           </div>
 
           <div className={styles.field}>
             <label htmlFor="companyName">회사명</label>
 
-            <input id="companyName" type="text" />
+            <input
+              id="companyName"
+              type="text"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+            />
           </div>
 
           <div className={styles.field}>
             <label htmlFor="companyCountry">회사 국가</label>
 
-            <input id="companyCountry" type="text" />
+            <input
+              id="companyCountry"
+              type="text"
+              value={companyCountryCode}
+              onChange={(e) => setCompanyCountryCode(e.target.value)}
+              placeholder="예: KR"
+            />
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="companyType">회사 기업</label>
+            <label htmlFor="companyType">협업 기업</label>
 
-            <input id="companyType" type="text" />
+            <input
+              id="companyType"
+              type="text"
+              value={collaboratingCompanyName}
+              onChange={(e) => setCollaboratingCompanyName(e.target.value)}
+            />
           </div>
         </div>
 
-        {/* 오른쪽 영역 */}
         <div className={styles.rightColumn}>
           <div className={styles.field}>
             <label>초대할 팀원 이메일</label>
@@ -111,32 +174,15 @@ function CreateWorkspaceForm() {
         </div>
       </div>
 
-      {/* =========================
-          초대 코드
-      ========================= */}
-
-      <div className={styles.inviteArea}>
-        <button type="button" className={styles.inviteButton}>
-          초대 코드 생성
-        </button>
-
-        <input
-          type="text"
-          className={styles.inviteCodeInput}
-          aria-label="초대 코드"
-        />
-      </div>
-
-      {/* =========================
-          워크스페이스 생성
-      ========================= */}
+      {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
 
       <button
         type="button"
         className={styles.createButton}
         onClick={handleCreateWorkspace}
+        disabled={isLoading}
       >
-        워크스페이스 생성
+        {isLoading ? "생성 중..." : "워크스페이스 생성"}
       </button>
     </section>
   );
