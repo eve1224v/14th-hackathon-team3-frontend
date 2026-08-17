@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import styles from "./OnboardingModal.module.css";
 
@@ -8,6 +9,8 @@ import rectangle2 from "../../../../assets/icons/rectangle2.svg";
 import dropdownIcon from "../../../../assets/icons/dropdownIcon.svg";
 
 function OnboardingModal({ onClose, userName }) {
+  const { t } = useTranslation();
+
   const [step, setStep] = useState(1);
 
   /* =========================
@@ -31,7 +34,7 @@ function OnboardingModal({ onClose, userName }) {
 
   const [autoHoliday, setAutoHoliday] = useState(false);
 
-  const [selectedWorkDays, setSelectedWorkDays] = useState(["월", "화"]);
+  const [selectedWorkDays, setSelectedWorkDays] = useState(["mon", "tue"]);
 
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -72,35 +75,32 @@ function OnboardingModal({ onClose, userName }) {
         <div className={styles.header}>
           <div>
             <h1>
-              환영합니다, <strong>{userName}님!</strong>
+              {t("onboarding.welcome", {
+                name: userName,
+              })}
             </h1>
 
             {step === 1 && (
               <>
-                <h2>업무 시작 전, 기본 정보를 입력해주세요.</h2>
+                <h2>{t("onboarding.step1.title")}</h2>
 
-                <p>함께 일할 팀이 나를 쉽게 이해할 수 있어요.</p>
+                <p>{t("onboarding.step1.description")}</p>
               </>
             )}
 
             {step === 2 && (
               <>
-                <h2>나의 업무 시간을 설정해주세요.</h2>
+                <h2>{t("onboarding.step2.title")}</h2>
 
-                <p>
-                  서로의 근무 시간을 알고, 필요한 순간에 업무를 이어갈 수
-                  있어요.
-                </p>
+                <p>{t("onboarding.step2.description")}</p>
               </>
             )}
 
             {step === 3 && (
               <>
-                <h2>함께할 공간을 선택해주세요.</h2>
+                <h2>{t("onboarding.step3.title")}</h2>
 
-                <p>
-                  새 워크스페이스를 만들거나, 초대받은 팀에 참여할 수 있어요.
-                </p>
+                <p>{t("onboarding.step3.description")}</p>
               </>
             )}
           </div>
@@ -200,7 +200,7 @@ function OnboardingModal({ onClose, userName }) {
             className={styles.nextButton}
             onClick={handleNext}
           >
-            다음
+            {t("common.next")}
           </button>
         ) : (
           <button
@@ -208,7 +208,7 @@ function OnboardingModal({ onClose, userName }) {
             className={styles.closeButton}
             onClick={onClose}
           >
-            닫기
+            {t("common.close")}
           </button>
         )}
       </section>
@@ -234,43 +234,61 @@ function StepOne({
   isLanguageOpen,
   setIsLanguageOpen,
 }) {
-  const languageOptions = ["한국어", "English", "日本語", "简体中文"];
+  const { t } = useTranslation();
+
+  const languageOptions = [
+    {
+      value: "ko",
+      label: t("languages.korean"),
+    },
+    {
+      value: "en",
+      label: t("languages.english"),
+    },
+    {
+      value: "ja",
+      label: t("languages.japanese"),
+    },
+  ];
 
   const handleLanguageSelect = (option) => {
-    setLanguage(option);
+    setLanguage(option.value);
     setIsLanguageOpen(false);
   };
+
+  const selectedLanguageLabel =
+    languageOptions.find((option) => option.value === language)?.label || "";
 
   return (
     <div className={styles.stepContent}>
       <div className={styles.twoColumn}>
         <div className={styles.column}>
           <div className={styles.field}>
-            <label htmlFor="company">소속 기업</label>
+            <label htmlFor="company">{t("onboarding.company")}</label>
 
             <input
               id="company"
               type="text"
-              placeholder="기업 이름을 입력하세요."
+              placeholder={t("onboarding.companyPlaceholder")}
               value={company}
               onChange={(e) => setCompany(e.target.value)}
             />
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="department">부서/팀</label>
+            <label htmlFor="department">{t("onboarding.departmentTeam")}</label>
 
             <input
               id="department"
               type="text"
-              placeholder="부서 이름을 입력하세요."
+              placeholder={t("onboarding.departmentPlaceholder")}
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
             />
 
             <input
               type="text"
-              placeholder="팀 이름을 입력하세요."
+              placeholder={t("onboarding.teamPlaceholder")}
               value={team}
               onChange={(e) => setTeam(e.target.value)}
             />
@@ -279,19 +297,19 @@ function StepOne({
 
         <div className={styles.column}>
           <div className={styles.field}>
-            <label htmlFor="position">직책</label>
+            <label htmlFor="position">{t("onboarding.position")}</label>
 
             <input
               id="position"
               type="text"
-              placeholder="직책 이름을 입력하세요."
+              placeholder={t("onboarding.positionPlaceholder")}
               value={position}
               onChange={(e) => setPosition(e.target.value)}
             />
           </div>
 
           <div className={styles.field}>
-            <label>기본 언어 설정</label>
+            <label>{t("onboarding.defaultLanguage")}</label>
 
             <div className={styles.customDropdown}>
               <button
@@ -306,7 +324,7 @@ function StepOne({
                       : styles.dropdownPlaceholder
                   }
                 >
-                  {language || "선택"}
+                  {selectedLanguageLabel || t("common.select")}
                 </span>
 
                 <img
@@ -322,12 +340,12 @@ function StepOne({
                 <div className={styles.dropdownMenu}>
                   {languageOptions.map((option) => (
                     <button
-                      key={option}
+                      key={option.value}
                       type="button"
                       className={styles.dropdownOption}
                       onClick={() => handleLanguageSelect(option)}
                     >
-                      {option}
+                      {option.label}
                     </button>
                   ))}
                 </div>
@@ -358,17 +376,31 @@ function StepTwo({
   endTime,
   setEndTime,
 }) {
+  const { t } = useTranslation();
+
   const countryOptions = [
-    "대한민국 / Asia-Seoul",
-    "United Kingdom / Europe-London",
-    "United States / America-New_York",
-    "Japan / Asia-Tokyo",
+    {
+      value: "KR",
+      label: `${t("countries.korea")} / Asia-Seoul`,
+    },
+    {
+      value: "GB",
+      label: `${t("countries.uk")} / Europe-London`,
+    },
+    {
+      value: "US",
+      label: `${t("countries.usa")} / America-New_York`,
+    },
+    {
+      value: "JP",
+      label: `${t("countries.japan")} / Asia-Tokyo`,
+    },
   ];
 
-  const workDays = ["일", "월", "화", "수", "목", "금", "토"];
+  const workDays = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
   const handleCountrySelect = (option) => {
-    setCountry(option);
+    setCountry(option.value);
     setIsCountryOpen(false);
   };
 
@@ -382,14 +414,15 @@ function StepTwo({
     });
   };
 
+  const selectedCountryLabel =
+    countryOptions.find((option) => option.value === country)?.label || "";
+
   return (
     <div className={styles.stepContent}>
       <div className={styles.twoColumn}>
-        {/* 왼쪽 */}
-
         <div className={styles.column}>
           <div className={styles.field}>
-            <label>국가/시간대</label>
+            <label>{t("onboarding.countryTimezone")}</label>
 
             <div className={styles.customDropdown}>
               <button
@@ -404,7 +437,7 @@ function StepTwo({
                       : styles.dropdownPlaceholder
                   }
                 >
-                  {country || "국가 및 지역을 선택하세요."}
+                  {selectedCountryLabel || t("onboarding.countryPlaceholder")}
                 </span>
 
                 <img
@@ -420,12 +453,12 @@ function StepTwo({
                 <div className={styles.dropdownMenu}>
                   {countryOptions.map((option) => (
                     <button
-                      key={option}
+                      key={option.value}
                       type="button"
                       className={styles.dropdownOption}
                       onClick={() => handleCountrySelect(option)}
                     >
-                      {option}
+                      {option.label}
                     </button>
                   ))}
                 </div>
@@ -440,15 +473,13 @@ function StepTwo({
               onChange={(e) => setAutoHoliday(e.target.checked)}
             />
 
-            <span>국가 공휴일 자동 추가</span>
+            <span>{t("onboarding.autoHoliday")}</span>
           </label>
         </div>
 
-        {/* 오른쪽 */}
-
         <div className={styles.column}>
           <div className={styles.field}>
-            <label>근무 요일</label>
+            <label>{t("onboarding.workDays")}</label>
 
             <div className={styles.weekDays}>
               {workDays.map((day) => {
@@ -463,7 +494,7 @@ function StepTwo({
                     }`}
                     onClick={() => handleWorkDayClick(day)}
                   >
-                    {day}
+                    {t(`weekDays.${day}`)}
                   </button>
                 );
               })}
@@ -471,19 +502,19 @@ function StepTwo({
           </div>
 
           <div className={styles.field}>
-            <label>근무 시작 시간/종료 시간</label>
+            <label>{t("onboarding.workTime")}</label>
 
             <input
               type="text"
               value={startTime}
-              placeholder="근무 시작 시간"
+              placeholder={t("onboarding.startTime")}
               onChange={(e) => setStartTime(e.target.value)}
             />
 
             <input
               type="text"
               value={endTime}
-              placeholder="근무 종료 시간"
+              placeholder={t("onboarding.endTime")}
               onChange={(e) => setEndTime(e.target.value)}
             />
           </div>
@@ -498,15 +529,17 @@ function StepTwo({
 ========================================================= */
 
 function StepThree() {
+  const { t } = useTranslation();
+
   return (
     <div className={styles.stepContent}>
       <div className={styles.workspaceChoices}>
         <button type="button" className={styles.workspaceChoice}>
-          새 워크스페이스 만들기
+          {t("onboarding.createWorkspace")}
         </button>
 
         <button type="button" className={styles.workspaceChoice}>
-          초대받은 링크로 팀에 참여하기
+          {t("onboarding.joinWorkspace")}
         </button>
       </div>
     </div>
