@@ -4,6 +4,7 @@ export const ROUTES = {
 
   CREATE_WORKSPACE: "/workspace/create",
   JOIN_WORKSPACE: "/workspace/join",
+  PROJECT_HOME: "/projects",
 
   CREATE_PROJECT: "/project/create",
   PROJECT_SETTINGS: "/project/settings",
@@ -21,4 +22,8 @@ export const ROUTES = {
   CREATE_ISSUE: "/issue/create",
   ISSUE_DETAIL: "/issue/:issueId",
   ISSUE_EDIT: "/issue/:issueId/edit",
+
+  PROFILE_SETTINGS: "/settings/profile",
+
+  SYSTEM_SETTINGS: "/settings/system",
 };
