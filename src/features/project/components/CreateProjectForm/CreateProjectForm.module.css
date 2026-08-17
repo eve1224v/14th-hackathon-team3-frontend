@@ -1,7 +1,9 @@
 .container {
   position: relative;
 
-  width: 100%;
+  margin-left: 234px;
+
+  width: calc(100% - 234px);
 
   box-sizing: border-box;
 
@@ -10,6 +12,47 @@
   padding-bottom: 70px;
 
   color: #ffffff;
+}
+
+/* =========================
+   뒤로
+========================= */
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+
+  margin-bottom: 34px;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 10px;
+  font-weight: 400;
+
+  cursor: pointer;
+}
+
+.backButtonIcon {
+  display: block;
+
+  width: 12px;
+  height: 12px;
+
+  object-fit: contain;
+}
+
+.backButton:hover {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .title {
@@ -200,6 +243,10 @@
   border-color: #4d67ff;
 }
 
+/* =========================
+   Calendar Popup
+========================= */
+
 .calendarPopup {
   position: absolute;
 
@@ -346,6 +393,10 @@
 .selectedDay:hover {
   background: #1998ee;
 }
+
+/* =========================
+   Company
+========================= */
 
 .companyCard {
   margin-bottom: 0;
@@ -528,6 +579,31 @@
   cursor: pointer;
 }
 
+/* =========================
+   Error
+========================= */
+
+.errorMessage {
+  width: 690px;
+
+  box-sizing: border-box;
+
+  margin: 14px 0 0;
+
+  color: #ff6464;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  line-height: 1.4;
+}
+
+/* =========================
+   Bottom
+========================= */
+
 .bottomActions {
   width: 690px;
 
@@ -570,4 +646,13 @@
   background-color: #4d67ff;
 
   color: #ffffff;
+}
+
+/* API 요청 중 */
+
+.cancelButton:disabled,
+.createButton:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
 }
