@@ -15,12 +15,15 @@ const parseResponse = async (response) => {
   }
 
   if (!response.ok) {
-    throw {
-      status: response.status,
-      code: data?.code,
-      message: data?.message || "요청 처리 중 오류가 발생했습니다.",
-      data: data?.data,
-    };
+    const error = new Error(
+      data?.message || "요청 처리 중 오류가 발생했습니다.",
+    );
+
+    error.status = response.status;
+    error.code = data?.code;
+    error.data = data?.data;
+
+    throw error;
   }
 
   return data;
@@ -28,9 +31,12 @@ const parseResponse = async (response) => {
 
 /* =========================================
    로그인
+
+   POST
+   /api/v1/auth/login
 ========================================= */
 
-export const login = async ({ email, password }) => {
+export const login = async (email, password) => {
   const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
     method: "POST",
 
@@ -96,6 +102,98 @@ export const verifyEmailVerification = async ({ email, verificationCode }) => {
       }),
     },
   );
+
+  return parseResponse(response);
+};
+
+/* =========================================
+   로그아웃
+
+   POST
+   /api/v1/auth/logout
+========================================= */
+
+export const logout = async () => {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    const error = new Error("로그인 정보가 없습니다.");
+
+    error.status = 401;
+
+    throw error;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+    method: "POST",
+
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  return parseResponse(response);
+};
+
+export const requestPasswordReset = async (email) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/auth/password-reset/request`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        email,
+      }),
+    },
+  );
+
+  return parseResponse(response);
+};
+
+export const verifyPasswordReset = async ({ email, verificationCode }) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/auth/password-reset/verify`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        email,
+        verificationCode,
+      }),
+    },
+  );
+
+  return parseResponse(response);
+};
+
+export const resetPassword = async ({
+  email,
+  resetToken,
+  newPassword,
+  newPasswordConfirm,
+}) => {
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/password-reset`, {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      email,
+      resetToken,
+      newPassword,
+      newPasswordConfirm,
+    }),
+  });
 
   return parseResponse(response);
 };
