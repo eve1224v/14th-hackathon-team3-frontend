@@ -1,53 +1,86 @@
 .container {
-  position: relative;
+  margin-left: 234px;
 
-  width: 100%;
-  min-height: 100%;
+  width: calc(100% - 234px);
+  min-height: 100vh;
 
   box-sizing: border-box;
 
-  padding-top: 140px;
-  padding-left: 90px;
-  padding-bottom: 80px;
+  background: #0d1023;
 
   color: #ffffff;
 
   font-family: Pretendard, sans-serif;
 }
 
-/* =========================
-   Title
-========================= */
+.content {
+  width: 760px;
+
+  box-sizing: border-box;
+
+  padding-top: 72px;
+
+  margin-left: 90px;
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.5);
+
+  font-family: Pretendard, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+
+  cursor: pointer;
+}
+
+.backButtonIcon {
+  width: 12px;
+  height: 12px;
+
+  display: block;
+
+  object-fit: contain;
+}
+
+.backButton:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
 
 .title {
-  margin: 0 0 34px;
+  margin: 38px 0 36px;
 
   color: #ffffff;
 
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  line-height: 110%;
+
+  line-height: 1.1;
 }
 
 /* =========================
-   Form Grid
+   FORM
 ========================= */
 
 .formGrid {
-  width: 660px;
+  width: 100%;
 
   display: grid;
 
   grid-template-columns: 280px 280px;
 
-  column-gap: 100px;
+  column-gap: 85px;
 
   align-items: flex-start;
 }
-
-/* =========================
-   Column
-========================= */
 
 .leftColumn,
 .rightColumn {
@@ -57,38 +90,26 @@
   flex-direction: column;
 }
 
-.rightColumn {
-  position: relative;
-}
-
-/* =========================
-   Field
-========================= */
-
 .field {
   width: 100%;
 
   display: flex;
   flex-direction: column;
 
-  gap: 8px;
+  gap: 9px;
 
-  margin-bottom: 22px;
+  margin-bottom: 28px;
 }
 
 .field label {
   color: #ffffff;
 
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 110%;
+  font-size: 10px;
+  font-weight: 500;
 }
 
-/* =========================
-   Input 공통
-========================= */
-
-.field > input {
+.field input,
+.field select {
   width: 100%;
   height: 39px;
 
@@ -97,83 +118,52 @@
   padding: 0 12px;
 
   border: 1px solid #252a44;
-  border-radius: 8px;
+  border-radius: 7px;
+
+  outline: none;
 
   background: #1b1f35;
 
   color: #ffffff;
 
   font-family: Pretendard, sans-serif;
-  font-size: 12px;
-
-  outline: none;
+  font-size: 11px;
 }
 
-.field > input:focus {
+.field input:focus,
+.field select:focus {
   border-color: #4d67ff;
 }
 
-/* =========================
-   팀원 Email List
-========================= */
+.field select {
+  appearance: auto;
 
-.memberEmailList {
-  width: 280px;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 10px;
-}
-
-.memberEmailList input {
-  width: 280px;
-  height: 39px;
-
-  flex-shrink: 0;
-
-  box-sizing: border-box;
-
-  padding: 0 12px;
-
-  border: 1px solid #252a44;
-  border-radius: 8px;
-
-  background: #1b1f35;
-
-  color: #ffffff;
-
-  font-family: Pretendard, sans-serif;
-  font-size: 12px;
-
-  outline: none;
-}
-
-.memberEmailList input:focus {
-  border-color: #4d67ff;
-}
-
-.memberEmailList input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
 }
 
 /* =========================
-   팀원 추가 버튼 영역
+   INVITE EMAIL
 ========================= */
 
-.plusMemberArea {
-  width: 280px;
+.inviteEmailRow {
+  width: 100%;
 
   display: flex;
   align-items: center;
-  justify-content: center;
 
-  margin-top: 8px;
+  gap: 8px;
 }
 
-/* 실제 + 아이콘 버튼 */
+.inviteEmailRow input {
+  width: 280px;
 
-.plusMemberButton {
+  flex-shrink: 0;
+}
+
+.addMemberButton {
+  width: 20px;
+  height: 20px;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -181,105 +171,132 @@
   padding: 0;
 
   border: none;
+
   background: transparent;
+
+  color: #ffffff;
+
+  font-size: 20px;
+  font-weight: 300;
 
   cursor: pointer;
 }
 
-.plusMemberIcon {
-  display: block;
-
-  width: 24px;
-  height: 24px;
-
-  object-fit: contain;
-}
-
 /* =========================
-   초대 코드
+   INVITE CODE
 ========================= */
 
 .inviteArea {
-  width: 660px;
-
-  margin-top: 28px;
+  width: 440px;
 
   display: flex;
   align-items: center;
+
+  margin-top: 42px;
 }
 
 .inviteButton {
-  height: 31px;
+  height: 30px;
 
   flex-shrink: 0;
 
-  padding: 0 10px;
+  padding: 0 11px;
 
   border: none;
-  border-radius: 8px 0 0 8px;
+  border-radius: 6px 0 0 6px;
 
   background: #ffffff;
 
-  color: #111111;
+  color: #171717;
 
   font-family: Pretendard, sans-serif;
-  font-size: 12px;
+  font-size: 9px;
   font-weight: 500;
 
   cursor: pointer;
 }
 
 .inviteCodeInput {
-  width: 414px;
-  height: 31px;
+  width: 330px;
+  height: 30px;
 
   box-sizing: border-box;
 
   padding: 0 12px;
 
   border: none;
-  border-radius: 0 6px 6px 0;
+  border-radius: 0 5px 5px 0;
 
-  background: rgba(86, 112, 255, 0.2);
+  outline: none;
+
+  background: #20285f;
 
   color: #ffffff;
 
   font-family: Pretendard, sans-serif;
-  font-size: 12px;
-
-  outline: none;
+  font-size: 10px;
 }
 
 /* =========================
-   워크스페이스 생성 버튼
+   ERROR
 ========================= */
 
+.errorMessage {
+  width: 440px;
+
+  margin: 12px 0 0;
+
+  color: #ff6464;
+
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* =========================
+   CREATE BUTTON
+========================= */
+
+.buttonArea {
+  width: 660px;
+
+  display: flex;
+  justify-content: flex-end;
+
+  margin-top: 48px;
+}
+
 .createButton {
-  position: relative;
+  min-width: 92px;
+  height: 31px;
 
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  height: 33px;
-
-  margin-top: 40px;
-  margin-left: 570px;
-
-  padding: 0 10px;
+  padding: 0 11px;
 
   border: none;
-  border-radius: 8px;
+  border-radius: 7px;
 
   background: #4d67ff;
 
   color: #ffffff;
 
   font-family: Pretendard, sans-serif;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 9px;
+  font-weight: 600;
+
+  white-space: nowrap;
 
   cursor: pointer;
 }
 
-.createButton:hover {
+.createButton:hover:not(:disabled) {
   background: #4359e8;
+}
+
+.createButton:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
 }
