@@ -1,36 +1,41 @@
+/* =========================
+   전체 Layout
+========================= */
+
 .layout {
   width: 100vw;
   height: 100vh;
 
-  display: flex;
+  background: #0d1021;
 
   overflow: hidden;
-
-  background-color: #0d1021;
 }
 
 /* =========================
-   사이드바 제외 실제 화면
-   여기에서만 스크롤
+   Sidebar 제외 실제 화면
+
+   Sidebar가 fixed이므로
+   본문을 234px 오른쪽으로 밀어줘야 함
 ========================= */
 
 .mainViewport {
-  flex: 1;
+  position: relative;
+
+  margin-left: 234px;
 
   width: calc(100vw - 234px);
   height: 100vh;
 
-  min-width: 0;
-  min-height: 0;
+  box-sizing: border-box;
 
   overflow-x: auto;
   overflow-y: auto;
 
-  background-color: #0d1021;
+  background: #0d1021;
 }
 
 /* =========================
-   실제 콘텐츠 영역
+   실제 콘텐츠 Canvas
 ========================= */
 
 .mainCanvas {
@@ -40,16 +45,11 @@
   min-width: 1206px;
 
   min-height: 1024px;
-
-  /* fit-content 사용하지 않음 */
-  height: auto;
-
-  /* 자식 높이를 확실하게 포함 */
-  display: flow-root;
+  height: fit-content;
 
   box-sizing: border-box;
 
-  background-color: #0d1021;
+  background: #0d1021;
 }
 
 /* =========================
