@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 
 import styles from "./CreateProjectForm.module.css";
@@ -7,62 +8,204 @@ import { ROUTES } from "../../../../router/routes.constant";
 
 import calendarIcon from "../../../../assets/icons/calendarIcon.svg";
 import searchIcon from "../../../../assets/icons/searchIcon.svg";
+import backbuttonIcon from "../../../../assets/icons/backbuttonIcon.svg";
+
+import { getWorkspaceDetail } from "../../../../api/workspaceApi";
+
+import { createProject } from "../../../../api/projectApi";
+
+import ProjectCreateSuccessModal from "../ProjectCreateSuccessModal/ProjectCreateSuccessModal";
 
 function CreateProjectForm() {
   const navigate = useNavigate();
 
   /* =========================
-     Calendar State
+     Project
+  ========================= */
+
+  const [projectName, setProjectName] = useState("");
+
+  const [projectGoal, setProjectGoal] = useState("");
+
+  /* =========================
+     Calendar
   ========================= */
 
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const [startDate, setStartDate] = useState("");
+
   const [endDate, setEndDate] = useState("");
 
-  // true = 시작 날짜 선택 중
-  // false = 마감 날짜 선택 중
   const [selectingStart, setSelectingStart] = useState(true);
 
-  // 처음 보여줄 달력: 2026년 8월
   const [currentDate, setCurrentDate] = useState(new Date(2026, 7, 1));
 
   /* =========================
-     Company Search State
+     Company
   ========================= */
 
   const [searchCompany, setSearchCompany] = useState("");
 
-  const companies = [
-    {
-      id: 1,
-      name: "기업 A",
-      role: "주관사",
-      isMine: true,
-    },
-    {
-      id: 2,
-      name: "기업 B",
-      role: "파트너사",
-      isMine: false,
-    },
-  ];
+  const [companies, setCompanies] = useState([]);
+
+  /* =========================
+     State
+  ========================= */
+
+  const [isWorkspaceLoading, setIsWorkspaceLoading] = useState(true);
+
+  const [isCreating, setIsCreating] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+  /* =========================
+     성공 Modal
+  ========================= */
+
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+
+  /* =========================
+     회사 정보 불러오기
+  ========================= */
+
+  useEffect(() => {
+    const loadCompanies = async () => {
+      const workspaceId = localStorage.getItem("workspaceId");
+
+      if (!workspaceId) {
+        setErrorMessage("워크스페이스 정보가 없습니다.");
+
+        setIsWorkspaceLoading(false);
+
+        return;
+      }
+
+      try {
+        setIsWorkspaceLoading(true);
+
+        setErrorMessage("");
+
+        /* =========================================
+             먼저 localStorage 확인
+          ========================================= */
+
+        const savedHostCompany = localStorage.getItem("workspaceCompany");
+
+        const savedPartners = localStorage.getItem(
+          "workspaceCollaboratingCompanies",
+        );
+
+        if (savedHostCompany) {
+          const host = JSON.parse(savedHostCompany);
+
+          const partners = savedPartners ? JSON.parse(savedPartners) : [];
+
+          const companyList = [
+            {
+              id: host.companyId,
+
+              name: host.name,
+
+              countryCode: host.countryCode,
+
+              role: "주관사",
+
+              apiRole: "HOST",
+
+              isMine: true,
+            },
+
+            ...partners.map((company) => ({
+              id: company.companyId,
+
+              name: company.name,
+
+              countryCode: company.countryCode,
+
+              role: "파트너사",
+
+              apiRole: "PARTNER",
+
+              isMine: false,
+            })),
+          ];
+
+          setCompanies(companyList);
+
+          return;
+        }
+
+        /* =========================================
+             localStorage에 없으면 상세 조회
+          ========================================= */
+
+        const result = await getWorkspaceDetail(workspaceId);
+
+        const data = result?.data;
+
+        if (!data) {
+          setErrorMessage("워크스페이스 정보를 불러오지 못했습니다.");
+
+          return;
+        }
+
+        const companyList = [];
+
+        if (data.company) {
+          companyList.push({
+            id: data.company.companyId,
+
+            name: data.company.name,
+
+            countryCode: data.company.countryCode,
+
+            role: "주관사",
+
+            apiRole: "HOST",
+
+            isMine: true,
+          });
+        }
+
+        if (Array.isArray(data.collaboratingCompanies)) {
+          data.collaboratingCompanies.forEach((company) => {
+            companyList.push({
+              id: company.companyId,
+
+              name: company.name,
+
+              countryCode: company.countryCode,
+
+              role: "파트너사",
+
+              apiRole: "PARTNER",
+
+              isMine: false,
+            });
+          });
+        }
+
+        setCompanies(companyList);
+      } catch (error) {
+        console.error("워크스페이스 회사 정보 조회 실패:", error);
+
+        setErrorMessage(error.message || "회사 정보를 불러오지 못했습니다.");
+      } finally {
+        setIsWorkspaceLoading(false);
+      }
+    };
+
+    loadCompanies();
+  }, []);
+
+  /* =========================
+     검색
+  ========================= */
 
   const filteredCompanies = companies.filter((company) =>
     company.name.toLowerCase().includes(searchCompany.trim().toLowerCase()),
   );
-
-  /* =========================
-     Navigation
-  ========================= */
-
-  const handleCreateProject = () => {
-    navigate(ROUTES.PROJECT_SETTINGS);
-  };
-
-  const handleCancel = () => {
-    navigate(ROUTES.HOME);
-  };
 
   /* =========================
      Date Utils
@@ -70,11 +213,26 @@ function CreateProjectForm() {
 
   const formatDate = (date) => {
     const year = date.getFullYear();
+
     const month = String(date.getMonth() + 1).padStart(2, "0");
 
     const day = String(date.getDate()).padStart(2, "0");
 
     return `${year}/${month}/${day}`;
+  };
+
+  const formatApiDate = (value) => {
+    if (!value) {
+      return "";
+    }
+
+    const parts = value.split("/");
+
+    if (parts.length !== 3) {
+      return "";
+    }
+
+    return `${parts[0]}-${parts[1]}-${parts[2]}`;
   };
 
   const parseDate = (value) => {
@@ -89,25 +247,16 @@ function CreateProjectForm() {
     }
 
     const year = Number(parts[0]);
+
     const month = Number(parts[1]);
+
     const day = Number(parts[2]);
 
     if (!year || !month || !day) {
       return null;
     }
 
-    const date = new Date(year, month - 1, day);
-
-    // 잘못된 날짜 방지
-    if (
-      date.getFullYear() !== year ||
-      date.getMonth() !== month - 1 ||
-      date.getDate() !== day
-    ) {
-      return null;
-    }
-
-    return date;
+    return new Date(year, month - 1, day);
   };
 
   const isSameDate = (date1, date2) => {
@@ -138,15 +287,15 @@ function CreateProjectForm() {
   };
 
   /* =========================
-     Calendar Click
+     Calendar
   ========================= */
 
   const handleDateClick = (date) => {
     const formattedDate = formatDate(date);
 
-    // 시작 날짜 선택
     if (selectingStart) {
       setStartDate(formattedDate);
+
       setEndDate("");
 
       setSelectingStart(false);
@@ -154,13 +303,11 @@ function CreateProjectForm() {
       return;
     }
 
-    // 마감 날짜 선택
     const start = parseDate(startDate);
 
-    // 시작 날짜보다 이전 날짜를
-    // 두 번째로 누르면 새로운 시작 날짜로 설정
     if (start && date.getTime() < start.getTime()) {
       setStartDate(formattedDate);
+
       setEndDate("");
 
       setSelectingStart(false);
@@ -185,10 +332,6 @@ function CreateProjectForm() {
     );
   };
 
-  /* =========================
-     Calendar Days
-  ========================= */
-
   const year = currentDate.getFullYear();
 
   const month = currentDate.getMonth();
@@ -200,8 +343,6 @@ function CreateProjectForm() {
   const previousMonthLastDate = new Date(year, month, 0).getDate();
 
   const calendarDays = [];
-
-  /* 이전 달 */
 
   for (let i = firstDay - 1; i >= 0; i--) {
     const day = previousMonthLastDate - i;
@@ -215,8 +356,6 @@ function CreateProjectForm() {
     });
   }
 
-  /* 이번 달 */
-
   for (let day = 1; day <= lastDate; day++) {
     calendarDays.push({
       day,
@@ -226,8 +365,6 @@ function CreateProjectForm() {
       currentMonth: true,
     });
   }
-
-  /* 다음 달 */
 
   let nextMonthDay = 1;
 
@@ -243,233 +380,443 @@ function CreateProjectForm() {
     nextMonthDay += 1;
   }
 
+  /* =========================
+     프로젝트 생성
+  ========================= */
+
+  const handleCreateProject = async () => {
+    setErrorMessage("");
+
+    const workspaceId = localStorage.getItem("workspaceId");
+
+    const trimmedName = projectName.trim();
+
+    const trimmedGoal = projectGoal.trim();
+
+    if (!workspaceId) {
+      setErrorMessage("워크스페이스 정보가 없습니다.");
+
+      return;
+    }
+
+    if (!trimmedName) {
+      setErrorMessage("프로젝트명을 입력해주세요.");
+
+      return;
+    }
+
+    if (!trimmedGoal) {
+      setErrorMessage("프로젝트 목표를 입력해주세요.");
+
+      return;
+    }
+
+    const parsedStart = parseDate(startDate);
+
+    const parsedEnd = parseDate(endDate);
+
+    if (!parsedStart) {
+      setErrorMessage("시작 일자를 입력해주세요.");
+
+      return;
+    }
+
+    if (!parsedEnd) {
+      setErrorMessage("마감 일자를 입력해주세요.");
+
+      return;
+    }
+
+    if (parsedStart.getTime() > parsedEnd.getTime()) {
+      setErrorMessage("마감 일자는 시작 일자보다 빠를 수 없습니다.");
+
+      return;
+    }
+
+    if (companies.length === 0) {
+      setErrorMessage("참여 기업 정보가 없습니다.");
+
+      return;
+    }
+
+    const companyWithoutId = companies.find((company) => !company.id);
+
+    if (companyWithoutId) {
+      setErrorMessage(
+        `${companyWithoutId.name}의 회사 ID를 확인할 수 없습니다.`,
+      );
+
+      return;
+    }
+
+    const participatingCompanies = companies.map((company) => ({
+      companyId: Number(company.id),
+
+      role: company.apiRole,
+    }));
+
+    try {
+      setIsCreating(true);
+
+      const result = await createProject({
+        workspaceId,
+
+        name: trimmedName,
+
+        objective: trimmedGoal,
+
+        startDate: formatApiDate(startDate),
+
+        endDate: formatApiDate(endDate),
+
+        participatingCompanies,
+      });
+
+      console.log("프로젝트 생성 성공:", result);
+
+      const projectId = result?.data?.projectId;
+
+      if (!projectId) {
+        setErrorMessage("프로젝트 ID를 받지 못했습니다.");
+
+        return;
+      }
+
+      /* =========================
+           프로젝트 저장
+        ========================= */
+
+      localStorage.setItem("projectId", String(projectId));
+
+      localStorage.setItem("projectName", trimmedName);
+
+      localStorage.setItem(
+        "selectedProject",
+        JSON.stringify({
+          projectId,
+
+          name: trimmedName,
+
+          objective: trimmedGoal,
+
+          startDate: formatApiDate(startDate),
+
+          endDate: formatApiDate(endDate),
+
+          status: result?.data?.status || "DRAFT",
+        }),
+      );
+
+      /* =========================
+           프로젝트 갱신 이벤트
+        ========================= */
+
+      window.dispatchEvent(new Event("projectCreated"));
+
+      window.dispatchEvent(new Event("projectChanged"));
+
+      /* =========================
+           성공 Modal OPEN
+        ========================= */
+
+      setIsSuccessModalOpen(true);
+    } catch (error) {
+      console.error("프로젝트 생성 실패:", error);
+
+      switch (error.code) {
+        case "400INVALID_PROJECT_INPUT":
+          setErrorMessage(
+            error.message || "프로젝트 입력값 또는 기간을 확인해주세요.",
+          );
+
+          break;
+
+        case "403PROJECT_CREATE_DENIED":
+          setErrorMessage("프로젝트 생성 권한이 없습니다.");
+
+          break;
+
+        case "409PROJECT_NAME_DUPLICATED":
+          setErrorMessage("동일한 이름의 프로젝트가 이미 존재합니다.");
+
+          break;
+
+        default:
+          if (error.status === 401) {
+            setErrorMessage("로그인이 만료되었습니다. 다시 로그인해주세요.");
+          } else {
+            setErrorMessage(error.message || "프로젝트 생성에 실패했습니다.");
+          }
+      }
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  /* =========================
+     성공 Modal 닫기
+  ========================= */
+
+  const handleSuccessModalClose = () => {
+    setIsSuccessModalOpen(false);
+
+    navigate(ROUTES.PROJECT_HOME);
+  };
+
   return (
-    <section className={styles.container}>
-      <h1 className={styles.title}>새 프로젝트 만들기</h1>
+    <>
+      <section className={styles.container}>
+        {/* BACK */}
 
-      {/* =========================
-          기본 정보
-      ========================= */}
+        <button
+          type="button"
+          className={styles.backButton}
+          onClick={() => navigate(-1)}
+        >
+          <img src={backbuttonIcon} alt="" className={styles.backButtonIcon} />
 
-      <section className={styles.card}>
-        <h2 className={styles.cardTitle}>기본 정보</h2>
+          <span>뒤로</span>
+        </button>
 
-        <div className={styles.field}>
-          <label htmlFor="projectName">프로젝트명</label>
+        <h1 className={styles.title}>새 프로젝트 만들기</h1>
 
-          <input id="projectName" type="text" />
-        </div>
+        {/* =========================
+            기본 정보
+        ========================= */}
 
-        <div className={styles.field}>
-          <label htmlFor="projectGoal">프로젝트 목표</label>
+        <section className={styles.card}>
+          <h2 className={styles.cardTitle}>기본 정보</h2>
 
-          <textarea id="projectGoal" />
-        </div>
-      </section>
+          <div className={styles.field}>
+            <label htmlFor="projectName">프로젝트명</label>
 
-      {/* =========================
-          프로젝트 기간
-      ========================= */}
+            <input
+              id="projectName"
+              type="text"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+            />
+          </div>
 
-      <section className={`${styles.card} ${styles.periodCard}`}>
-        <div className={styles.periodTitleRow}>
-          <h2 className={styles.cardTitle}>프로젝트 기간</h2>
+          <div className={styles.field}>
+            <label htmlFor="projectGoal">프로젝트 목표</label>
+
+            <textarea
+              id="projectGoal"
+              value={projectGoal}
+              onChange={(e) => setProjectGoal(e.target.value)}
+            />
+          </div>
+        </section>
+
+        {/* =========================
+            프로젝트 기간
+        ========================= */}
+
+        <section className={`${styles.card} ${styles.periodCard}`}>
+          <div className={styles.periodTitleRow}>
+            <h2 className={styles.cardTitle}>프로젝트 기간</h2>
+
+            <button
+              type="button"
+              className={styles.calendarButton}
+              onClick={() => setIsCalendarOpen((prev) => !prev)}
+            >
+              <img src={calendarIcon} alt="" className={styles.calendarIcon} />
+            </button>
+          </div>
+
+          <div className={styles.dateRow}>
+            <div className={styles.dateField}>
+              <label>시작 일자</label>
+
+              <input
+                type="text"
+                value={startDate}
+                placeholder="2026/08/06"
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+
+            <div className={styles.dateField}>
+              <label>마감 일자</label>
+
+              <input
+                type="text"
+                value={endDate}
+                placeholder="2026/08/24"
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {isCalendarOpen && (
+            <div className={styles.calendarPopup}>
+              <div className={styles.calendarHeader}>
+                <button
+                  type="button"
+                  className={styles.monthButton}
+                  onClick={handlePreviousMonth}
+                >
+                  ‹
+                </button>
+
+                <strong>
+                  {currentDate.toLocaleString("en-US", {
+                    month: "long",
+                  })}{" "}
+                  {year}
+                </strong>
+
+                <button
+                  type="button"
+                  className={styles.monthButton}
+                  onClick={handleNextMonth}
+                >
+                  ›
+                </button>
+              </div>
+
+              <div className={styles.calendarDivider} />
+
+              <div className={styles.weekRow}>
+                <span>SUN</span>
+                <span>MON</span>
+                <span>TUE</span>
+                <span>WED</span>
+                <span>THU</span>
+                <span>FRI</span>
+                <span>SAT</span>
+              </div>
+
+              <div className={styles.calendarGrid}>
+                {calendarDays.map((item, index) => {
+                  const isStart = isSameDate(item.date, selectedStartDate);
+
+                  const isEnd = isSameDate(item.date, selectedEndDate);
+
+                  const isRange = isBetweenDates(item.date);
+
+                  const classNames = [
+                    styles.dayButton,
+
+                    !item.currentMonth ? styles.otherMonthDay : "",
+
+                    isRange ? styles.rangeDay : "",
+
+                    isStart || isEnd ? styles.selectedDay : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ");
+
+                  return (
+                    <button
+                      key={`${item.date.getTime()}-${index}`}
+                      type="button"
+                      className={classNames}
+                      onClick={() => handleDateClick(item.date)}
+                    >
+                      {item.day}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* =========================
+            참여 기업
+        ========================= */}
+
+        <section className={`${styles.card} ${styles.companyCard}`}>
+          <h2 className={styles.cardTitle}>참여 기업</h2>
+
+          <div className={styles.searchWrapper}>
+            <img src={searchIcon} alt="" className={styles.searchIcon} />
+
+            <input
+              type="text"
+              className={styles.searchInput}
+              placeholder="기업명 검색"
+              value={searchCompany}
+              onChange={(e) => setSearchCompany(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.companyList}>
+            {isWorkspaceLoading ? (
+              <p className={styles.noCompany}>기업 정보를 불러오는 중입니다.</p>
+            ) : filteredCompanies.length > 0 ? (
+              filteredCompanies.map((company, index) => (
+                <div
+                  className={styles.companyItem}
+                  key={company.id ?? `${company.name}-${index}`}
+                >
+                  <div className={styles.companyCircle} />
+
+                  <div className={styles.companyInfo}>
+                    <div className={styles.companyNameRow}>
+                      <strong>{company.name}</strong>
+
+                      {company.isMine && (
+                        <span className={styles.badge}>내 소속</span>
+                      )}
+                    </div>
+
+                    <p>{company.role}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className={styles.noCompany}>검색 결과가 없습니다.</p>
+            )}
+          </div>
+
+          <button type="button" className={styles.addCompanyButton}>
+            기업 추가
+          </button>
+        </section>
+
+        {/* =========================
+            ERROR
+        ========================= */}
+
+        {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
+
+        {/* =========================
+            Bottom Buttons
+        ========================= */}
+
+        <div className={styles.bottomActions}>
+          <button
+            type="button"
+            className={styles.cancelButton}
+            onClick={() => navigate(-1)}
+            disabled={isCreating}
+          >
+            취소
+          </button>
 
           <button
             type="button"
-            className={styles.calendarButton}
-            aria-label="캘린더 열기"
-            onClick={() => {
-              setIsCalendarOpen((prev) => !prev);
-
-              if (!isCalendarOpen) {
-                setSelectingStart(true);
-              }
-            }}
+            className={styles.createButton}
+            onClick={handleCreateProject}
+            disabled={isCreating || isWorkspaceLoading}
           >
-            <img src={calendarIcon} className={styles.calendarIcon} alt="" />
+            {isCreating ? "생성 중..." : "프로젝트 생성"}
           </button>
         </div>
-
-        <div className={styles.dateRow}>
-          <div className={styles.dateField}>
-            <label htmlFor="startDate">시작 일자</label>
-
-            <input
-              id="startDate"
-              type="text"
-              value={startDate}
-              placeholder="2026/08/06"
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-          </div>
-
-          <div className={styles.dateField}>
-            <label htmlFor="endDate">마감 일자</label>
-
-            <input
-              id="endDate"
-              type="text"
-              value={endDate}
-              placeholder="2026/08/24"
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {/* =========================
-            Calendar Popup
-        ========================= */}
-
-        {isCalendarOpen && (
-          <div className={styles.calendarPopup}>
-            <div className={styles.calendarHeader}>
-              <button
-                type="button"
-                className={styles.monthButton}
-                onClick={handlePreviousMonth}
-              >
-                ‹
-              </button>
-
-              <strong>
-                {currentDate.toLocaleString("en-US", {
-                  month: "long",
-                })}{" "}
-                {year}
-              </strong>
-
-              <button
-                type="button"
-                className={styles.monthButton}
-                onClick={handleNextMonth}
-              >
-                ›
-              </button>
-            </div>
-
-            <div className={styles.calendarDivider} />
-
-            <div className={styles.weekRow}>
-              <span>SUN</span>
-              <span>MON</span>
-              <span>TUE</span>
-              <span>WED</span>
-              <span>THU</span>
-              <span>FRI</span>
-              <span>SAT</span>
-            </div>
-
-            <div className={styles.calendarGrid}>
-              {calendarDays.map((item, index) => {
-                const isStart = isSameDate(item.date, selectedStartDate);
-
-                const isEnd = isSameDate(item.date, selectedEndDate);
-
-                const isRange = isBetweenDates(item.date);
-
-                const classNames = [
-                  styles.dayButton,
-
-                  !item.currentMonth ? styles.otherMonthDay : "",
-
-                  isRange ? styles.rangeDay : "",
-
-                  isStart || isEnd ? styles.selectedDay : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ");
-
-                return (
-                  <button
-                    key={`${item.date.getTime()}-${index}`}
-                    type="button"
-                    className={classNames}
-                    onClick={() => handleDateClick(item.date)}
-                  >
-                    {item.day}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </section>
 
       {/* =========================
-          참여 기업
+          프로젝트 생성 성공 Modal
       ========================= */}
 
-      <section className={`${styles.card} ${styles.companyCard}`}>
-        <h2 className={styles.cardTitle}>참여 기업</h2>
-
-        {/* 검색 */}
-
-        <div className={styles.searchWrapper}>
-          <img src={searchIcon} className={styles.searchIcon} alt="" />
-
-          <input
-            type="text"
-            className={styles.searchInput}
-            placeholder="기업명 검색"
-            value={searchCompany}
-            onChange={(e) => setSearchCompany(e.target.value)}
-          />
-        </div>
-
-        {/* 기업 목록 */}
-
-        <div className={styles.companyList}>
-          {filteredCompanies.length > 0 ? (
-            filteredCompanies.map((company) => (
-              <div className={styles.companyItem} key={company.id}>
-                <div className={styles.companyCircle} />
-
-                <div className={styles.companyInfo}>
-                  <div className={styles.companyNameRow}>
-                    <strong>{company.name}</strong>
-
-                    {company.isMine && (
-                      <span className={styles.badge}>내 소속</span>
-                    )}
-                  </div>
-
-                  <p>{company.role}</p>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className={styles.noCompany}>검색 결과가 없습니다.</p>
-          )}
-        </div>
-
-        <button type="button" className={styles.addCompanyButton}>
-          기업 추가
-        </button>
-      </section>
-
-      {/* =========================
-          Bottom
-      ========================= */}
-
-      <div className={styles.bottomActions}>
-        <button
-          type="button"
-          className={styles.cancelButton}
-          onClick={handleCancel}
-        >
-          취소
-        </button>
-
-        <button
-          type="button"
-          className={styles.createButton}
-          onClick={handleCreateProject}
-        >
-          프로젝트 생성
-        </button>
-      </div>
-    </section>
+      {isSuccessModalOpen && (
+        <ProjectCreateSuccessModal onClose={handleSuccessModalClose} />
+      )}
+    </>
   );
 }
 

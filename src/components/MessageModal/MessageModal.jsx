@@ -1,47 +1,39 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import styles from "./MessageModal.module.css";
+
 import sendIcon from "../../assets/icons/sendIcon.svg";
 import chatIcon2 from "../../assets/icons/chatIcon2.svg";
 import searchIcon from "../../assets/icons/searchIcon.svg";
 import chatcheckIcon from "../../assets/icons/chatcheckIcon.svg";
 
 function MessageModal({ onClose }) {
+  const { t } = useTranslation();
+
   /* =========================
      화면 상태
-     false → 사람 선택
-     true  → 채팅
   ========================= */
 
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  /* =========================
-     최근 대화 존재 여부
-  ========================= */
-
   const [hasMessageHistory] = useState(false);
 
-  /* =========================
-     검색
-  ========================= */
-
   const [searchText, setSearchText] = useState("");
-
-  /* =========================
-     선택 사용자
-  ========================= */
 
   const [selectedUsers, setSelectedUsers] = useState([]);
 
   /* =========================
      Filter
+
+     실제 상태값은 번역하지 않음
   ========================= */
 
-  const [selectedCompany, setSelectedCompany] = useState("소속 기업");
+  const [selectedCompany, setSelectedCompany] = useState("ALL");
 
-  const [selectedTeam, setSelectedTeam] = useState("소속 팀");
+  const [selectedTeam, setSelectedTeam] = useState("ALL");
 
-  const [selectedPosition, setSelectedPosition] = useState("직책");
+  const [selectedPosition, setSelectedPosition] = useState("ALL");
 
   const [openDropdown, setOpenDropdown] = useState(null);
 
@@ -53,6 +45,8 @@ function MessageModal({ onClose }) {
 
   /* =========================
      사용자 데이터
+
+     실제 데이터라고 보고 번역하지 않음
   ========================= */
 
   const recentUsers = [
@@ -65,7 +59,7 @@ function MessageModal({ onClose }) {
       detailPosition: "Backend Engineer",
       time: "09:15",
       city: "London",
-      activity: "최근 활동 5분 전",
+      activityMinutes: 5,
     },
 
     {
@@ -77,7 +71,7 @@ function MessageModal({ onClose }) {
       detailPosition: "Product Manager",
       time: "09:15",
       city: "London",
-      activity: "최근 활동 5분 전",
+      activityMinutes: 5,
     },
   ];
 
@@ -131,6 +125,8 @@ function MessageModal({ onClose }) {
 
   /* =========================
      채팅 메시지
+
+     실제 메시지 데이터는 번역 대상 아님
   ========================= */
 
   const [messages, setMessages] = useState([
@@ -144,6 +140,7 @@ function MessageModal({ onClose }) {
         "Hi Emily, Could you please review this by 3PM tomorrow (BST)? If you find any issues, let me know!",
 
       time: "14:00 KST",
+
       otherTime: "06:00 BST",
     },
 
@@ -157,6 +154,7 @@ function MessageModal({ onClose }) {
         "I finished reviewing the API integration. I found one issue in the error-handling flow and left a comment on Issue #42. Should I fix it right away, or wait for the development team's confirmation?",
 
       time: "14:00 KST",
+
       otherTime: "06:00 BST",
     },
 
@@ -170,30 +168,18 @@ function MessageModal({ onClose }) {
         "Confirmed! You can go ahead and fix that part. Once it's completed, please leave the result on Issue #42. Thank you!",
 
       time: "14:00 KST",
+
       otherTime: "06:00 BST",
     },
   ]);
 
-  /* =========================
-     번역 말풍선
-     message id 저장
-  ========================= */
-
   const [openedTranslationId, setOpenedTranslationId] = useState(null);
-
-  /* =========================
-     메시지 입력
-  ========================= */
 
   const [messageInput, setMessageInput] = useState("");
 
-  /*
-    현재는 API 연결 전이라
-    예시 번역문을 즉시 생성하는 mock 함수.
-
-    나중에는 이 함수 내부에서
-    번역 API를 호출하면 됨.
-  */
+  /* =========================
+     Mock Translation
+  ========================= */
 
   const getMockTranslation = (text) => {
     if (!text.trim()) {
@@ -202,7 +188,9 @@ function MessageModal({ onClose }) {
 
     const predefined = {
       안녕하세요: "Hello!",
+
       "내일까지 확인 부탁드립니다.": "Please check it by tomorrow.",
+
       "문제 있으면 말씀해주세요.":
         "Please let me know if there are any issues.",
     };
@@ -271,11 +259,9 @@ function MessageModal({ onClose }) {
   };
 
   const handleAllFilter = () => {
-    setSelectedCompany("소속 기업");
-
-    setSelectedTeam("소속 팀");
-
-    setSelectedPosition("직책");
+    setSelectedCompany("ALL");
+    setSelectedTeam("ALL");
+    setSelectedPosition("ALL");
 
     setOpenDropdown(null);
   };
@@ -294,10 +280,6 @@ function MessageModal({ onClose }) {
     });
   };
 
-  /* =========================
-     선택 완료
-  ========================= */
-
   const handleComplete = () => {
     if (selectedUsers.length === 0) {
       return;
@@ -315,53 +297,83 @@ function MessageModal({ onClose }) {
 
     return users.filter((user) => {
       const searchTarget = `
-        ${user.name}
-        ${user.company}
-        ${user.team}
-        ${user.position}
-        ${user.detailPosition}
-      `.toLowerCase();
+          ${user.name}
+          ${user.company}
+          ${user.team}
+          ${user.position}
+          ${user.detailPosition}
+        `.toLowerCase();
 
       const matchesSearch = !keyword || searchTarget.includes(keyword);
 
       const matchesCompany =
-        selectedCompany === "소속 기업" || user.company === selectedCompany;
+        selectedCompany === "ALL" || user.company === selectedCompany;
 
-      const matchesTeam =
-        selectedTeam === "소속 팀" || user.team === selectedTeam;
+      const matchesTeam = selectedTeam === "ALL" || user.team === selectedTeam;
 
       const matchesPosition =
-        selectedPosition === "직책" || user.position === selectedPosition;
+        selectedPosition === "ALL" || user.position === selectedPosition;
 
       return matchesSearch && matchesCompany && matchesTeam && matchesPosition;
     });
   };
 
   const isAllSelected =
-    selectedCompany === "소속 기업" &&
-    selectedTeam === "소속 팀" &&
-    selectedPosition === "직책";
+    selectedCompany === "ALL" &&
+    selectedTeam === "ALL" &&
+    selectedPosition === "ALL";
 
-  const companyDropdownOptions = [
-    ...companyOptions.filter((company) => company !== selectedCompany),
+  const getCompanyLabel = () => {
+    if (selectedCompany === "ALL") {
+      return t("message.company");
+    }
 
-    ...(selectedCompany !== "소속 기업" ? ["소속 기업"] : []),
-  ];
+    return selectedCompany;
+  };
 
-  const teamDropdownOptions = [
-    ...teamOptions.filter((team) => team !== selectedTeam),
+  const getTeamLabel = () => {
+    if (selectedTeam === "ALL") {
+      return t("message.team");
+    }
 
-    ...(selectedTeam !== "소속 팀" ? ["소속 팀"] : []),
-  ];
+    return selectedTeam;
+  };
 
-  const positionDropdownOptions = [
-    ...positionOptions.filter((position) => position !== selectedPosition),
+  const getPositionLabel = () => {
+    if (selectedPosition === "ALL") {
+      return t("message.position");
+    }
 
-    ...(selectedPosition !== "직책" ? ["직책"] : []),
-  ];
+    return selectedPosition;
+  };
+
+  const companyDropdownOptions =
+    selectedCompany === "ALL"
+      ? companyOptions
+      : [
+          ...companyOptions.filter((company) => company !== selectedCompany),
+
+          "ALL",
+        ];
+
+  const teamDropdownOptions =
+    selectedTeam === "ALL"
+      ? teamOptions
+      : [...teamOptions.filter((team) => team !== selectedTeam), "ALL"];
+
+  const positionDropdownOptions =
+    selectedPosition === "ALL"
+      ? positionOptions
+      : [
+          ...positionOptions.filter(
+            (position) => position !== selectedPosition,
+          ),
+
+          "ALL",
+        ];
 
   /* =========================
-     선택한 상대
+     선택 상대
   ========================= */
 
   const selectedUser =
@@ -373,21 +385,21 @@ function MessageModal({ onClose }) {
         className={`${styles.modal} ${isChatOpen ? styles.chatModal : ""}`}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        {/* =================================================
-            채팅 화면
-        ================================================= */}
-
         {isChatOpen ? (
           <>
-            {/* Header */}
+            {/* =========================
+                Header
+            ========================= */}
 
             <div className={styles.titleRow}>
-              <h1>Message</h1>
+              <h1>{t("message.title")}</h1>
 
               <img src={chatIcon2} alt="" className={styles.titleIcon} />
             </div>
 
-            {/* 상대 정보 */}
+            {/* =========================
+                상대 정보
+            ========================= */}
 
             <div className={styles.chatUserCard}>
               <div className={styles.avatar} />
@@ -426,23 +438,24 @@ function MessageModal({ onClose }) {
                       isMe ? styles.myMessageRow : styles.otherMessageRow
                     }`}
                   >
-                    {/* 날짜 구분 */}
-
                     {index === 2 && (
                       <div className={styles.dateDivider}>
                         <span />
 
-                        <p>08/10 오늘</p>
+                        <p>08/10 {t("message.today")}</p>
 
                         <span />
                       </div>
                     )}
 
                     <div className={styles.senderName}>
-                      {isMe ? "홍길동 (나)" : selectedUser.name}
+                      {isMe
+                        ? t("message.me", {
+                            name: "홍길동",
+                          })
+                        : selectedUser.name}
                     </div>
 
-                    {/* 실제 메시지 */}
                     <div
                       className={`${styles.messageBubble} ${
                         isMe ? styles.myBubble : styles.otherBubble
@@ -451,13 +464,12 @@ function MessageModal({ onClose }) {
                       {message.text}
                     </div>
 
-                    {/* 시간 */}
                     <div className={styles.messageMeta}>
                       <span>{message.time}</span>
+
                       <span>{message.otherTime}</span>
                     </div>
 
-                    {/* 번역문 / 원문 보기 */}
                     <div className={styles.translationWrapper}>
                       <button
                         type="button"
@@ -468,12 +480,13 @@ function MessageModal({ onClose }) {
                           )
                         }
                       >
-                        {isMe ? "번역문 보기" : "원문 보기"}
+                        {isMe
+                          ? t("message.viewTranslation")
+                          : t("message.viewOriginal")}
 
                         <img src={chatcheckIcon} alt="" />
                       </button>
 
-                      {/* 버튼 아래에 오버레이로 표시 */}
                       {openedTranslationId === message.id && (
                         <div
                           className={`${styles.translationBubble} ${
@@ -496,14 +509,16 @@ function MessageModal({ onClose }) {
             ========================= */}
 
             <div className={styles.messageComposer}>
-              <label>메시지</label>
+              <label>{t("message.messageLabel")}</label>
 
               <textarea
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
               />
 
-              <div className={styles.aiLabel}>→ AI 번역</div>
+              <div className={styles.aiLabel}>
+                → {t("message.aiTranslation")}
+              </div>
 
               <textarea
                 value={aiTranslation}
@@ -512,30 +527,29 @@ function MessageModal({ onClose }) {
               />
             </div>
 
-            {/* 보내기 */}
-
             <button
               type="button"
               className={styles.sendButton}
               onClick={handleSendMessage}
             >
-              <span>보내기</span>
+              <span>{t("message.send")}</span>
+
               <img src={sendIcon} alt="" />
             </button>
           </>
         ) : (
           <>
-            {/* =================================================
-                사용자 선택 화면
-            ================================================= */}
+            {/* =========================
+                사용자 선택
+            ========================= */}
 
             <div className={styles.titleRow}>
-              <h1>Message</h1>
+              <h1>{t("message.title")}</h1>
 
               <img src={chatIcon2} alt="" className={styles.titleIcon} />
             </div>
 
-            <p className={styles.description}>누구에게 메시지를 보낼까요?</p>
+            <p className={styles.description}>{t("message.selectRecipient")}</p>
 
             {/* Search */}
 
@@ -545,6 +559,7 @@ function MessageModal({ onClose }) {
               <input
                 type="text"
                 value={searchText}
+                placeholder={t("message.searchPlaceholder")}
                 onChange={(e) => setSearchText(e.target.value)}
               />
             </div>
@@ -559,30 +574,33 @@ function MessageModal({ onClose }) {
                 }`}
                 onClick={handleAllFilter}
               >
-                전체
+                {t("message.all")}
               </button>
 
               <FilterDropdown
-                label={selectedCompany}
+                label={getCompanyLabel()}
                 open={openDropdown === "company"}
                 onToggle={() => handleDropdownToggle("company")}
                 options={companyDropdownOptions}
+                allLabel={t("message.company")}
                 onSelect={handleCompanySelect}
               />
 
               <FilterDropdown
-                label={selectedTeam}
+                label={getTeamLabel()}
                 open={openDropdown === "team"}
                 onToggle={() => handleDropdownToggle("team")}
                 options={teamDropdownOptions}
+                allLabel={t("message.team")}
                 onSelect={handleTeamSelect}
               />
 
               <FilterDropdown
-                label={selectedPosition}
+                label={getPositionLabel()}
                 open={openDropdown === "position"}
                 onToggle={() => handleDropdownToggle("position")}
                 options={positionDropdownOptions}
+                allLabel={t("message.position")}
                 onSelect={handlePositionSelect}
               />
             </div>
@@ -590,7 +608,11 @@ function MessageModal({ onClose }) {
             {/* 최근 */}
 
             <div className={styles.section}>
-              <h2>{hasMessageHistory ? "최근 대화" : "최근 활동"}</h2>
+              <h2>
+                {hasMessageHistory
+                  ? t("message.recentChats")
+                  : t("message.recentActivity")}
+              </h2>
 
               <div className={styles.userList}>
                 {filterUsers(recentUsers).map((user) => (
@@ -600,6 +622,7 @@ function MessageModal({ onClose }) {
                     showActivity={!hasMessageHistory}
                     selected={selectedUsers.includes(user.id)}
                     onClick={() => handleUserClick(user.id)}
+                    t={t}
                   />
                 ))}
               </div>
@@ -608,7 +631,7 @@ function MessageModal({ onClose }) {
             {/* 추천 */}
 
             <div className={styles.section}>
-              <h2>추천</h2>
+              <h2>{t("message.recommended")}</h2>
 
               <div className={styles.userList}>
                 {filterUsers(recommendedUsers).map((user) => (
@@ -617,6 +640,7 @@ function MessageModal({ onClose }) {
                     user={user}
                     selected={selectedUsers.includes(user.id)}
                     onClick={() => handleUserClick(user.id)}
+                    t={t}
                   />
                 ))}
               </div>
@@ -624,7 +648,9 @@ function MessageModal({ onClose }) {
 
             {selectedUsers.length > 0 && (
               <div className={styles.selectedCount}>
-                {selectedUsers.length}명 선택
+                {t("message.selectedCount", {
+                  count: selectedUsers.length,
+                })}
               </div>
             )}
 
@@ -634,7 +660,8 @@ function MessageModal({ onClose }) {
               disabled={selectedUsers.length === 0}
               onClick={handleComplete}
             >
-              선택 완료
+              {t("message.completeSelection")}
+
               <span>→</span>
             </button>
           </>
@@ -648,7 +675,14 @@ function MessageModal({ onClose }) {
    FilterDropdown
 ========================================================= */
 
-function FilterDropdown({ label, open, onToggle, options, onSelect }) {
+function FilterDropdown({
+  label,
+  open,
+  onToggle,
+  options,
+  allLabel,
+  onSelect,
+}) {
   return (
     <div className={styles.filterDropdown}>
       <button type="button" className={styles.filterButton} onClick={onToggle}>
@@ -664,7 +698,7 @@ function FilterDropdown({ label, open, onToggle, options, onSelect }) {
               className={styles.filterOption}
               onClick={() => onSelect(option)}
             >
-              {option}
+              {option === "ALL" ? allLabel : option}
             </button>
           ))}
         </div>
@@ -677,7 +711,7 @@ function FilterDropdown({ label, open, onToggle, options, onSelect }) {
    UserItem
 ========================================================= */
 
-function UserItem({ user, showActivity = false, selected, onClick }) {
+function UserItem({ user, showActivity = false, selected, onClick, t }) {
   return (
     <button
       type="button"
@@ -690,7 +724,13 @@ function UserItem({ user, showActivity = false, selected, onClick }) {
         <div className={styles.userNameRow}>
           <strong>{user.name}</strong>
 
-          {showActivity && user.activity && <span>{user.activity}</span>}
+          {showActivity && user.activityMinutes !== undefined && (
+            <span>
+              {t("message.activeMinutesAgo", {
+                count: user.activityMinutes,
+              })}
+            </span>
+          )}
         </div>
 
         <p>
@@ -702,7 +742,7 @@ function UserItem({ user, showActivity = false, selected, onClick }) {
         </p>
 
         <p>
-          현재 {user.time}
+          {t("message.currentTime")} {user.time}
           {" · "}
           {user.city}
         </p>

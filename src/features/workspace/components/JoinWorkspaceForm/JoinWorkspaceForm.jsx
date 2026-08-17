@@ -8,8 +8,6 @@ function JoinWorkspaceForm() {
   const navigate = useNavigate();
 
   const handleJoinWorkspace = () => {
-    // 워크스페이스 참여 후에는
-    // 새 프로젝트 만들기 화면으로 이동하지 않음
     navigate(ROUTES.HOME);
   };
 

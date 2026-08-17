@@ -68,6 +68,8 @@
   width: 100%;
   height: 49px;
 
+  box-sizing: border-box;
+
   padding: 0 14px;
 
   border: none;
@@ -116,18 +118,8 @@
   justify-content: flex-end;
   align-items: center;
 
-  margin-top: 4px;
-  margin-bottom: 55px;
-}
-
-.keepLogin {
-  display: flex;
-  align-items: center;
-
-  gap: 6px;
-
-  font-size: 11px;
-  color: rgba(0, 0, 0, 0.8);
+  margin-top: -5px;
+  margin-bottom: 30px;
 }
 
 .findPassword {
@@ -141,6 +133,8 @@
   font-size: 11px;
 
   text-decoration: underline;
+
+  cursor: pointer;
 }
 
 .loginButton {
@@ -156,37 +150,13 @@
 
   font-size: 18px;
   font-weight: 700;
+
+  cursor: pointer;
 }
 
-.socialButton {
-  width: 100%;
-  height: 49px;
-
-  margin-top: 10px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 12px;
-
-  border: none;
-  border-radius: 12px;
-
-  background-color: #dedede;
-
-  color: #111111;
-
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.socialButton img {
-  width: 22px;
-  height: 22px;
-  align-items: center;
-
-  object-fit: contain;
+.loginButton:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .signupArea {
@@ -209,13 +179,18 @@
   background: none;
 
   color: rgba(0, 0, 0, 0.8);
+
   font-size: 10px;
 
   text-decoration: underline;
+
+  cursor: pointer;
 }
 
 .errorMessage {
-  margin-top: 8px;
-  font-size: 13px;
+  margin: -15px 0 12px;
+
+  font-size: 12px;
+
   color: #ff5c5c;
 }

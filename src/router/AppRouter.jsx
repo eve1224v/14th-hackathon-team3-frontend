@@ -5,6 +5,7 @@ import HomePage from "../features/home/pages/HomePage/HomePage";
 
 import CreateWorkspacePage from "../features/workspace/pages/CreateWorkspacePage/CreateWorkspacePage";
 import JoinWorkspacePage from "../features/workspace/pages/JoinWorkspacePage/JoinWorkspacePage";
+import ProjectHomePage from "../features/project/pages/ProjectHomePage/ProjectHomePage";
 
 import CreateProjectPage from "../features/project/pages/CreateProjectPage/CreateProjectPage";
 import ProjectSettingsPage from "../features/project/pages/ProjectSettingsPage/ProjectSettingsPage";
@@ -21,36 +22,29 @@ import IssueDetailPage from "../features/issue/pages/IssueDetailPage/IssueDetail
 import CreateIssuePage from "../features/issue/pages/CreateIssuePage/CreateIssuePage";
 import EditIssuePage from "../features/issue/pages/EditIssuePage/EditIssuePage";
 
+import ProfileSettingModal from "../features/settings/profile/ProfileSettingModal";
+import SystemSettingModal from "../features/settings/system/SystemSettingModal";
+
 import { ROUTES } from "./routes.constant";
 
 function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path={ROUTES.HOME}
-          element={<MainPage />}
-        />
+        <Route path={ROUTES.HOME} element={<MainPage />} />
 
-        <Route
-          path={ROUTES.DASHBOARD}
-          element={<HomePage />}
-        />
+        <Route path={ROUTES.DASHBOARD} element={<HomePage />} />
 
         <Route
           path={ROUTES.CREATE_WORKSPACE}
           element={<CreateWorkspacePage />}
         />
 
-        <Route
-          path={ROUTES.JOIN_WORKSPACE}
-          element={<JoinWorkspacePage />}
-        />
+        <Route path={ROUTES.PROJECT_HOME} element={<ProjectHomePage />} />
 
-        <Route
-          path={ROUTES.CREATE_PROJECT}
-          element={<CreateProjectPage />}
-        />
+        <Route path={ROUTES.JOIN_WORKSPACE} element={<JoinWorkspacePage />} />
+
+        <Route path={ROUTES.CREATE_PROJECT} element={<CreateProjectPage />} />
 
         <Route
           path={ROUTES.PROJECT_SETTINGS}
@@ -62,59 +56,42 @@ function AppRouter() {
           element={<TimezoneSettingsPage />}
         />
 
-        <Route
-          path={ROUTES.MEMBER_SETTINGS}
-          element={<MemberSettingsPage />}
-        />
+        <Route path={ROUTES.MEMBER_SETTINGS} element={<MemberSettingsPage />} />
 
         <Route
           path={ROUTES.INTEGRATION_SETTINGS}
           element={<IntegrationSettingsPage />}
         />
 
-        <Route
-          path={ROUTES.HANDOVER}
-          element={<HandoverPage />}
-        />
+        <Route path={ROUTES.HANDOVER} element={<HandoverPage />} />
 
-        <Route
-          path={ROUTES.CYCLE}
-          element={<CyclePage />}
-        />
+        <Route path={ROUTES.CYCLE} element={<CyclePage />} />
 
         {/* =========================
             Issue
         ========================= */}
 
-        <Route
-          path={ROUTES.ISSUE}
-          element={<IssueListPage />}
-        />
+        <Route path={ROUTES.ISSUE} element={<IssueListPage />} />
 
-        <Route
-          path={ROUTES.MY_ISSUE}
-          element={<IssueListPage type="my" />}
-        />
+        <Route path={ROUTES.MY_ISSUE} element={<IssueListPage type="my" />} />
 
         <Route
           path={ROUTES.TEAM_ISSUE}
           element={<IssueListPage type="team" />}
         />
 
-        <Route
-          path={ROUTES.CREATE_ISSUE}
-          element={<CreateIssuePage />}
-        />
+        <Route path={ROUTES.CREATE_ISSUE} element={<CreateIssuePage />} />
+
+        <Route path={ROUTES.ISSUE_DETAIL} element={<IssueDetailPage />} />
+
+        <Route path={ROUTES.ISSUE_EDIT} element={<EditIssuePage />} />
 
         <Route
-          path={ROUTES.ISSUE_DETAIL}
-          element={<IssueDetailPage />}
+          path={ROUTES.PROFILE_SETTINGS}
+          element={<ProfileSettingModal />}
         />
 
-        <Route
-          path={ROUTES.ISSUE_EDIT}
-          element={<EditIssuePage />}
-        />
+        <Route path={ROUTES.SYSTEM_SETTINGS} element={<SystemSettingModal />} />
       </Routes>
     </BrowserRouter>
   );

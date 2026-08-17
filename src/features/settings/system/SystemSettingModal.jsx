@@ -1,0 +1,577 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
+import styles from "./SystemSettingModal.module.css";
+
+import GeneralSetting from "./tabs/GeneralSetting";
+import NotificationSetting from "./tabs/NotificationSetting";
+import TimeSetting from "./tabs/TimeSetting";
+import AccountSetting from "./tabs/AccountSetting";
+
+import settingIcon from "../../../assets/icons/settingIcon.svg";
+import notifyIcon2 from "../../../assets/icons/notifyIcon2.svg";
+import clockIcon from "../../../assets/icons/clockIcon.svg";
+import profileIcon from "../../../assets/icons/profileIcon.svg";
+import closeIcon from "../../../assets/icons/closeIcon.svg";
+
+import { getWorkspaceDetail } from "../../../api/workspaceApi";
+
+import { updateUserLanguage } from "../../../api/userApi";
+
+import { getMyRegion, updateMyRegion } from "../../../api/regionApi";
+
+function SystemSettingModal() {
+  const navigate = useNavigate();
+
+  const { t, i18n } = useTranslation();
+
+  /* =========================================
+     현재 탭
+  ========================================= */
+
+  const [activeTab, setActiveTab] = useState("general");
+
+  /* =========================================
+     시스템 설정 Form
+  ========================================= */
+
+  const [systemForm, setSystemForm] = useState({
+    workspaceName: "",
+    companyName: "",
+    partnerCompany: "",
+
+    /*
+      서버 조회 없이 localStorage에서
+      바로 사용하는 언어
+    */
+    language: localStorage.getItem("userLanguage") || "ko",
+
+    /*
+      업무 지역 API
+    */
+    region: "",
+
+    /*
+      서버에서 region에 따라 결정되는 timezone
+
+      사용자가 직접 수정하지 않음
+    */
+    timezone: "",
+  });
+
+  /* =========================================
+     Workspace State
+  ========================================= */
+
+  const [isWorkspaceLoading, setIsWorkspaceLoading] = useState(true);
+
+  const [workspaceError, setWorkspaceError] = useState("");
+
+  /* =========================================
+     Region State
+  ========================================= */
+
+  const [isRegionLoading, setIsRegionLoading] = useState(true);
+
+  const [regionError, setRegionError] = useState("");
+
+  /* =========================================
+     Save State
+  ========================================= */
+
+  const [isSaving, setIsSaving] = useState(false);
+
+  /* =========================================
+     Notification
+  ========================================= */
+
+  const [notificationSettings, setNotificationSettings] = useState({
+    mention: true,
+    issue: true,
+    deadline: true,
+    message: true,
+    doNotDisturb: true,
+  });
+
+  /* =========================================
+     사용자 이메일
+  ========================================= */
+
+  const userEmail = localStorage.getItem("userEmail") || "";
+
+  /* =========================================
+     워크스페이스 정보 조회
+  ========================================= */
+
+  useEffect(() => {
+    const fetchWorkspace = async () => {
+      const workspaceId = localStorage.getItem("workspaceId");
+
+      if (!workspaceId) {
+        setWorkspaceError("선택된 워크스페이스가 없습니다.");
+
+        setIsWorkspaceLoading(false);
+
+        return;
+      }
+
+      try {
+        setIsWorkspaceLoading(true);
+
+        setWorkspaceError("");
+
+        const result = await getWorkspaceDetail(workspaceId);
+
+        const workspace = result?.data;
+
+        if (!workspace) {
+          setWorkspaceError("워크스페이스 정보를 불러오지 못했습니다.");
+
+          return;
+        }
+
+        const partnerNames = Array.isArray(workspace.collaboratingCompanies)
+          ? workspace.collaboratingCompanies
+              .map((company) => {
+                if (typeof company === "string") {
+                  return company;
+                }
+
+                return company?.name || "";
+              })
+              .filter(Boolean)
+          : [];
+
+        setSystemForm((prev) => ({
+          ...prev,
+
+          workspaceName: workspace.name || "",
+
+          companyName: workspace.company?.name || workspace.companyName || "",
+
+          partnerCompany: partnerNames.join(", "),
+        }));
+      } catch (error) {
+        console.error("워크스페이스 조회 실패:", error);
+
+        setWorkspaceError(
+          error.message || "워크스페이스 정보를 불러오지 못했습니다.",
+        );
+      } finally {
+        setIsWorkspaceLoading(false);
+      }
+    };
+
+    fetchWorkspace();
+  }, []);
+
+  /* =========================================
+     업무 지역 조회
+  ========================================= */
+
+  useEffect(() => {
+    const fetchRegion = async () => {
+      try {
+        setIsRegionLoading(true);
+
+        setRegionError("");
+
+        const result = await getMyRegion();
+
+        console.log("업무 지역 조회 성공:", result);
+
+        const data = result?.data;
+
+        /*
+          아직 설정하지 않은 사용자는
+
+          region: null
+          timezone: null
+
+          이므로 빈 문자열로 처리
+        */
+
+        setSystemForm((prev) => ({
+          ...prev,
+
+          region: data?.region || "",
+
+          timezone: data?.timezone || "",
+        }));
+      } catch (error) {
+        console.error("업무 지역 조회 실패:", error);
+
+        if (error.status === 401) {
+          setRegionError(
+            "로그인이 만료되었거나 인증 정보가 올바르지 않습니다.",
+          );
+
+          return;
+        }
+
+        setRegionError(
+          error.message || "업무 지역 정보를 불러오지 못했습니다.",
+        );
+      } finally {
+        setIsRegionLoading(false);
+      }
+    };
+
+    fetchRegion();
+  }, []);
+
+  /* =========================================
+     닫기
+  ========================================= */
+
+  const handleClose = () => {
+    navigate(-1);
+  };
+
+  /* =========================================
+     Form
+  ========================================= */
+
+  const handleSystemFormChange = (e) => {
+    const { name, value } = e.target;
+
+    setSystemForm((prev) => ({
+      ...prev,
+
+      [name]: value,
+    }));
+
+    /*
+      지역을 다시 선택하면
+      기존 오류 메시지 제거
+    */
+
+    if (name === "region" || name === "timezone") {
+      setRegionError("");
+    }
+  };
+
+  /* =========================================
+     Notification
+  ========================================= */
+
+  const handleNotificationChange = (name) => {
+    setNotificationSettings((prev) => ({
+      ...prev,
+
+      [name]: !prev[name],
+    }));
+  };
+
+  /* =========================================
+     저장
+  ========================================= */
+
+  const handleSave = async () => {
+    if (isSaving) {
+      return;
+    }
+
+    /*
+      국가 및 시간 탭에서
+      region을 선택하지 않은 경우
+    */
+
+    if (activeTab === "time" && !systemForm.region) {
+      setRegionError("업무 지역을 선택해주세요.");
+
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+
+      /* =====================================
+         일반 설정 저장
+      ===================================== */
+
+      if (activeTab === "general") {
+        const savedLanguage = localStorage.getItem("userLanguage") || "ko";
+
+        /*
+          같은 언어면 API 호출 안 함
+        */
+
+        if (savedLanguage !== systemForm.language) {
+          const result = await updateUserLanguage(systemForm.language);
+
+          const changedLanguage = result?.data?.language;
+
+          if (changedLanguage) {
+            localStorage.setItem("userLanguage", changedLanguage);
+
+            await i18n.changeLanguage(changedLanguage);
+
+            setSystemForm((prev) => ({
+              ...prev,
+
+              language: changedLanguage,
+            }));
+          }
+        }
+      }
+
+      /* =====================================
+         국가 및 시간 저장
+      ===================================== */
+
+      if (activeTab === "time") {
+        /*
+          서버에는 timezone을 보내지 않고
+          region만 전송
+        */
+
+        const result = await updateMyRegion(systemForm.region);
+
+        console.log("업무 지역 저장 성공:", result);
+
+        const data = result?.data;
+
+        /*
+          서버가 실제로 저장한 값을
+          다시 화면 state에 반영
+        */
+
+        setSystemForm((prev) => ({
+          ...prev,
+
+          region: data?.region || "",
+
+          timezone: data?.timezone || "",
+        }));
+      }
+
+      /* =====================================
+         저장 완료 → 모달 닫기
+      ===================================== */
+
+      navigate(-1);
+    } catch (error) {
+      console.error("시스템 설정 저장 실패:", error);
+
+      /*
+        업무 지역 오류
+      */
+
+      if (activeTab === "time") {
+        if (error.status === 400) {
+          setRegionError(
+            error.message || "선택한 업무 지역이 올바르지 않습니다.",
+          );
+
+          return;
+        }
+
+        if (error.status === 401) {
+          setRegionError(
+            "로그인이 만료되었거나 인증 정보가 올바르지 않습니다.",
+          );
+
+          return;
+        }
+      }
+
+      alert(error.message || t("common.saveError"));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  /* =========================================
+     LOGOUT
+  ========================================= */
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+
+    localStorage.removeItem("accessToken");
+
+    navigate("/");
+
+    window.location.reload();
+  };
+
+  return (
+    <div className={styles.overlay} onMouseDown={handleClose}>
+      <section
+        className={styles.modal}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        {/* =================================
+            LEFT
+        ================================= */}
+
+        <div className={styles.systemSidebar}>
+          <h2>{t("settings.title")}</h2>
+
+          <nav className={styles.systemNavigation}>
+            {/* 일반 */}
+
+            <button
+              type="button"
+              className={`${styles.systemNavItem} ${
+                activeTab === "general" ? styles.systemNavItemActive : ""
+              }`}
+              onClick={() => setActiveTab("general")}
+            >
+              <img src={settingIcon} alt="" className={styles.systemNavIcon} />
+
+              <span>{t("settings.general")}</span>
+            </button>
+
+            {/* 알림 */}
+
+            <button
+              type="button"
+              className={`${styles.systemNavItem} ${
+                activeTab === "notification" ? styles.systemNavItemActive : ""
+              }`}
+              onClick={() => setActiveTab("notification")}
+            >
+              <img src={notifyIcon2} alt="" className={styles.systemNavIcon} />
+
+              <span>{t("settings.notification")}</span>
+            </button>
+
+            {/* 국가 및 시간 */}
+
+            <button
+              type="button"
+              className={`${styles.systemNavItem} ${
+                activeTab === "time" ? styles.systemNavItemActive : ""
+              }`}
+              onClick={() => setActiveTab("time")}
+            >
+              <img src={clockIcon} alt="" className={styles.systemNavIcon} />
+
+              <span>{t("settings.countryTime")}</span>
+            </button>
+
+            {/* 계정 */}
+
+            <button
+              type="button"
+              className={`${styles.systemNavItem} ${
+                activeTab === "account" ? styles.systemNavItemActive : ""
+              }`}
+              onClick={() => setActiveTab("account")}
+            >
+              <img src={profileIcon} alt="" className={styles.systemNavIcon} />
+
+              <span>{t("settings.account")}</span>
+            </button>
+          </nav>
+        </div>
+
+        {/* =================================
+            RIGHT
+        ================================= */}
+
+        <div className={styles.systemContent}>
+          {/* 닫기 */}
+
+          <button
+            type="button"
+            className={styles.closeButton}
+            onClick={handleClose}
+            aria-label={t("common.close")}
+          >
+            <img src={closeIcon} alt="" />
+          </button>
+
+          {/* =================================
+              일반
+          ================================= */}
+
+          {activeTab === "general" && (
+            <GeneralSetting
+              systemForm={systemForm}
+              onChange={handleSystemFormChange}
+              isLoading={isWorkspaceLoading}
+              errorMessage={workspaceError}
+              styles={styles}
+            />
+          )}
+
+          {/* =================================
+              알림
+          ================================= */}
+
+          {activeTab === "notification" && (
+            <NotificationSetting
+              notificationSettings={notificationSettings}
+              onChange={handleNotificationChange}
+              styles={styles}
+            />
+          )}
+
+          {/* =================================
+              국가 및 시간
+          ================================= */}
+
+          {activeTab === "time" && (
+            <TimeSetting
+              systemForm={systemForm}
+              onChange={handleSystemFormChange}
+              isLoading={isRegionLoading}
+              errorMessage={regionError}
+              styles={styles}
+            />
+          )}
+
+          {/* =================================
+              계정
+          ================================= */}
+
+          {activeTab === "account" && (
+            <AccountSetting
+              userEmail={userEmail}
+              onLogout={handleLogout}
+              styles={styles}
+            />
+          )}
+
+          {/* =================================
+              하단 버튼
+
+              계정 탭에서는 표시 X
+          ================================= */}
+
+          {activeTab !== "account" && (
+            <div className={styles.systemActions}>
+              <button
+                type="button"
+                className={styles.systemCancelButton}
+                onClick={handleClose}
+                disabled={isSaving}
+              >
+                {t("common.cancel")}
+              </button>
+
+              <button
+                type="button"
+                className={styles.systemSaveButton}
+                onClick={handleSave}
+                disabled={
+                  isSaving ||
+                  (activeTab === "general" && isWorkspaceLoading) ||
+                  (activeTab === "time" && isRegionLoading)
+                }
+              >
+                {isSaving ? t("common.saving") : t("common.save")}
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+export default SystemSettingModal;
