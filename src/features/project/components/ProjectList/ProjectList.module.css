@@ -1,0 +1,489 @@
+/* ========================================
+   CONTAINER
+======================================== */
+
+.container {
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+
+  box-sizing: border-box;
+
+  padding: 95px 90px 100px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+/* ========================================
+   HEADER
+======================================== */
+
+.header {
+  width: 100%;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom: 42px;
+}
+
+.title {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+.summary {
+  margin: 10px 0 0;
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%;
+}
+
+/* ========================================
+   HEADER BUTTONS
+======================================== */
+
+.headerButtons {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.refreshButton,
+.createButton {
+  height: 33px;
+
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  border: none;
+  border-radius: 8px;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.refreshButton {
+  border: 1px solid #4d67ff;
+
+  background: transparent;
+
+  color: #ffffff;
+}
+
+.refreshButton:hover {
+  background: rgba(77, 103, 255, 0.1);
+}
+
+.refreshButton:disabled {
+  opacity: 0.5;
+
+  cursor: default;
+}
+
+.createButton {
+  background: #4d67ff;
+
+  color: #ffffff;
+}
+
+.createButton:hover {
+  opacity: 0.85;
+}
+
+/* ========================================
+   SECTION HEADER
+======================================== */
+
+.sectionHeader {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 18px;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 110%;
+}
+
+/* ========================================
+   STATUS FILTER
+======================================== */
+
+.statusFilter {
+  position: relative;
+
+  width: 120px;
+  height: 32px;
+}
+
+.statusFilter select {
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+
+  padding: 0 30px 0 10px;
+
+  border: 1px solid #252a44;
+  border-radius: 7px;
+
+  background: #1b1f35;
+
+  color: rgba(255, 255, 255, 0.75);
+
+  font-family: Pretendard, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+
+  outline: none;
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.statusFilter select:hover {
+  border-color: #3a4161;
+}
+
+.statusFilter select:focus {
+  border-color: #4d67ff;
+}
+
+.statusFilter select option {
+  background: #ffffff;
+
+  color: #111111;
+}
+
+.statusFilter img {
+  position: absolute;
+
+  top: 50%;
+  right: 8px;
+
+  width: 15px;
+  height: 15px;
+
+  transform: translateY(-50%);
+
+  display: block;
+
+  object-fit: contain;
+
+  pointer-events: none;
+}
+
+/* ========================================
+   PROJECT LIST
+======================================== */
+
+.projectList {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+
+  gap: 20px;
+}
+
+/* ========================================
+   PROJECT CARD
+======================================== */
+
+.projectCard {
+  min-width: 0;
+  min-height: 205px;
+
+  box-sizing: border-box;
+
+  padding: 20px;
+
+  border: 1px solid #252a44;
+  border-radius: 10px;
+
+  background: #13172b;
+
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.projectCard:hover {
+  border-color: #3a4161;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+}
+
+/* ========================================
+   CARD TOP
+======================================== */
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 15px;
+}
+
+.cardTop > div {
+  min-width: 0;
+}
+
+.cardTop h3 {
+  margin: 0;
+
+  overflow: hidden;
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 140%;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+}
+
+.cardTop p {
+  margin: 7px 0 0;
+
+  color: #7183ff;
+
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* ========================================
+   SETTING BUTTON
+======================================== */
+
+.settingButton {
+  width: 26px;
+  height: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 6px;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  transition: background-color 0.15s ease;
+}
+
+.settingButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.settingButton img {
+  display: block;
+
+  width: 17px;
+  height: 17px;
+
+  object-fit: contain;
+}
+
+/* ========================================
+   PROJECT PERIOD
+======================================== */
+
+.projectPeriod {
+  margin-top: 25px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* ========================================
+   MEMBER COUNT
+======================================== */
+
+.memberCount {
+  margin: 10px 0 0;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 10px;
+  font-weight: 400;
+}
+
+/* ========================================
+   PROGRESS
+======================================== */
+
+.progressRow {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 28px;
+}
+
+.progressBar {
+  flex: 1;
+
+  height: 5px;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  background: #252a44;
+}
+
+.progressFill {
+  height: 100%;
+
+  border-radius: 10px;
+
+  background: #4d67ff;
+
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  min-width: 20px;
+
+  color: rgba(255, 255, 255, 0.65);
+
+  font-size: 10px;
+  font-weight: 500;
+
+  text-align: right;
+}
+
+/* ========================================
+   LOADING / EMPTY
+======================================== */
+
+.stateMessage {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin: 0;
+
+  padding: 50px 20px;
+
+  border: 1px solid #252a44;
+  border-radius: 10px;
+
+  background: #13172b;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 12px;
+  font-weight: 400;
+
+  text-align: center;
+}
+
+/* ========================================
+   ERROR
+======================================== */
+
+.errorMessage {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin: 0;
+
+  padding: 20px;
+
+  border: 1px solid rgba(255, 100, 100, 0.25);
+  border-radius: 10px;
+
+  background: rgba(255, 100, 100, 0.05);
+
+  color: #ff6464;
+
+  font-size: 12px;
+  font-weight: 400;
+
+  text-align: center;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 1300px) {
+  .projectList {
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .container {
+    padding-right: 40px;
+    padding-left: 40px;
+  }
+
+  .projectList {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    gap: 20px;
+  }
+}
