@@ -89,7 +89,7 @@
 ========================= */
 
 .targetSection {
-  margin-top: 17px;
+  margin-top: 13px;
 }
 
 
@@ -334,4 +334,62 @@
     invert(100%);
 
   opacity: 0.7;
+}
+
+
+/* =========================
+   수정 모드 input
+========================= */
+
+.teamEditInput {
+  width: 170px;
+  height: 24px;
+
+  box-sizing: border-box;
+
+  margin-top: 5px;
+
+  padding: 0 8px;
+
+  border: 1px solid rgba(166, 180, 255, 0.18);
+  border-radius: 6px;
+
+  outline: none;
+
+  background: #1b2038;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+
+.managerEditInput {
+  width: 150px;
+  height: 24px;
+
+  box-sizing: border-box;
+
+  padding: 0 8px;
+
+  border: 1px solid rgba(166, 180, 255, 0.18);
+  border-radius: 6px;
+
+  outline: none;
+
+  background: #1b2038;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+
+.teamEditInput:focus,
+.managerEditInput:focus {
+  border-color: #4d67ff;
 }

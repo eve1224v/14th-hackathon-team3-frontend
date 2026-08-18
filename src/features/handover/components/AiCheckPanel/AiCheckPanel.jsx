@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import styles from "./AiCheckPanel.module.css";
 
 import warningTriangleIcon from "../../../../assets/icons/warningTriangleIcon.svg";
@@ -5,6 +7,12 @@ import questionCircleIcon from "../../../../assets/icons/questionCircleIcon.svg"
 import rightArrowIcon from "../../../../assets/icons/rightArrowIcon.svg";
 
 function AiCheckPanel() {
+  const navigate = useNavigate();
+
+  const handleIssueDetail = () => {
+    navigate("/issue/1");
+  };
+
   return (
     <section className={styles.panel}>
       <div className={styles.header}>
@@ -15,7 +23,10 @@ function AiCheckPanel() {
         </span>
       </div>
 
-      <div className={styles.firstItem}>
+      <div
+        className={styles.firstItem}
+        onClick={handleIssueDetail}
+      >
         <img
           src={warningTriangleIcon}
           alt=""
@@ -40,7 +51,10 @@ function AiCheckPanel() {
 
       <div className={styles.divider} />
 
-      <div className={styles.secondItem}>
+      <div
+        className={styles.secondItem}
+        onClick={handleIssueDetail}
+      >
         <img
           src={questionCircleIcon}
           alt=""

@@ -219,12 +219,6 @@
 }
 
 
-/*
-  전달 정보가 기존보다 조금 위로 오도록
-  오른쪽 패널 사이 간격을 18px → 14px로 수정
-*/
-
-
 /* =========================
    공통 제목
 ========================= */
@@ -284,41 +278,55 @@
 }
 
 
-.viewAllButton {
-  width: 65px;
-  height: 24px;
+/* 전체 보기 */
 
-  box-sizing: border-box;
+.viewAllButton {
+  height: 13px;
 
   display: flex;
   align-items: center;
-  justify-content: flex-end;
 
   gap: 5px;
+
+  margin-top: 5px;
 
   padding: 0;
 
   border: none;
-
   background: transparent;
 
-  color: rgba(255, 255, 255, 0.55);
-
-  font-family: Pretendard, sans-serif;
-  font-size: 10px;
-  font-weight: 400;
+  opacity: 0.7;
 
   cursor: pointer;
 }
 
 
+.viewAllButton span {
+  width: 45px;
+  height: 13px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
 .viewAllButton img {
+  display: block;
+
   width: 6px;
   height: 11px;
 
-  object-fit: contain;
+  flex-shrink: 0;
 
-  opacity: 0.6;
+  object-fit: contain;
 }
 
 
@@ -367,42 +375,6 @@
 }
 
 
-/* 임시 저장 */
-
-.saveButton {
-  position: absolute;
-
-  top: 0;
-  left: 0;
-
-  width: 67px;
-  height: 31px;
-
-  box-sizing: border-box;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
-
-  background: transparent;
-
-  color: #ffffff;
-
-  font-family: Pretendard, sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-
-  white-space: nowrap;
-
-  cursor: pointer;
-}
-
-
 /* 인수인계 전달 */
 
 .transferButton {
@@ -420,8 +392,6 @@
   align-items: center;
   justify-content: center;
 
-  gap: 5px;
-
   padding: 0;
 
   border: none;
@@ -432,8 +402,6 @@
   color: #ffffff;
 
   font-family: Pretendard, sans-serif;
-  font-size: 12px;
-  font-weight: 600;
 
   white-space: nowrap;
 
@@ -441,7 +409,181 @@
 }
 
 
-.transferArrow {
-  font-size: 15px;
-  line-height: 1;
+.transferText {
+  width: 79px;
+  height: 13px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================================
+   인수인계 전달 완료 모달
+================================================== */
+
+.modalOverlay {
+  position: fixed;
+
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  z-index: 3000;
+}
+
+
+.completeModal {
+  position: relative;
+
+  width: 420px;
+  height: 376px;
+
+  box-sizing: border-box;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+/* ==================================================
+   X 버튼
+================================================== */
+
+.modalCloseButton {
+  position: absolute;
+
+  top: 18px;
+  right: 18px;
+
+  width: 13px;
+  height: 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  z-index: 100;
+}
+
+
+.modalCloseButton img {
+  display: block;
+
+  width: 13px;
+  height: 13px;
+
+  object-fit: contain;
+
+  opacity: 1;
+
+  filter: brightness(0) saturate(100%);
+}
+
+
+/* ==================================================
+   제목
+================================================== */
+
+.modalTitle {
+  position: absolute;
+
+  top: 75px;
+  left: 50%;
+
+  width: 163px;
+  height: 24px;
+
+  margin: 0;
+
+  transform: translateX(-50%);
+
+  color: #000000;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  text-align: center;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================================
+   성공 체크 아이콘
+================================================== */
+
+.successCheckIcon {
+  position: absolute;
+
+  top: 151px;
+  left: 50%;
+
+  display: block;
+
+  width: 114px;
+  height: 114px;
+
+  transform: translateX(-50%);
+
+  object-fit: contain;
+}
+
+
+/* ==================================================
+   설명
+================================================== */
+
+.modalDescription {
+  position: absolute;
+
+  top: 304px;
+  left: 50%;
+
+  width: 155px;
+  height: 13px;
+
+  margin: 0;
+
+  transform: translateX(-50%);
+
+  color: #000000;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  text-align: center;
+
+  white-space: nowrap;
 }

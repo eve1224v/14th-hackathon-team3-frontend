@@ -4,12 +4,15 @@ import warningTriangleIcon from "../../../../assets/icons/warningTriangleIcon.sv
 import referenceLinkIcon from "../../../../assets/icons/referenceLinkIcon.svg";
 import editPencilIcon from "../../../../assets/icons/editPencilIcon.svg";
 
+
 function HandoverItem({
+  issueId,
   title,
   description,
   manager,
   evidenceCount,
   warning,
+  onEdit,
 }) {
   return (
     <div className={styles.itemRow}>
@@ -33,7 +36,9 @@ function HandoverItem({
               alt=""
             />
 
-            <span>근거 부족</span>
+            <span>
+              근거 부족
+            </span>
           </div>
         ) : (
           <div className={styles.evidence}>
@@ -42,24 +47,31 @@ function HandoverItem({
               alt=""
             />
 
-            <span>근거 {evidenceCount}개</span>
+            <span>
+              근거 {evidenceCount}개
+            </span>
           </div>
         )}
       </article>
 
+
       <button
         type="button"
         className={styles.editButton}
+        onClick={() => onEdit(issueId)}
       >
         <img
           src={editPencilIcon}
           alt=""
         />
 
-        <span>수정</span>
+        <span>
+          수정
+        </span>
       </button>
     </div>
   );
 }
+
 
 export default HandoverItem;
