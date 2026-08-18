@@ -87,11 +87,11 @@ function GeneralSetting({
               value={systemForm.language}
               onChange={onChange}
             >
-              <option value="ko">{t("languages.korean")}</option>
+              <option value="ko">한국어</option>
 
-              <option value="en">{t("languages.english")}</option>
+              <option value="en">English</option>
 
-              <option value="ja">{t("languages.japanese")}</option>
+              <option value="ja">日本語</option>
             </select>
           </div>
         </div>

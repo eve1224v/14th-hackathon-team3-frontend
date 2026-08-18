@@ -19,6 +19,7 @@
   height: 505px;
 
   box-sizing: border-box;
+  border-radius: 8px;
 
   display: flex;
   flex-direction: column;

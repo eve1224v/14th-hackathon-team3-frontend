@@ -20,15 +20,12 @@ function CreateWorkspaceForm() {
   ========================================= */
 
   const [workspaceName, setWorkspaceName] = useState("");
-
   const [companyName, setCompanyName] = useState("");
-
   const [companyCountryCode, setCompanyCountryCode] = useState("");
 
   const [collaboratingCompanyName, setCollaboratingCompanyName] = useState("");
 
-  const [collaboratingCountryCode, setCollaboratingCountryCode] =
-    useState("KR");
+  const [collaboratingCountryCode] = useState("KR");
 
   const [inviteeEmails, setInviteeEmails] = useState("");
 
@@ -36,9 +33,13 @@ function CreateWorkspaceForm() {
      초대 링크
   ========================================= */
 
-  const [inviteCode, setInviteCode] = useState("");
+  const [inviteUrl, setInviteUrl] = useState("");
 
   const [shouldCreateInviteLink, setShouldCreateInviteLink] = useState(false);
+
+  const [isWorkspaceCreated, setIsWorkspaceCreated] = useState(false);
+
+  const [isCopied, setIsCopied] = useState(false);
 
   /* =========================================
      상태
@@ -87,10 +88,7 @@ function CreateWorkspaceForm() {
   };
 
   /* =========================================
-     초대 코드 생성 예약
-
-     workspaceId는 워크스페이스 생성 후 생기므로
-     여기서는 초대 링크 생성 여부만 저장
+     초대 링크 생성 선택
   ========================================= */
 
   const handleCreateInviteCode = () => {
@@ -98,7 +96,31 @@ function CreateWorkspaceForm() {
 
     setShouldCreateInviteLink(true);
 
-    setInviteCode("워크스페이스 생성 후 초대 링크가 생성됩니다.");
+    setInviteUrl("워크스페이스 생성 후 초대 링크가 생성됩니다.");
+  };
+
+  /* =========================================
+     초대 링크 복사
+  ========================================= */
+
+  const handleCopyInviteUrl = async () => {
+    if (!inviteUrl) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+
+      setIsCopied(true);
+
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error("초대 링크 복사 실패:", error);
+
+      setErrorMessage("초대 링크를 복사하지 못했습니다.");
+    }
   };
 
   /* =========================================
@@ -186,7 +208,6 @@ function CreateWorkspaceForm() {
         : [];
 
       console.log("주관사:", hostCompany);
-
       console.log("협업 기업:", partnerCompanies);
 
       /* =========================================
@@ -254,9 +275,11 @@ function CreateWorkspaceForm() {
           const generatedInviteUrl = invitationResult?.data?.inviteUrl || "";
 
           if (generatedInviteUrl) {
-            setInviteCode(generatedInviteUrl);
+            setInviteUrl(generatedInviteUrl);
 
             localStorage.setItem("workspaceInviteUrl", generatedInviteUrl);
+          } else {
+            setInviteUrl("초대 링크를 받지 못했습니다.");
           }
         } catch (invitationError) {
           console.error("초대 링크 생성 실패:", invitationError);
@@ -296,10 +319,10 @@ function CreateWorkspaceForm() {
       window.dispatchEvent(new Event("workspaceChanged"));
 
       /* =========================================
-         7. 프로젝트 목록 화면으로 이동
+         7. 생성 완료 상태
       ========================================= */
 
-      navigate(ROUTES.PROJECT_HOME);
+      setIsWorkspaceCreated(true);
     } catch (error) {
       console.error("워크스페이스 생성 실패:", error);
 
@@ -328,6 +351,14 @@ function CreateWorkspaceForm() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  /* =========================================
+     다음 화면 이동
+  ========================================= */
+
+  const handleNext = () => {
+    navigate(ROUTES.PROJECT_HOME);
   };
 
   return (
@@ -373,6 +404,7 @@ function CreateWorkspaceForm() {
                 type="text"
                 value={workspaceName}
                 maxLength={100}
+                disabled={isWorkspaceCreated}
                 onChange={(e) => setWorkspaceName(e.target.value)}
               />
             </div>
@@ -387,6 +419,7 @@ function CreateWorkspaceForm() {
                 type="text"
                 value={companyName}
                 maxLength={100}
+                disabled={isWorkspaceCreated}
                 onChange={(e) => setCompanyName(e.target.value)}
               />
             </div>
@@ -399,6 +432,7 @@ function CreateWorkspaceForm() {
               <select
                 id="companyCountryCode"
                 value={companyCountryCode}
+                disabled={isWorkspaceCreated}
                 onChange={(e) => setCompanyCountryCode(e.target.value)}
               >
                 <option value="">선택</option>
@@ -423,31 +457,10 @@ function CreateWorkspaceForm() {
                 type="text"
                 value={collaboratingCompanyName}
                 maxLength={100}
+                disabled={isWorkspaceCreated}
                 onChange={(e) => setCollaboratingCompanyName(e.target.value)}
               />
             </div>
-
-            {/* 협력 기업 국가 */}
-
-            {collaboratingCompanyName.trim() && (
-              <div className={styles.field}>
-                <label htmlFor="collaboratingCountryCode">협력 기업 국가</label>
-
-                <select
-                  id="collaboratingCountryCode"
-                  value={collaboratingCountryCode}
-                  onChange={(e) => setCollaboratingCountryCode(e.target.value)}
-                >
-                  <option value="KR">대한민국</option>
-
-                  <option value="US">미국</option>
-
-                  <option value="GB">영국</option>
-
-                  <option value="JP">일본</option>
-                </select>
-              </div>
-            )}
           </div>
 
           {/* =========================
@@ -464,6 +477,7 @@ function CreateWorkspaceForm() {
                   type="text"
                   value={inviteeEmails}
                   placeholder="email@example.com"
+                  disabled={isWorkspaceCreated}
                   onChange={(e) => setInviteeEmails(e.target.value)}
                 />
 
@@ -471,6 +485,7 @@ function CreateWorkspaceForm() {
                   type="button"
                   className={styles.addMemberButton}
                   aria-label="팀원 추가"
+                  disabled={isWorkspaceCreated}
                 >
                   +
                 </button>
@@ -484,21 +499,33 @@ function CreateWorkspaceForm() {
         ========================================= */}
 
         <div className={styles.inviteArea}>
-          <button
-            type="button"
-            className={styles.inviteButton}
-            onClick={handleCreateInviteCode}
-            disabled={isLoading}
-          >
-            초대 코드 생성
-          </button>
+          {!isWorkspaceCreated && (
+            <button
+              type="button"
+              className={styles.inviteButton}
+              onClick={handleCreateInviteCode}
+              disabled={isLoading}
+            >
+              초대 링크 생성
+            </button>
+          )}
 
           <input
             type="text"
             className={styles.inviteCodeInput}
-            value={inviteCode}
+            value={inviteUrl}
             readOnly
           />
+
+          {isWorkspaceCreated && inviteUrl && inviteUrl.startsWith("http") && (
+            <button
+              type="button"
+              className={styles.inviteButton}
+              onClick={handleCopyInviteUrl}
+            >
+              {isCopied ? "복사 완료" : "링크 복사"}
+            </button>
+          )}
         </div>
 
         {/* =========================================
@@ -508,18 +535,28 @@ function CreateWorkspaceForm() {
         {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
 
         {/* =========================================
-            CREATE
+            CREATE / NEXT
         ========================================= */}
 
         <div className={styles.buttonArea}>
-          <button
-            type="button"
-            className={styles.createButton}
-            onClick={handleCreateWorkspace}
-            disabled={isLoading}
-          >
-            {isLoading ? "생성 중..." : "워크스페이스 생성"}
-          </button>
+          {!isWorkspaceCreated ? (
+            <button
+              type="button"
+              className={styles.createButton}
+              onClick={handleCreateWorkspace}
+              disabled={isLoading}
+            >
+              {isLoading ? "생성 중..." : "워크스페이스 생성"}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className={styles.createButton}
+              onClick={handleNext}
+            >
+              다음
+            </button>
+          )}
         </div>
       </div>
     </main>

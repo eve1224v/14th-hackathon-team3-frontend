@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
+
 import { useTranslation } from "react-i18next";
 
 import styles from "./Sidebar.module.css";
@@ -60,9 +62,6 @@ function Sidebar() {
 
   /* ========================================
      로그인 정보
-
-     isLoggedIn만 true여도 로그인으로 판단하지 않음
-     accessToken까지 있어야 서버 API 호출
   ======================================== */
 
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
@@ -112,7 +111,7 @@ function Sidebar() {
   const [isActivityUpdating, setIsActivityUpdating] = useState(false);
 
   /* ========================================
-     로그아웃 상태
+     로그아웃
   ======================================== */
 
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -124,16 +123,25 @@ function Sidebar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   /* ========================================
-     시간
+     시간 계산
   ======================================== */
 
   const getTime = (timeZone) => {
-    return new Intl.DateTimeFormat("en-GB", {
-      timeZone,
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }).format(new Date());
+    try {
+      return new Intl.DateTimeFormat("en-GB", {
+        timeZone,
+
+        hour: "2-digit",
+
+        minute: "2-digit",
+
+        hour12: false,
+      }).format(new Date());
+    } catch (error) {
+      console.error("시간대 변환 실패:", error);
+
+      return "--:--";
+    }
   };
 
   /* ========================================
@@ -150,11 +158,18 @@ function Sidebar() {
     return localStorage.getItem("userRegion") || "SEOUL";
   });
 
-  const selectedRegionInfo =
-    REGION_INFO_MAP[selectedRegion] || REGION_INFO_MAP.SEOUL;
+  const [selectedTimezone, setSelectedTimezone] = useState(() => {
+    return localStorage.getItem("userTimezone") || "Asia/Seoul";
+  });
+
+  const selectedRegionInfo = REGION_INFO_MAP[selectedRegion] || {
+    name: selectedRegion || "[KR] 서울, 대한민국",
+
+    timezone: selectedTimezone,
+  };
 
   const [selectedRegionTime, setSelectedRegionTime] = useState(() =>
-    getTime(selectedRegionInfo.timezone),
+    getTime(selectedTimezone),
   );
 
   /* ========================================
@@ -163,12 +178,13 @@ function Sidebar() {
 
   useEffect(() => {
     const updateTime = () => {
+      /* 서울은 항상 고정 */
+
       setSeoulTime(getTime("Asia/Seoul"));
 
-      const regionInfo =
-        REGION_INFO_MAP[selectedRegion] || REGION_INFO_MAP.SEOUL;
+      /* 아래 시간만 설정 지역 */
 
-      setSelectedRegionTime(getTime(regionInfo.timezone));
+      setSelectedRegionTime(getTime(selectedTimezone));
     };
 
     updateTime();
@@ -178,7 +194,7 @@ function Sidebar() {
     return () => {
       clearInterval(timer);
     };
-  }, [selectedRegion]);
+  }, [selectedTimezone]);
 
   /* ========================================
      시스템 설정 지역 변경 감지
@@ -188,10 +204,31 @@ function Sidebar() {
     const handleTimeZoneChanged = () => {
       const savedRegion = localStorage.getItem("userRegion") || "SEOUL";
 
+      const savedTimezone =
+        localStorage.getItem("userTimezone") || "Asia/Seoul";
+
+      console.log("Sidebar 지역 변경:", savedRegion);
+
+      console.log("Sidebar 시간대 변경:", savedTimezone);
+
       setSelectedRegion(savedRegion);
+
+      setSelectedTimezone(savedTimezone);
+
+      /*
+          이벤트 받은 즉시
+          아래 시간도 바로 변경
+        */
+
+      setSelectedRegionTime(getTime(savedTimezone));
     };
 
     window.addEventListener("timeZoneChanged", handleTimeZoneChanged);
+
+    /*
+      다른 탭에서 localStorage가
+      변경된 경우
+    */
 
     window.addEventListener("storage", handleTimeZoneChanged);
 
@@ -203,10 +240,7 @@ function Sidebar() {
   }, []);
 
   /* ========================================
-     워크스페이스 목록 조회
-     + 활동 상태 조회
-
-     accessToken 있을 때만 실행
+     워크스페이스 / 활동 상태 조회
   ======================================== */
 
   useEffect(() => {
@@ -231,8 +265,8 @@ function Sidebar() {
         setWorkspaces(workspaceList);
 
         /* ===============================
-           워크스페이스 없는 경우
-        =============================== */
+             워크스페이스 없는 경우
+          =============================== */
 
         if (workspaceList.length === 0) {
           setSelectedWorkspace(null);
@@ -249,8 +283,8 @@ function Sidebar() {
         }
 
         /* ===============================
-           기존 선택 워크스페이스
-        =============================== */
+             기존 선택 워크스페이스
+          =============================== */
 
         const savedWorkspaceId = localStorage.getItem("workspaceId");
 
@@ -264,9 +298,9 @@ function Sidebar() {
         }
 
         /* ===============================
-           저장된 워크스페이스 없으면
-           첫 번째 워크스페이스 선택
-        =============================== */
+             저장된 워크스페이스 없으면
+             첫 번째 선택
+          =============================== */
 
         if (!workspaceToSelect) {
           workspaceToSelect = workspaceList[0];
@@ -395,10 +429,6 @@ function Sidebar() {
   ======================================== */
 
   const handleActivityToggle = async (e) => {
-    /*
-      토큰 없으면 API 호출하지 않음
-    */
-
     if (!isAuthenticated) {
       return;
     }
@@ -445,11 +475,6 @@ function Sidebar() {
 
     try {
       setIsLoggingOut(true);
-
-      /*
-        accessToken이 있는 경우에만
-        서버 로그아웃 API 실행
-      */
 
       if (accessToken) {
         const result = await logout();
@@ -539,6 +564,10 @@ function Sidebar() {
 
   return (
     <aside className={styles.sidebar}>
+      {/* =========================
+          Logo
+      ========================= */}
+
       <div className={styles.logoArea}>
         <img className={styles.logo} src={logoIcon} alt="RelAi" />
       </div>
@@ -557,6 +586,8 @@ function Sidebar() {
                 })}
               </p>
             </div>
+
+            {/* Workspace */}
 
             <div className={styles.workspaceDropdown}>
               <button
@@ -677,16 +708,20 @@ function Sidebar() {
         {/* ========================================
             시간
 
-            첫 번째 = 서울
-            두 번째 = 사용자 설정 지역
+            위 = 서울 고정
+            아래 = 시스템 설정 지역
         ======================================== */}
 
         <div className={styles.timeSection}>
+          {/* 서울 */}
+
           <div>
             <p>{t("sidebar.seoul")}</p>
 
             <strong>{seoulTime}</strong>
           </div>
+
+          {/* 사용자 설정 지역 */}
 
           <div>
             <p>{selectedRegionInfo.name}</p>

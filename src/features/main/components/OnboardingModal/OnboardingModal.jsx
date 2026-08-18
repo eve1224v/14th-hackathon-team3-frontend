@@ -16,16 +16,15 @@ import { ROUTES } from "../../../../router/routes.constant";
 
 import JoinWorkspaceModal from "../JoinWorkspaceModal/JoinWorkspaceModal";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "https://api.likelion-bato.cloud";
+
 /* =========================================================
    Onboarding Modal
 ========================================================= */
 
 function OnboardingModal({ onClose, userName }) {
   const navigate = useNavigate();
-
-  /* =========================================
-     현재 Step
-  ========================================= */
 
   const [step, setStep] = useState(1);
 
@@ -41,48 +40,190 @@ function OnboardingModal({ onClose, userName }) {
 
   const [position, setPosition] = useState("");
 
-  /* 사용자 지역 */
-
   const [region, setRegion] = useState("");
 
   const [isRegionOpen, setIsRegionOpen] = useState(false);
-
-  /* 기본 언어 */
 
   const [language, setLanguage] = useState("");
 
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
 
   /* =========================================
-     초대 워크스페이스 Modal
+     API 상태
+  ========================================= */
+
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+  /* =========================================
+     Join Workspace Modal
   ========================================= */
 
   const [isJoinWorkspaceModalOpen, setIsJoinWorkspaceModalOpen] =
     useState(false);
 
   /* =========================================
-     다음
+     Step 1 저장
   ========================================= */
 
-  const handleNext = () => {
-    if (step === 1) {
-      setStep(2);
+  const handleNext = async () => {
+    if (step !== 1 || isSavingSettings) {
+      return;
     }
 
-    setIsRegionOpen(false);
+    setErrorMessage("");
 
-    setIsLanguageOpen(false);
+    if (!region) {
+      setErrorMessage("사용자 지역을 선택해주세요.");
+
+      return;
+    }
+
+    if (!language) {
+      setErrorMessage("기본 언어를 선택해주세요.");
+
+      return;
+    }
+
+    const accessToken = localStorage.getItem("accessToken");
+
+    if (!accessToken) {
+      setErrorMessage("로그인 정보가 없습니다. 다시 로그인해주세요.");
+
+      return;
+    }
+
+    try {
+      setIsSavingSettings(true);
+
+      /* =========================================
+           1. 기본 언어 저장
+        ========================================= */
+
+      const languageResponse = await fetch(
+        `${API_BASE_URL}/api/v1/users/me/language`,
+        {
+          method: "PATCH",
+
+          headers: {
+            "Content-Type": "application/json",
+
+            Authorization: `Bearer ${accessToken}`,
+          },
+
+          body: JSON.stringify({
+            language,
+          }),
+        },
+      );
+
+      const languageResult = await languageResponse.json().catch(() => null);
+
+      if (!languageResponse.ok) {
+        throw new Error(
+          languageResult?.message || "기본 언어 저장에 실패했습니다.",
+        );
+      }
+
+      /* =========================================
+           2. 사용자 지역 저장
+        ========================================= */
+
+      const regionResponse = await fetch(
+        `${API_BASE_URL}/api/v1/users/me/region`,
+        {
+          method: "PATCH",
+
+          headers: {
+            "Content-Type": "application/json",
+
+            Authorization: `Bearer ${accessToken}`,
+          },
+
+          body: JSON.stringify({
+            region,
+          }),
+        },
+      );
+
+      const regionResult = await regionResponse.json().catch(() => null);
+
+      if (!regionResponse.ok) {
+        throw new Error(
+          regionResult?.message || "사용자 지역 저장에 실패했습니다.",
+        );
+      }
+
+      /* =========================================
+           3. LocalStorage 저장
+        ========================================= */
+
+      localStorage.setItem("userLanguage", language);
+
+      localStorage.setItem("userRegion", region);
+
+      /* =========================================
+           4. WorkspaceMember 프로필 임시 저장
+
+           workspaceId 생성 후
+           members/me/profile API에서 사용
+        ========================================= */
+
+      localStorage.setItem(
+        "pendingWorkspaceProfile",
+        JSON.stringify({
+          companyName: company.trim(),
+
+          departmentName: department.trim(),
+
+          teamName: team.trim(),
+
+          jobTitle: position.trim(),
+        }),
+      );
+
+      /*
+          기존 화면에서도 사용하는 값
+        */
+
+      localStorage.setItem("userCompany", company.trim());
+
+      localStorage.setItem("userTeam", team.trim());
+
+      localStorage.setItem("userJobTitle", position.trim());
+
+      /* =========================================
+           5. Sidebar 지역 시간 갱신
+        ========================================= */
+
+      window.dispatchEvent(new Event("timeZoneChanged"));
+
+      window.dispatchEvent(new Event("userInfoUpdated"));
+
+      /* =========================================
+           6. Step 2
+        ========================================= */
+
+      setStep(2);
+
+      setIsRegionOpen(false);
+
+      setIsLanguageOpen(false);
+    } catch (error) {
+      console.error("온보딩 설정 저장 실패:", error);
+
+      setErrorMessage(error.message || "설정 저장에 실패했습니다.");
+    } finally {
+      setIsSavingSettings(false);
+    }
   };
 
   /* =========================================
-     Progress Click
+     Progress
   ========================================= */
 
   const handleProgressClick = (targetStep) => {
-    /*
-      현재 진행한 단계까지만 이동 가능
-    */
-
     if (targetStep <= step) {
       setStep(targetStep);
 
@@ -93,35 +234,22 @@ function OnboardingModal({ onClose, userName }) {
   };
 
   /* =========================================
-     새 워크스페이스 만들기
+     새 워크스페이스
   ========================================= */
 
   const handleCreateWorkspace = () => {
-    /*
-      온보딩 닫기
-    */
-
     if (onClose) {
       onClose();
     }
-
-    /*
-      워크스페이스 생성 페이지 이동
-    */
 
     navigate(ROUTES.CREATE_WORKSPACE);
   };
 
   /* =========================================
-     초대받은 워크스페이스 참여
+     초대 워크스페이스 참여
   ========================================= */
 
   const handleJoinWorkspace = () => {
-    /*
-      바로 /workspace/join으로 이동하지 않고
-      초대 코드 입력 Modal 먼저 띄움
-    */
-
     setIsJoinWorkspaceModalOpen(true);
   };
 
@@ -129,17 +257,16 @@ function OnboardingModal({ onClose, userName }) {
     <>
       <div className={styles.overlay}>
         <section className={styles.modal}>
-          {/* =========================================
-              Header
-          ========================================= */}
+          {/* Header */}
 
           <div className={styles.header}>
             <div>
               <h1>
-                환영합니다, <strong>{userName || "사용자"}!</strong>
+                환영합니다,{" "}
+                <strong>
+                  {userName || localStorage.getItem("userName") || "사용자"}!
+                </strong>
               </h1>
-
-              {/* Step 1 Header */}
 
               {step === 1 && (
                 <>
@@ -148,8 +275,6 @@ function OnboardingModal({ onClose, userName }) {
                   <p>함께 일할 팀이나 다른 사람이 이해할 수 있어요.</p>
                 </>
               )}
-
-              {/* Step 2 Header */}
 
               {step === 2 && (
                 <>
@@ -165,13 +290,9 @@ function OnboardingModal({ onClose, userName }) {
             <img className={styles.logo} src={logo2} alt="RelAi" />
           </div>
 
-          {/* =========================================
-              Progress
-          ========================================= */}
+          {/* Progress */}
 
           <div className={styles.progress}>
-            {/* Step 1 */}
-
             <button
               type="button"
               className={styles.progressButton}
@@ -179,8 +300,6 @@ function OnboardingModal({ onClose, userName }) {
             >
               <img src={step >= 1 ? rectangle1 : rectangle2} alt="" />
             </button>
-
-            {/* Step 2 */}
 
             <button
               type="button"
@@ -193,9 +312,7 @@ function OnboardingModal({ onClose, userName }) {
             </button>
           </div>
 
-          {/* =========================================
-              Step 1
-          ========================================= */}
+          {/* Step 1 */}
 
           {step === 1 && (
             <StepOne
@@ -218,9 +335,7 @@ function OnboardingModal({ onClose, userName }) {
             />
           )}
 
-          {/* =========================================
-              Step 2
-          ========================================= */}
+          {/* Step 2 */}
 
           {step === 2 && (
             <StepTwo
@@ -229,31 +344,26 @@ function OnboardingModal({ onClose, userName }) {
             />
           )}
 
-          {/* =========================================
-              하단 버튼
+          {/* Error */}
 
-              Step 1에서만 다음 버튼
-          ========================================= */}
+          {errorMessage && (
+            <p className={styles.errorMessage}>{errorMessage}</p>
+          )}
+
+          {/* 다음 */}
 
           {step === 1 && (
             <button
               type="button"
               className={styles.nextButton}
               onClick={handleNext}
+              disabled={isSavingSettings}
             >
-              다음
+              {isSavingSettings ? "저장 중..." : "다음"}
             </button>
           )}
         </section>
       </div>
-
-      {/* =========================================
-          초대 워크스페이스 참여 Modal
-
-          Step 2의
-          "초대받은 링크로 팀에 참여하기"
-          버튼 클릭 시 표시
-      ========================================= */}
 
       {isJoinWorkspaceModalOpen && (
         <JoinWorkspaceModal
@@ -266,10 +376,6 @@ function OnboardingModal({ onClose, userName }) {
 
 /* =========================================================
    Step 1
-
-   기본 정보
-   + 사용자 지역
-   + 기본 언어
 ========================================================= */
 
 function StepOne({
@@ -299,39 +405,27 @@ function StepOne({
 }) {
   const { t } = useTranslation();
 
-  /* =========================================
-     사용자 지역
-  ========================================= */
-
   const regionOptions = [
     {
       value: "SEOUL",
       label: "[KR] 서울, 대한민국",
-      timezone: "Asia/Seoul",
     },
 
     {
       value: "TOKYO",
       label: "[JP] 도쿄, 일본",
-      timezone: "Asia/Tokyo",
     },
 
     {
       value: "NEW_YORK",
       label: "[US] 뉴욕, 미국",
-      timezone: "America/New_York",
     },
 
     {
       value: "LOS_ANGELES",
       label: "[US] 로스앤젤레스, 미국",
-      timezone: "America/Los_Angeles",
     },
   ];
-
-  /* =========================================
-     기본 언어
-  ========================================= */
 
   const languageOptions = [
     {
@@ -350,35 +444,13 @@ function StepOne({
     },
   ];
 
-  /* =========================================
-     지역 선택
-  ========================================= */
-
   const handleRegionSelect = (option) => {
     setRegion(option.value);
 
     setIsRegionOpen(false);
 
     setIsLanguageOpen(false);
-
-    /*
-      Sidebar 시간 표시용
-    */
-
-    localStorage.setItem("userRegion", option.value);
-
-    localStorage.setItem("userTimezone", option.timezone);
-
-    /*
-      Sidebar에 지역 변경 알림
-    */
-
-    window.dispatchEvent(new Event("timeZoneChanged"));
   };
-
-  /* =========================================
-     언어 선택
-  ========================================= */
 
   const handleLanguageSelect = (option) => {
     setLanguage(option.value);
@@ -386,25 +458,10 @@ function StepOne({
     setIsLanguageOpen(false);
 
     setIsRegionOpen(false);
-
-    /*
-      추후 서버 API 연결 전까지
-      선택값 저장
-    */
-
-    localStorage.setItem("userLanguage", option.value);
   };
-
-  /* =========================================
-     선택된 지역 표시
-  ========================================= */
 
   const selectedRegionLabel =
     regionOptions.find((option) => option.value === region)?.label || "";
-
-  /* =========================================
-     선택된 언어 표시
-  ========================================= */
 
   const selectedLanguageLabel =
     languageOptions.find((option) => option.value === language)?.label || "";
@@ -412,13 +469,9 @@ function StepOne({
   return (
     <div className={styles.stepContent}>
       <div className={styles.twoColumn}>
-        {/* =========================================
-            왼쪽
-        ========================================= */}
+        {/* LEFT */}
 
         <div className={styles.column}>
-          {/* 소속 기업 */}
-
           <div className={styles.field}>
             <label htmlFor="company">소속 기업</label>
 
@@ -430,8 +483,6 @@ function StepOne({
               onChange={(e) => setCompany(e.target.value)}
             />
           </div>
-
-          {/* 부서 / 팀 */}
 
           <div className={styles.field}>
             <label htmlFor="department">부서/팀</label>
@@ -454,13 +505,9 @@ function StepOne({
           </div>
         </div>
 
-        {/* =========================================
-            오른쪽
-        ========================================= */}
+        {/* RIGHT */}
 
         <div className={styles.column}>
-          {/* 직책 */}
-
           <div className={styles.field}>
             <label htmlFor="position">직책</label>
 
@@ -473,16 +520,10 @@ function StepOne({
             />
           </div>
 
-          {/* =========================================
-              사용자 지역 및 기본 언어
-          ========================================= */}
-
           <div className={styles.field}>
             <label>사용자 지역 및 기본 언어 설정</label>
 
-            {/* =====================================
-                사용자 지역
-            ===================================== */}
+            {/* Region */}
 
             <div className={styles.customDropdown}>
               <button
@@ -529,9 +570,7 @@ function StepOne({
               )}
             </div>
 
-            {/* =====================================
-                기본 언어
-            ===================================== */}
+            {/* Language */}
 
             <div className={styles.customDropdown}>
               <button
@@ -586,18 +625,12 @@ function StepOne({
 
 /* =========================================================
    Step 2
-
-   워크스페이스 선택
 ========================================================= */
 
 function StepTwo({ onCreateWorkspace, onJoinWorkspace }) {
   return (
     <div className={styles.stepContent}>
       <div className={styles.workspaceChoices}>
-        {/* =========================================
-            새 워크스페이스 만들기
-        ========================================= */}
-
         <button
           type="button"
           className={styles.workspaceChoice}
@@ -611,10 +644,6 @@ function StepTwo({ onCreateWorkspace, onJoinWorkspace }) {
 
           <span>새 워크스페이스 만들기</span>
         </button>
-
-        {/* =========================================
-            초대받은 링크로 팀에 참여하기
-        ========================================= */}
 
         <button
           type="button"

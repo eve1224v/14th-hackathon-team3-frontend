@@ -168,3 +168,208 @@ export const getOrCreateDirectConversation = async (
 
   return parseResponse(response);
 };
+
+/* =========================================
+   메시지 대화 내용 조회
+
+   GET
+   /api/v1/workspaces/{workspaceId}
+   /conversations/{conversationId}/messages
+========================================= */
+
+export const getConversationMessages = async (
+  workspaceId,
+  conversationId,
+  { page = 0, size = 50 } = {},
+) => {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    const error = new Error("로그인 정보가 없습니다.");
+
+    error.status = 401;
+
+    throw error;
+  }
+
+  if (!workspaceId) {
+    const error = new Error("워크스페이스 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  if (!conversationId) {
+    const error = new Error("대화방 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  const params = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  });
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/workspaces/${workspaceId}/conversations/${conversationId}/messages?${params.toString()}`,
+    {
+      method: "GET",
+
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  return parseResponse(response);
+};
+
+/* =========================================
+   AI 뉘앙스 번역 미리보기
+
+   POST
+   /api/v1/workspaces/{workspaceId}
+   /conversations/{conversationId}
+   /translation-preview
+========================================= */
+
+export const previewTranslation = async (
+  workspaceId,
+  conversationId,
+  content,
+) => {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    const error = new Error("로그인 정보가 없습니다.");
+
+    error.status = 401;
+
+    throw error;
+  }
+
+  if (!workspaceId) {
+    const error = new Error("워크스페이스 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  if (!conversationId) {
+    const error = new Error("대화방 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  if (!content?.trim()) {
+    const error = new Error("번역할 메시지를 입력해주세요.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/workspaces/${workspaceId}/conversations/${conversationId}/translation-preview`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+
+        Authorization: `Bearer ${accessToken}`,
+      },
+
+      body: JSON.stringify({
+        content: content.trim(),
+      }),
+    },
+  );
+
+  return parseResponse(response);
+};
+
+/* =========================================
+   메시지 전송
+
+   POST
+   /api/v1/workspaces/{workspaceId}
+   /conversations/{conversationId}/messages
+========================================= */
+
+export const sendConversationMessage = async (
+  workspaceId,
+  conversationId,
+  { originalContent, translationUsed },
+) => {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    const error = new Error("로그인 정보가 없습니다.");
+
+    error.status = 401;
+
+    throw error;
+  }
+
+  if (!workspaceId) {
+    const error = new Error("워크스페이스 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  if (!conversationId) {
+    const error = new Error("대화방 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  const content = originalContent?.trim();
+
+  if (!content) {
+    const error = new Error("메시지 내용을 입력해주세요.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  if (content.length > 4000) {
+    const error = new Error("메시지는 최대 4000자까지 입력할 수 있습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/workspaces/${workspaceId}/conversations/${conversationId}/messages`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+
+        Authorization: `Bearer ${accessToken}`,
+      },
+
+      body: JSON.stringify({
+        originalContent: content,
+
+        translationUsed: Boolean(translationUsed),
+      }),
+    },
+  );
+
+  return parseResponse(response);
+};
