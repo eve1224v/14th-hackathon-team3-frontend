@@ -219,7 +219,9 @@ export const getProjectMembers = async (
 
 /* ========================================
    프로젝트 멤버 일괄 관리
-   PUT /api/v1/projects/{projectId}/members
+
+   PUT
+   /api/v1/projects/{projectId}/members
 ======================================== */
 
 export const manageProjectMembers = async (projectId, actions) => {
@@ -324,15 +326,10 @@ export const updateProjectTeamSettings = async (projectId, teams) => {
 };
 
 /* ========================================
-   프로젝트 외부 서비스 연동 관리
+   프로젝트 외부 서비스 연동 일괄 관리
 
    PUT
    /api/v1/projects/{projectId}/integrations
-
-   CONNECT
-   UPDATE
-   SYNC
-   DISCONNECT
 ======================================== */
 
 export const manageProjectIntegrations = async (projectId, actions) => {
@@ -369,7 +366,6 @@ export const manageProjectIntegrations = async (projectId, actions) => {
 
       headers: {
         "Content-Type": "application/json",
-
         Authorization: `Bearer ${accessToken}`,
       },
 

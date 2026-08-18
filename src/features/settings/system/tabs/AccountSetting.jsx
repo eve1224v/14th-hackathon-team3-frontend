@@ -61,16 +61,6 @@ function AccountSetting({ userEmail, onLogout, styles }) {
               {t("account.logout")}
             </button>
           </div>
-
-          <div className={styles.dangerRow}>
-            <div>
-              <strong>{t("account.deleteAccount")}</strong>
-
-              <p>{t("account.deleteAccountDescription")}</p>
-            </div>
-
-            <button type="button">{t("account.deleteAccount")}</button>
-          </div>
         </div>
       </div>
 

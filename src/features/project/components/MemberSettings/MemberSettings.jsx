@@ -6,106 +6,118 @@ import helpIcon from "../../../../assets/icons/helpIcon.svg";
 import dropdownIcon from "../../../../assets/icons/dropdownIcon.svg";
 
 import {
+  getProjectDetail,
   getProjectMembers,
   manageProjectMembers,
 } from "../../../../api/projectApi";
 
 function MemberSettings() {
+  /* =========================
+     기본 State
+  ========================= */
+
   const [email, setEmail] = useState("");
 
   const [members, setMembers] = useState([]);
 
   const [pendingInvitations, setPendingInvitations] = useState([]);
 
-  const [openRoleMemberId, setOpenRoleMemberId] = useState(null);
+  const [teamId, setTeamId] = useState(null);
+
+  const [teamName, setTeamName] = useState("");
 
   const [isLoading, setIsLoading] = useState(true);
 
   const [isInviting, setIsInviting] = useState(false);
 
-  const [updatingMemberId, setUpdatingMemberId] = useState(null);
-
   const [errorMessage, setErrorMessage] = useState("");
 
   /* =========================
-     역할 목록
-
-     API 명세
-     PROJECT_ADMIN
-     MEMBER
+     역할 Dropdown
   ========================= */
 
-  const roleOptions = [
-    {
-      value: "PROJECT_ADMIN",
-      label: "프로젝트 관리자",
-    },
+  const roleOptions = ["PROJECT_ADMIN", "MEMBER"];
 
-    {
-      value: "MEMBER",
-      label: "멤버",
-    },
-  ];
-
-  /* =========================
-     Role 표시
-  ========================= */
-
-  const getRoleLabel = (role) => {
-    switch (role) {
-      case "PROJECT_ADMIN":
-        return "프로젝트 관리자";
-
-      case "MEMBER":
-        return "멤버";
-
-      default:
-        return role || "-";
-    }
+  const roleLabelMap = {
+    PROJECT_ADMIN: "관리자",
+    MEMBER: "멤버",
   };
 
+  const [openRoleMemberId, setOpenRoleMemberId] = useState(null);
+
   /* =========================
-     멤버 데이터 저장
+     프로젝트 상세 조회
+     → 실제 teamId 확보
   ========================= */
 
-  const applyMemberData = (result) => {
-    const memberData = result?.data?.members || [];
+  useEffect(() => {
+    let isCancelled = false;
 
-    const invitationData = result?.data?.pendingInvitations || [];
+    const fetchProjectDetail = async () => {
+      const projectId = localStorage.getItem("projectId");
 
-    const formattedMembers = memberData.map((member) => ({
-      id: member.memberId,
+      if (!projectId) {
+        if (!isCancelled) {
+          setErrorMessage("프로젝트 정보가 없습니다.");
 
-      name: member.name,
+          setIsLoading(false);
+        }
 
-      company: member.companyName,
+        return;
+      }
 
-      team: member.teamName,
+      try {
+        const result = await getProjectDetail(projectId);
 
-      role: member.role,
+        if (isCancelled) {
+          return;
+        }
 
-      accessScope: member.accessScope,
-    }));
+        console.log("프로젝트 상세 조회 성공:", result);
 
-    setMembers(formattedMembers);
+        const teamSchedules = Array.isArray(result?.data?.teamSchedules)
+          ? result.data.teamSchedules
+          : [];
 
-    setPendingInvitations(invitationData);
-  };
+        if (teamSchedules.length > 0) {
+          const firstTeam = teamSchedules[0];
+
+          setTeamId(firstTeam.teamId);
+
+          setTeamName(firstTeam.teamName || "");
+        } else {
+          setTeamId(null);
+
+          setTeamName("");
+
+          setErrorMessage("프로젝트에 등록된 팀이 없습니다.");
+        }
+      } catch (error) {
+        if (isCancelled) {
+          return;
+        }
+
+        console.error("프로젝트 상세 조회 실패:", error);
+
+        if (error.status === 401) {
+          setErrorMessage("로그인이 만료되었습니다. 다시 로그인해주세요.");
+        } else {
+          setErrorMessage(
+            error.message || "프로젝트 정보를 불러오지 못했습니다.",
+          );
+        }
+      }
+    };
+
+    fetchProjectDetail();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   /* =========================
-     멤버 목록 새로고침
-  ========================= */
-
-  const refreshMembers = async (projectId) => {
-    const result = await getProjectMembers(projectId);
-
-    applyMemberData(result);
-
-    return result;
-  };
-
-  /* =========================
-     최초 멤버 조회
+     멤버 조회
   ========================= */
 
   useEffect(() => {
@@ -133,7 +145,13 @@ function MemberSettings() {
 
         console.log("프로젝트 멤버 조회 성공:", result);
 
-        applyMemberData(result);
+        const data = result?.data || {};
+
+        setMembers(Array.isArray(data.members) ? data.members : []);
+
+        setPendingInvitations(
+          Array.isArray(data.pendingInvitations) ? data.pendingInvitations : [],
+        );
 
         setErrorMessage("");
       } catch (error) {
@@ -143,14 +161,25 @@ function MemberSettings() {
 
         console.error("프로젝트 멤버 조회 실패:", error);
 
-        if (error.code === "403PROJECT_ACCESS_DENIED") {
-          setErrorMessage("프로젝트 접근 권한이 없습니다.");
-        } else if (error.code === "404PROJECT_NOT_FOUND") {
-          setErrorMessage("프로젝트를 찾을 수 없습니다.");
-        } else if (error.status === 401) {
-          setErrorMessage("로그인이 필요합니다.");
-        } else {
-          setErrorMessage(error.message || "멤버 정보를 불러오지 못했습니다.");
+        switch (error.code) {
+          case "403PROJECT_ACCESS_DENIED":
+            setErrorMessage("프로젝트 접근 권한이 없습니다.");
+
+            break;
+
+          case "404PROJECT_NOT_FOUND":
+            setErrorMessage("프로젝트를 찾을 수 없습니다.");
+
+            break;
+
+          default:
+            if (error.status === 401) {
+              setErrorMessage("로그인이 만료되었습니다. 다시 로그인해주세요.");
+            } else {
+              setErrorMessage(
+                error.message || "프로젝트 멤버를 불러오지 못했습니다.",
+              );
+            }
         }
       } finally {
         if (!isCancelled) {
@@ -167,6 +196,32 @@ function MemberSettings() {
   }, []);
 
   /* =========================
+     멤버 다시 조회
+  ========================= */
+
+  const refreshMembers = async (projectId) => {
+    const result = await getProjectMembers(projectId);
+
+    const data = result?.data || {};
+
+    setMembers(Array.isArray(data.members) ? data.members : []);
+
+    setPendingInvitations(
+      Array.isArray(data.pendingInvitations) ? data.pendingInvitations : [],
+    );
+  };
+
+  /* =========================
+     이메일 유효성 검사
+  ========================= */
+
+  const isValidEmail = (value) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    return emailRegex.test(value);
+  };
+
+  /* =========================
      멤버 초대
   ========================= */
 
@@ -179,6 +234,12 @@ function MemberSettings() {
       return;
     }
 
+    if (!isValidEmail(trimmedEmail)) {
+      alert("올바른 이메일 주소를 입력해주세요.");
+
+      return;
+    }
+
     const projectId = localStorage.getItem("projectId");
 
     if (!projectId) {
@@ -187,18 +248,64 @@ function MemberSettings() {
       return;
     }
 
+    if (!teamId) {
+      alert("프로젝트 팀 정보를 확인할 수 없습니다.");
+
+      return;
+    }
+
+    /*
+        새 명세 기준 INVITE Payload
+
+        {
+          type: "INVITE",
+          email: "...",
+          teamId: 실제 teamId,
+          role: "MEMBER",
+          accessScope: "TEAM_ONLY"
+        }
+      */
+
+    const actions = [
+      {
+        type: "INVITE",
+
+        email: trimmedEmail,
+
+        teamId: Number(teamId),
+
+        role: "MEMBER",
+
+        accessScope: "TEAM_ONLY",
+      },
+    ];
+
+    console.log("멤버 초대 Payload:", {
+      actions,
+    });
+
     try {
       setIsInviting(true);
 
-      const result = await manageProjectMembers(projectId, [
-        {
-          type: "INVITE",
+      setErrorMessage("");
 
-          email: trimmedEmail,
-        },
-      ]);
+      const result = await manageProjectMembers(projectId, actions);
 
       console.log("멤버 초대 성공:", result);
+
+      /*
+          일부 action 실패 여부 확인
+        */
+
+      const failedActions = result?.data?.failedActions || [];
+
+      if (failedActions.length > 0) {
+        console.error("일부 멤버 작업 실패:", failedActions);
+
+        alert("일부 멤버 초대 작업에 실패했습니다.");
+
+        return;
+      }
 
       setEmail("");
 
@@ -210,19 +317,31 @@ function MemberSettings() {
 
       switch (error.code) {
         case "400INVALID_MEMBER_ACTION":
-          alert("멤버 초대 정보가 올바르지 않습니다.");
+          alert("멤버 작업 정보가 올바르지 않습니다.");
+
           break;
 
         case "403PROJECT_ADMIN_REQUIRED":
           alert("프로젝트 관리 권한이 없습니다.");
+
           break;
 
         case "404MEMBER_OR_TEAM_NOT_FOUND":
           alert("멤버 또는 팀을 찾을 수 없습니다.");
+
+          break;
+
+        case "409LAST_PROJECT_ADMIN_CANNOT_CHANGE":
+          alert("마지막 프로젝트 관리자는 변경할 수 없습니다.");
+
           break;
 
         default:
-          alert(error.message || "멤버 초대에 실패했습니다.");
+          if (error.status === 401) {
+            alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
+          } else {
+            alert(error.message || "멤버 초대에 실패했습니다.");
+          }
       }
     } finally {
       setIsInviting(false);
@@ -235,6 +354,8 @@ function MemberSettings() {
 
   const handleEmailKeyDown = (event) => {
     if (event.key === "Enter") {
+      event.preventDefault();
+
       handleInviteMember();
     }
   };
@@ -252,12 +373,6 @@ function MemberSettings() {
   ========================= */
 
   const handleRoleSelect = async (member, newRole) => {
-    if (member.role === newRole) {
-      setOpenRoleMemberId(null);
-
-      return;
-    }
-
     const projectId = localStorage.getItem("projectId");
 
     if (!projectId) {
@@ -266,24 +381,48 @@ function MemberSettings() {
       return;
     }
 
+    const memberTeamId = member.teamId || teamId;
+
+    if (!memberTeamId) {
+      alert("멤버의 팀 정보를 확인할 수 없습니다.");
+
+      return;
+    }
+
+    const actions = [
+      {
+        type: "UPDATE",
+
+        memberId: member.memberId,
+
+        teamId: Number(memberTeamId),
+
+        role: newRole,
+
+        accessScope: member.accessScope || "TEAM_ONLY",
+      },
+    ];
+
+    console.log("멤버 UPDATE Payload:", {
+      actions,
+    });
+
     try {
-      setUpdatingMemberId(member.id);
+      const result = await manageProjectMembers(projectId, actions);
 
-      await manageProjectMembers(projectId, [
-        {
-          type: "UPDATE",
+      console.log("멤버 역할 수정 성공:", result);
 
-          memberId: member.id,
+      const failedActions = result?.data?.failedActions || [];
 
-          role: newRole,
+      if (failedActions.length > 0) {
+        alert("멤버 역할 변경에 실패했습니다.");
 
-          accessScope: member.accessScope,
-        },
-      ]);
+        return;
+      }
 
       setMembers((prev) =>
         prev.map((item) =>
-          item.id === member.id
+          item.memberId === member.memberId
             ? {
                 ...item,
 
@@ -295,31 +434,43 @@ function MemberSettings() {
 
       setOpenRoleMemberId(null);
     } catch (error) {
-      console.error("멤버 역할 변경 실패:", error);
+      console.error("멤버 역할 수정 실패:", error);
 
       switch (error.code) {
         case "400INVALID_MEMBER_ACTION":
-          alert("멤버 변경 정보가 올바르지 않습니다.");
+          alert("멤버 작업 정보가 올바르지 않습니다.");
+
           break;
 
         case "403PROJECT_ADMIN_REQUIRED":
           alert("프로젝트 관리 권한이 없습니다.");
+
           break;
 
         case "404MEMBER_OR_TEAM_NOT_FOUND":
           alert("멤버 또는 팀을 찾을 수 없습니다.");
+
           break;
 
         case "409LAST_PROJECT_ADMIN_CANNOT_CHANGE":
-          alert("마지막 프로젝트 관리자의 역할은 변경할 수 없습니다.");
+          alert("마지막 프로젝트 관리자는 변경할 수 없습니다.");
+
           break;
 
         default:
-          alert(error.message || "역할 변경에 실패했습니다.");
+          alert(error.message || "멤버 역할 변경에 실패했습니다.");
       }
-    } finally {
-      setUpdatingMemberId(null);
     }
+  };
+
+  /* =========================
+     초대 코드 복사
+
+     현재 실제 초대 코드 API 없음
+  ========================= */
+
+  const handleCopyInviteCode = () => {
+    alert("초대 코드 API가 아직 연결되지 않았습니다.");
   };
 
   return (
@@ -340,6 +491,7 @@ function MemberSettings() {
             id="memberEmail"
             type="email"
             value={email}
+            placeholder="example@company.com"
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={handleEmailKeyDown}
             disabled={isInviting}
@@ -349,33 +501,42 @@ function MemberSettings() {
             type="button"
             className={styles.inviteButton}
             onClick={handleInviteMember}
-            disabled={isInviting}
+            disabled={isInviting || !teamId}
           >
-            {isInviting ? "..." : "초대"}
+            {isInviting ? "초대 중..." : "초대"}
           </button>
         </div>
 
+        {/* 현재 프로젝트에서 사용하는 팀 */}
+
+        {teamName && <p>배정 팀: {teamName}</p>}
+
         {/* =========================
             초대 코드
-
-            현재 받은 API 명세에는
-            초대 코드 API가 없기 때문에
-            기존 UI만 유지
+            현재 API 미연결
         ========================= */}
 
         <div className={styles.inviteLinkRow}>
-          <button type="button" className={styles.copyButton}>
+          <button
+            type="button"
+            className={styles.copyButton}
+            onClick={handleCopyInviteCode}
+          >
             초대 코드 복사
           </button>
 
-          <div className={styles.inviteLink}>
-            https://relai.app/invite/global-landing-8F3K2
-          </div>
+          <div className={styles.inviteLink}>초대 코드 API 연결 필요</div>
         </div>
       </section>
 
       {/* =========================
-          액세스 권한 멤버
+          Error
+      ========================= */}
+
+      {errorMessage && <p>{errorMessage}</p>}
+
+      {/* =========================
+          액세스 권한이 있는 멤버
       ========================= */}
 
       <section className={styles.memberCard}>
@@ -391,6 +552,10 @@ function MemberSettings() {
               <img src={helpIcon} alt="" className={styles.helpIcon} />
             </button>
 
+            {/* =========================
+                Tooltip
+            ========================= */}
+
             <div className={styles.roleTooltip}>
               <div className={styles.tooltipTitle}>
                 <img src={helpIcon} alt="" />
@@ -400,16 +565,20 @@ function MemberSettings() {
 
               <div className={styles.tooltipContent}>
                 <div className={styles.tooltipItem}>
-                  <strong>프로젝트 관리자</strong>
+                  <strong>관리자</strong>
 
-                  <p>프로젝트 설정과 멤버 관리 권한을 가집니다.</p>
+                  <p>
+                    프로젝트 설정과 멤버 관리 등 프로젝트 전반을 관리할 수
+                    있습니다.
+                  </p>
                 </div>
 
                 <div className={styles.tooltipItem}>
                   <strong>멤버</strong>
 
                   <p>
-                    프로젝트에 참여하여 허용된 범위의 업무를 수행할 수 있습니다.
+                    프로젝트에 참여하고 허용된 접근 범위의 데이터를 사용할 수
+                    있습니다.
                   </p>
                 </div>
               </div>
@@ -421,44 +590,24 @@ function MemberSettings() {
             Loading
         ========================= */}
 
-        {isLoading && (
+        {isLoading ? (
+          <p>멤버를 불러오는 중입니다.</p>
+        ) : (
           <div className={styles.memberList}>
-            <p>멤버 정보를 불러오는 중입니다.</p>
-          </div>
-        )}
-
-        {/* =========================
-            Error
-        ========================= */}
-
-        {!isLoading && errorMessage && (
-          <div className={styles.memberList}>
-            <p>{errorMessage}</p>
-          </div>
-        )}
-
-        {/* =========================
-            멤버 목록
-        ========================= */}
-
-        {!isLoading && !errorMessage && (
-          <div className={styles.memberList}>
-            {members.length === 0 && pendingInvitations.length === 0 && (
-              <p>등록된 멤버가 없습니다.</p>
-            )}
+            {/* =========================
+                멤버 목록
+            ========================= */}
 
             {members.map((member) => {
-              const isRoleOpen = openRoleMemberId === member.id;
-
-              const isUpdating = updatingMemberId === member.id;
+              const isRoleOpen = openRoleMemberId === member.memberId;
 
               const availableRoles = roleOptions.filter(
-                (role) => role.value !== member.role,
+                (role) => role !== member.role,
               );
 
               return (
                 <div
-                  key={member.id}
+                  key={member.memberId}
                   className={`${styles.memberRow} ${
                     isRoleOpen ? styles.activeMemberRow : ""
                   }`}
@@ -479,26 +628,35 @@ function MemberSettings() {
                     </div>
 
                     <p>
-                      {member.company || "-"}
-                      {" · "}
-                      {member.team || "-"}
+                      {member.companyName || "-"}
+
+                      {member.teamName && (
+                        <>
+                          {" · "}
+                          {member.teamName}
+                        </>
+                      )}
+
+                      {member.accessScope && (
+                        <>
+                          {" · "}
+                          {member.accessScope}
+                        </>
+                      )}
                     </p>
                   </div>
 
                   {/* =========================
-                          역할 Dropdown
-                      ========================= */}
+                        역할 Dropdown
+                    ========================= */}
 
                   <div className={styles.roleDropdown}>
                     <button
                       type="button"
                       className={styles.roleButton}
-                      onClick={() => handleRoleDropdown(member.id)}
-                      disabled={isUpdating}
+                      onClick={() => handleRoleDropdown(member.memberId)}
                     >
-                      <span>
-                        {isUpdating ? "변경 중..." : getRoleLabel(member.role)}
-                      </span>
+                      <span>{roleLabelMap[member.role] || member.role}</span>
 
                       <img
                         src={dropdownIcon}
@@ -509,16 +667,16 @@ function MemberSettings() {
                       />
                     </button>
 
-                    {isRoleOpen && !isUpdating && (
+                    {isRoleOpen && (
                       <div className={styles.roleMenu}>
                         {availableRoles.map((role) => (
                           <button
-                            key={role.value}
+                            key={role}
                             type="button"
                             className={styles.roleOption}
-                            onClick={() => handleRoleSelect(member, role.value)}
+                            onClick={() => handleRoleSelect(member, role)}
                           >
-                            {role.label}
+                            {roleLabelMap[role] || role}
                           </button>
                         ))}
                       </div>
@@ -529,11 +687,11 @@ function MemberSettings() {
             })}
 
             {/* =========================
-                  초대 대기
-              ========================= */}
+                초대 대기
+            ========================= */}
 
             {pendingInvitations.map((invitation) => (
-              <div className={styles.pendingRow} key={invitation.invitationId}>
+              <div key={invitation.invitationId} className={styles.pendingRow}>
                 <div className={styles.pendingAvatar} />
 
                 <span className={styles.pendingEmail}>{invitation.email}</span>
