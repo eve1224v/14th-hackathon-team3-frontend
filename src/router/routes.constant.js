@@ -4,8 +4,9 @@ export const ROUTES = {
 
   CREATE_WORKSPACE: "/workspace/create",
   JOIN_WORKSPACE: "/workspace/join",
-  PROJECT_HOME: "/projects",
+  WORKSPACE_MEMBERS: "/workspace/members",
 
+  PROJECT_HOME: "/projects",
   CREATE_PROJECT: "/project/create",
   PROJECT_SETTINGS: "/project/settings",
   TIMEZONE_SETTINGS: "/project/settings/timezone",
@@ -15,6 +16,7 @@ export const ROUTES = {
   HANDOVER: "/handover",
 
   CYCLE: "/cycle",
+  CYCLE_DETAIL: "/cycle/:cycleId",
 
   ISSUE: "/issue",
   MY_ISSUE: "/issue/my",
@@ -24,6 +26,5 @@ export const ROUTES = {
   ISSUE_EDIT: "/issue/:issueId/edit",
 
   PROFILE_SETTINGS: "/settings/profile",
-
   SYSTEM_SETTINGS: "/settings/system",
 };
