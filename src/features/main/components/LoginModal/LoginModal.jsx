@@ -15,6 +15,7 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
   const { t, i18n } = useTranslation();
 
   const [email, setEmail] = useState("");
+
   const [password, setPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
@@ -50,7 +51,7 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
       setIsLoading(true);
 
       /* =========================================
-         1. 로그인
+         1. 로그인 API
       ========================================= */
 
       const result = await login(trimmedEmail, password);
@@ -59,6 +60,8 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
 
       const accessToken = result?.data?.accessToken;
 
+      const userId = result?.data?.userId;
+
       if (!accessToken) {
         setErrorMessage(t("login.errors.noAccessToken"));
 
@@ -66,10 +69,16 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
       }
 
       /* =========================================
-         2. 인증 정보 저장
+         2. 이전 로그인 정보 정리
       ========================================= */
 
       localStorage.removeItem("accessToken");
+
+      localStorage.removeItem("refreshToken");
+
+      /* =========================================
+         3. 인증 정보 저장
+      ========================================= */
 
       localStorage.setItem("accessToken", accessToken);
 
@@ -77,8 +86,20 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
 
       localStorage.setItem("userEmail", trimmedEmail);
 
+      if (userId) {
+        localStorage.setItem("userId", String(userId));
+      }
+
+      /*
+        기존 사용자 로그인
+
+        신규 사용자 플래그 제거
+      */
+
+      localStorage.removeItem("isNewUser");
+
       /* =========================================
-         3. 이전 Workspace 선택 정보 초기화
+         4. 이전 Workspace 선택 정보 초기화
       ========================================= */
 
       localStorage.removeItem("workspaceId");
@@ -90,9 +111,7 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
       localStorage.removeItem("selectedWorkspace");
 
       /* =========================================
-         4. 사용자 기본 언어 조회
-
-         로그인 성공 직후 딱 1번만 조회
+         5. 사용자 기본 언어 조회
       ========================================= */
 
       try {
@@ -108,13 +127,6 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
           await i18n.changeLanguage(language);
         }
       } catch (languageError) {
-        /*
-          언어 조회 실패했다고
-          로그인 자체를 실패시키면 안 됨.
-
-          기본값 ko 사용
-        */
-
         console.error("로그인 후 기본 언어 조회 실패:", languageError);
 
         const fallbackLanguage = localStorage.getItem("userLanguage") || "ko";
@@ -127,10 +139,16 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
       }
 
       /* =========================================
-         5. 사용자 정보 갱신
+         6. 사용자 정보 갱신
       ========================================= */
 
       window.dispatchEvent(new Event("userInfoUpdated"));
+
+      window.dispatchEvent(new Event("authChanged"));
+
+      /* =========================================
+         7. 기존 사용자 → 메인
+      ========================================= */
 
       if (onLoginComplete) {
         onLoginComplete(result);
@@ -149,6 +167,7 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
           break;
 
         case "401UNAUTHORIZED":
+        case "401INVALID_LOGIN_CREDENTIALS":
           setErrorMessage(t("login.errors.unauthorized"));
 
           break;
@@ -259,13 +278,9 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
             </button>
           </div>
 
-          {/* Error */}
-
           {errorMessage && (
             <p className={styles.errorMessage}>{errorMessage}</p>
           )}
-
-          {/* 로그인 */}
 
           <button
             type="button"
@@ -276,8 +291,6 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
             {isLoading ? t("login.loggingIn") : t("login.login")}
           </button>
         </div>
-
-        {/* 회원가입 */}
 
         <div className={styles.signupArea}>
           <span>{t("login.noAccount")}</span>

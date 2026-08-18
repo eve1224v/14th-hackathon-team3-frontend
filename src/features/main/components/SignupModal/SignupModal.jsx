@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import { useTranslation } from "react-i18next";
 
 import styles from "./SignupModal.module.css";
@@ -9,7 +10,54 @@ import eyeIcon from "../../../../assets/icons/eyeIcon.svg";
 import {
   requestEmailVerification,
   verifyEmailVerification,
+  login,
 } from "../../../../api/authApi";
+
+/* =========================================
+   API
+========================================= */
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "https://api.likelion-bato.cloud";
+
+/* =========================================
+   회원가입 API
+
+   POST /api/v1/users/signup
+========================================= */
+
+const signup = async ({ name, email, password, passwordConfirm }) => {
+  const response = await fetch(`${API_BASE_URL}/api/v1/users/signup`, {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      name,
+      email,
+      password,
+      passwordConfirm,
+    }),
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const error = new Error(data?.message || "회원가입에 실패했습니다.");
+
+    error.status = response.status;
+
+    error.code = data?.code;
+
+    error.data = data?.data;
+
+    throw error;
+  }
+
+  return data;
+};
 
 function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
   const { t } = useTranslation();
@@ -47,6 +95,12 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
+
+  /* =========================================
+     회원가입 상태
+  ========================================= */
+
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
   /* =========================================
      60초 타이머
@@ -286,12 +340,20 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
      회원가입
   ========================================= */
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
+    if (isSigningUp) {
+      return;
+    }
+
     setSignupMessage("");
 
     const trimmedName = name.trim();
 
     const trimmedEmail = email.trim();
+
+    /* =========================================
+       Validation
+    ========================================= */
 
     if (!trimmedName) {
       setSignupMessage(t("signup.errors.nameRequired"));
@@ -335,13 +397,120 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
       return;
     }
 
-    localStorage.setItem("userName", trimmedName);
+    try {
+      setIsSigningUp(true);
 
-    localStorage.setItem("userEmail", trimmedEmail);
+      /* =========================================
+         1. 실제 회원가입 API
+      ========================================= */
 
-    window.dispatchEvent(new Event("userInfoUpdated"));
+      const signupResult = await signup({
+        name: trimmedName,
 
-    onSignupComplete(trimmedName);
+        email: trimmedEmail,
+
+        password,
+
+        passwordConfirm: passwordCheck,
+      });
+
+      console.log("회원가입 성공:", signupResult);
+
+      const signupUserId = signupResult?.data?.userId;
+
+      /* =========================================
+         2. 회원가입 성공 → 자동 로그인
+      ========================================= */
+
+      const loginResult = await login(trimmedEmail, password);
+
+      console.log("자동 로그인 성공:", loginResult);
+
+      const accessToken = loginResult?.data?.accessToken;
+
+      const loginUserId = loginResult?.data?.userId;
+
+      if (!accessToken) {
+        setSignupMessage(
+          "회원가입은 완료되었지만 로그인 토큰을 받지 못했습니다.",
+        );
+
+        return;
+      }
+
+      /* =========================================
+         3. 기존 인증정보 초기화
+      ========================================= */
+
+      localStorage.removeItem("accessToken");
+
+      localStorage.removeItem("refreshToken");
+
+      /* =========================================
+         4. 자동 로그인 정보 저장
+      ========================================= */
+
+      localStorage.setItem("accessToken", accessToken);
+
+      localStorage.setItem("isLoggedIn", "true");
+
+      localStorage.setItem("isNewUser", "true");
+
+      localStorage.setItem("userName", trimmedName);
+
+      localStorage.setItem("userEmail", trimmedEmail);
+
+      const finalUserId = loginUserId || signupUserId;
+
+      if (finalUserId) {
+        localStorage.setItem("userId", String(finalUserId));
+      }
+
+      /* =========================================
+         5. 이전 Workspace 정보 초기화
+      ========================================= */
+
+      localStorage.removeItem("workspaceId");
+
+      localStorage.removeItem("workspaceName");
+
+      localStorage.removeItem("workspaceCompanyName");
+
+      localStorage.removeItem("selectedWorkspace");
+
+      /* =========================================
+         6. 전역 상태 갱신
+      ========================================= */
+
+      window.dispatchEvent(new Event("userInfoUpdated"));
+
+      window.dispatchEvent(new Event("authChanged"));
+
+      /* =========================================
+         7. 신규 사용자 → 온보딩
+      ========================================= */
+
+      if (onSignupComplete) {
+        onSignupComplete(trimmedName);
+      }
+    } catch (error) {
+      console.error("회원가입 실패:", error);
+
+      switch (error.code) {
+        case "409DUPLICATE_EMAIL":
+          setSignupMessage("이미 가입된 이메일입니다.");
+          break;
+
+        case "400INVALID_INPUT_VALUE":
+          setSignupMessage(error.message || "회원가입 입력값을 확인해주세요.");
+          break;
+
+        default:
+          setSignupMessage(error.message || "회원가입에 실패했습니다.");
+      }
+    } finally {
+      setIsSigningUp(false);
+    }
   };
 
   return (
@@ -528,8 +697,9 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
               type="button"
               className={styles.signupButton}
               onClick={handleSignup}
+              disabled={isSigningUp}
             >
-              {t("signup.signup")}
+              {isSigningUp ? "가입 중..." : t("signup.signup")}
             </button>
           </div>
         </div>
