@@ -19,9 +19,15 @@
   overflow: visible;
 }
 
+
+/* ======================================== */
+/* LOGO */
+/* ======================================== */
+
 .logoArea {
   padding: 24px 0 0 20px;
 }
+
 
 .logo {
   display: block;
@@ -29,6 +35,7 @@
   width: 26px;
   height: auto;
 }
+
 
 /* ======================================== */
 /* SIDEBAR CONTENT */
@@ -44,6 +51,7 @@
   padding-top: 58px;
 }
 
+
 /* ======================================== */
 /* LOGIN */
 /* ======================================== */
@@ -57,6 +65,7 @@
   font-weight: 500;
 }
 
+
 /* ======================================== */
 /* USER */
 /* ======================================== */
@@ -69,6 +78,7 @@
   padding: 0 32px;
 }
 
+
 .greeting {
   margin: 0;
 
@@ -80,9 +90,11 @@
   white-space: nowrap;
 }
 
+
 .greeting strong {
   font-weight: 700;
 }
+
 
 /* ======================================== */
 /* WORKSPACE */
@@ -95,6 +107,7 @@
 
   margin: 15px 0 0 32px;
 }
+
 
 .workspaceButton {
   width: 110px;
@@ -121,6 +134,7 @@
   cursor: pointer;
 }
 
+
 .workspaceButton span {
   min-width: 0;
 
@@ -131,11 +145,13 @@
   text-overflow: ellipsis;
 }
 
+
 .workspaceButton:disabled {
   cursor: default;
 
   opacity: 0.8;
 }
+
 
 .workspaceDropdownIcon {
   width: 7px;
@@ -148,9 +164,11 @@
   transition: transform 0.2s ease;
 }
 
+
 .workspaceDropdownIconOpen {
   transform: rotate(180deg);
 }
+
 
 .workspaceMenu {
   position: absolute;
@@ -170,8 +188,11 @@
 
   z-index: 300;
 
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+  box-shadow:
+    0 4px 10px
+    rgba(0, 0, 0, 0.18);
 }
+
 
 .workspaceOption {
   width: 100%;
@@ -199,9 +220,11 @@
   cursor: pointer;
 }
 
+
 .workspaceOption:hover {
   background: #f0f1f5;
 }
+
 
 .workspaceError {
   position: absolute;
@@ -221,6 +244,7 @@
   line-height: 1.4;
 }
 
+
 /* ======================================== */
 /* MAIN MENU */
 /* ======================================== */
@@ -233,6 +257,7 @@
 
   margin-top: 17px;
 }
+
 
 .menuItem {
   width: 100%;
@@ -252,6 +277,7 @@
 
   color: #ffffff;
 
+  font-family: Pretendard, sans-serif;
   font-size: 12px;
   font-weight: 500;
 
@@ -260,6 +286,7 @@
   text-align: left;
 }
 
+
 .menuItem img {
   width: 15px;
   height: 15px;
@@ -267,13 +294,84 @@
   object-fit: contain;
 }
 
+
 .menuItem span {
   line-height: 16px;
 }
 
+
 .menuItem:hover {
   opacity: 0.75;
 }
+
+
+/* ======================================== */
+/* PROJECT → MEMBER */
+/* ======================================== */
+
+.projectMenu {
+  position: relative;
+
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+.memberMenuItem {
+  width: fit-content;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  box-sizing: border-box;
+
+  margin-left: 55px;
+
+  padding: 10px 0 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 110%;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.memberMenuItem img {
+  display: block;
+
+  width: 13.8px;
+  height: 13.8px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}
+
+
+.memberMenuItem span {
+  line-height: 13.8px;
+}
+
+
+.memberMenuItem:hover {
+  opacity: 0.75;
+}
+
 
 /* ======================================== */
 /* CREATE MENU */
@@ -287,8 +385,11 @@
 
   margin: 60px 0 0 32px;
 
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top:
+    1px solid
+    rgba(255, 255, 255, 0.12);
 }
+
 
 .actionMenu button {
   width: 100%;
@@ -300,12 +401,15 @@
 
   border: none;
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.12);
 
   background: transparent;
 
   color: #ffffff;
 
+  font-family: Pretendard, sans-serif;
   font-size: 11px;
   font-weight: 500;
 
@@ -314,9 +418,11 @@
   cursor: pointer;
 }
 
+
 .actionMenu button:hover {
   opacity: 0.75;
 }
+
 
 /* ======================================== */
 /* TIME */
@@ -334,10 +440,12 @@
   gap: 24px;
 }
 
+
 .timeSection > div {
   display: flex;
   flex-direction: column;
 }
+
 
 .timeSection p {
   margin: 0;
@@ -350,6 +458,7 @@
   line-height: 1.2;
 }
 
+
 .timeSection strong {
   margin-top: 1px;
 
@@ -360,6 +469,7 @@
 
   line-height: 1;
 }
+
 
 /* ======================================== */
 /* BOTTOM */
@@ -376,6 +486,7 @@
 
   gap: 14px;
 }
+
 
 .bottomButton {
   width: 20px;
@@ -394,6 +505,7 @@
   cursor: pointer;
 }
 
+
 .bottomButton img {
   width: 18px;
   height: 18px;
@@ -401,12 +513,14 @@
   object-fit: contain;
 }
 
+
 .notifyRow {
   display: flex;
   align-items: center;
 
   gap: 7px;
 }
+
 
 /* ======================================== */
 /* TOGGLE */
@@ -423,12 +537,15 @@
   flex-shrink: 0;
 }
 
+
 .toggle input {
   display: none;
 }
 
+
 .toggleSlider {
   position: absolute;
+
   inset: 0;
 
   border-radius: 20px;
@@ -439,6 +556,7 @@
 
   transition: 0.2s;
 }
+
 
 .toggleSlider::before {
   content: "";
@@ -458,13 +576,19 @@
   transition: 0.2s;
 }
 
-.toggle input:checked + .toggleSlider {
+
+.toggle input:checked
+  + .toggleSlider {
   background: #536cff;
 }
 
-.toggle input:checked + .toggleSlider::before {
-  transform: translateX(16px);
+
+.toggle input:checked
+  + .toggleSlider::before {
+  transform:
+    translateX(16px);
 }
+
 
 /* ======================================== */
 /* PROFILE POPUP */
@@ -473,6 +597,7 @@
 .profileWrapper {
   position: relative;
 }
+
 
 .profilePopup {
   position: absolute;
@@ -484,7 +609,9 @@
 
   background: #171b38;
 
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.18);
 
   border-radius: 10px;
 
@@ -492,8 +619,11 @@
 
   z-index: 1000;
 
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 6px 18px
+    rgba(0, 0, 0, 0.25);
 }
+
 
 .profileInfo {
   display: flex;
@@ -503,6 +633,7 @@
 
   padding: 16px 18px 12px;
 }
+
 
 .profileImage {
   width: 46px;
@@ -519,10 +650,12 @@
   background: #b5acb1;
 }
 
+
 .profileImage img {
   width: 25px;
   height: 25px;
 }
+
 
 .profileText {
   display: flex;
@@ -533,12 +666,14 @@
   min-width: 0;
 }
 
+
 .profileText strong {
   color: #ffffff;
 
   font-size: 13px;
   font-weight: 700;
 }
+
 
 .profileText span {
   color: #d4d5df;
@@ -552,9 +687,11 @@
   text-overflow: ellipsis;
 }
 
+
 .accountSection {
   padding: 0 18px 12px;
 }
+
 
 .accountTitle {
   margin: 4px 0 8px;
@@ -563,6 +700,7 @@
 
   font-size: 11px;
 }
+
 
 .profileMenuItem {
   width: 100%;
@@ -580,6 +718,7 @@
 
   color: #ffffff;
 
+  font-family: Pretendard, sans-serif;
   font-size: 12px;
 
   cursor: pointer;
@@ -587,22 +726,27 @@
   text-align: left;
 }
 
+
 .profileMenuItem img {
   width: 21px;
   height: 21px;
 }
 
+
 .profileMenuItem:hover {
   opacity: 0.75;
 }
+
 
 .profileDivider {
   height: 1px;
 
   margin: 0 16px;
 
-  background: rgba(255, 255, 255, 0.12);
+  background:
+    rgba(255, 255, 255, 0.12);
 }
+
 
 .profileLogoutButton {
   width: 100%;
@@ -621,18 +765,28 @@
 
   color: #e85656;
 
+  font-family: Pretendard, sans-serif;
   font-size: 12px;
 
   cursor: pointer;
 }
 
+
 .profileLogoutButton img {
   width: 16px;
   height: 16px;
 
-  filter: brightness(0) saturate(100%) invert(42%) sepia(92%) saturate(1788%)
-    hue-rotate(328deg) brightness(94%) contrast(92%);
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(42%)
+    sepia(92%)
+    saturate(1788%)
+    hue-rotate(328deg)
+    brightness(94%)
+    contrast(92%);
 }
+
 
 .profileLogoutButton:hover {
   opacity: 0.8;

@@ -11,6 +11,7 @@
   overflow: hidden;
 }
 
+
 /* =========================
    Sidebar 제외 실제 화면
 
@@ -28,11 +29,14 @@
 
   box-sizing: border-box;
 
+  margin-left: 234px;
+
   overflow-x: auto;
   overflow-y: auto;
 
   background: #0d1021;
 }
+
 
 /* =========================
    실제 콘텐츠 Canvas
@@ -51,6 +55,7 @@
 
   background: #0d1021;
 }
+
 
 /* =========================
    Chat Button
@@ -75,6 +80,7 @@
 
   z-index: 1000;
 }
+
 
 .chatButton img {
   display: block;
