@@ -437,3 +437,122 @@ export const updateProject = async (
 
   return parseResponse(response);
 };
+
+/* ========================================
+   외부 연동 OAuth 시작
+
+   POST
+   /api/v1/projects/{projectId}
+   /integrations/{provider}/oauth/start
+======================================== */
+
+export const startProjectIntegrationOAuth = async (projectId, provider) => {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    const error = new Error("로그인 정보가 없습니다.");
+
+    error.status = 401;
+
+    throw error;
+  }
+
+  if (!projectId) {
+    const error = new Error("프로젝트 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  if (!provider) {
+    const error = new Error("외부 서비스 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/projects/${projectId}/integrations/${provider}/oauth/start`,
+    {
+      method: "POST",
+
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  return parseResponse(response);
+};
+
+/* ========================================
+   외부 연동 OAuth 완료
+
+   POST
+   /api/v1/projects/{projectId}
+   /integrations/{provider}/oauth/complete
+======================================== */
+
+export const completeProjectIntegrationOAuth = async (
+  projectId,
+  provider,
+  { code, state, resourceIds = [], syncIntervalMinutes = 10 },
+) => {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    const error = new Error("로그인 정보가 없습니다.");
+
+    error.status = 401;
+
+    throw error;
+  }
+
+  if (!projectId) {
+    const error = new Error("프로젝트 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  if (!provider) {
+    const error = new Error("외부 서비스 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  if (!code || !state) {
+    const error = new Error("OAuth 인증 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/projects/${projectId}/integrations/${provider}/oauth/complete`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+
+        Authorization: `Bearer ${accessToken}`,
+      },
+
+      body: JSON.stringify({
+        code,
+        state,
+        resourceIds,
+        syncIntervalMinutes,
+      }),
+    },
+  );
+
+  return parseResponse(response);
+};
