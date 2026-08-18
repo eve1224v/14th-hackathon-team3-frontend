@@ -27,6 +27,7 @@ function HandoverCard({
   next,
   questions,
   approvals,
+  onView,
 }) {
   return (
     <article className={styles.handoverCard}>
@@ -82,6 +83,7 @@ function HandoverCard({
       <button
         type="button"
         className={styles.detailButton}
+        onClick={onView}
       >
         <span>
           내용 확인

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import styles from "./HomeDashboard.module.css";
@@ -64,6 +65,7 @@ const todoItems = [
 
 const projects = [
   {
+    id: 1,
     title: "Global Payment Integration",
     company: "파트너사 · 기업 B",
     cycle: "Cycle 3",
@@ -72,20 +74,49 @@ const projects = [
     completeCount: 8,
   },
   {
-    title: "Global Payment Integration",
-    company: "파트너사 · 기업 B",
+    id: 2,
+    title: "Global Commerce Renewal",
+    company: "파트너사 · 기업 A",
     cycle: "Cycle 3",
-    progress: 78,
-    issueCount: 12,
-    completeCount: 8,
+    progress: 65,
+    issueCount: 9,
+    completeCount: 6,
   },
   {
-    title: "Global Payment Integration",
-    company: "파트너사 · 기업 B",
+    id: 3,
+    title: "Design System Update",
+    company: "파트너사 · 기업 C",
     cycle: "Cycle 3",
-    progress: 78,
-    issueCount: 12,
-    completeCount: 8,
+    progress: 52,
+    issueCount: 8,
+    completeCount: 4,
+  },
+  {
+    id: 4,
+    title: "Global Launch Project",
+    company: "파트너사 · 기업 D",
+    cycle: "Cycle 3",
+    progress: 42,
+    issueCount: 7,
+    completeCount: 3,
+  },
+  {
+    id: 5,
+    title: "Payment Platform Renewal",
+    company: "파트너사 · 기업 E",
+    cycle: "Cycle 3",
+    progress: 71,
+    issueCount: 10,
+    completeCount: 7,
+  },
+  {
+    id: 6,
+    title: "Global Service Expansion",
+    company: "파트너사 · 기업 F",
+    cycle: "Cycle 3",
+    progress: 60,
+    issueCount: 10,
+    completeCount: 6,
   },
 ];
 
@@ -127,20 +158,19 @@ const activities = [
 ];
 
 
-function ArrowButton({ children, onClick }) {
+function ArrowButton({ children, onClick, isOpen = false }) {
   return (
     <button
       type="button"
       className={styles.arrowButton}
       onClick={onClick}
     >
-      <span>
-        {children}
-      </span>
+      <span>{children}</span>
 
       <img
         src={rightArrowIcon}
         alt=""
+        className={isOpen ? styles.arrowOpen : ""}
       />
     </button>
   );
@@ -150,10 +180,44 @@ function ArrowButton({ children, onClick }) {
 function HomeDashboard() {
   const navigate = useNavigate();
 
+  const [showAllProjects, setShowAllProjects] = useState(false);
 
+
+  // 상단 새로 고침
   const handleRefresh = () => {
     window.location.reload();
   };
+
+
+  // 최근 활동 영역만 새로 고침
+  const handleActivityRefresh = () => {
+    console.log("최근 활동 데이터 새로고침");
+  };
+
+
+  // 프로젝트 전체 보기 / 접기
+  const handleToggleProjects = () => {
+    setShowAllProjects((prev) => !prev);
+  };
+
+
+  // 프로젝트 카드 클릭
+  const handleProjectClick = (projectId) => {
+    console.log("선택한 프로젝트 ID:", projectId);
+
+    navigate(ROUTES.CYCLE);
+  };
+
+
+  // 최근 인수인계 내용 확인
+  const handleViewHandover = () => {
+    navigate(ROUTES.HANDOVER);
+  };
+
+
+  const visibleProjects = showAllProjects
+    ? projects
+    : projects.slice(0, 3);
 
 
   return (
@@ -205,10 +269,6 @@ function HomeDashboard() {
       ========================= */}
 
       <div className={styles.contentGrid}>
-        {/* =========================
-            왼쪽 영역
-        ========================= */}
-
         <main className={styles.leftColumn}>
           {/* 나의 업무 요약 */}
 
@@ -262,26 +322,42 @@ function HomeDashboard() {
                 진행 중인 프로젝트
               </h2>
 
-              <ArrowButton>
-                모든 프로젝트
+              <ArrowButton
+                onClick={handleToggleProjects}
+                isOpen={showAllProjects}
+              >
+                {showAllProjects
+                  ? "접기"
+                  : "모든 프로젝트"}
               </ArrowButton>
             </div>
 
             <div className={styles.projectList}>
-              {projects.map((project, index) => (
-                <ProjectCard
-                  key={index}
-                  {...project}
-                />
+              {visibleProjects.map((project) => (
+                <div
+                  key={project.id}
+                  className={styles.projectCardWrapper}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() =>
+                    handleProjectClick(project.id)
+                  }
+                  onKeyDown={(event) => {
+                    if (
+                      event.key === "Enter" ||
+                      event.key === " "
+                    ) {
+                      handleProjectClick(project.id);
+                    }
+                  }}
+                >
+                  <ProjectCard {...project} />
+                </div>
               ))}
             </div>
           </section>
         </main>
 
-
-        {/* =========================
-            오른쪽 영역
-        ========================= */}
 
         <aside className={styles.rightColumn}>
           {/* 최근 인수인계 */}
@@ -293,6 +369,7 @@ function HomeDashboard() {
 
             <HandoverCard
               {...handover}
+              onView={handleViewHandover}
             />
           </section>
 
@@ -308,7 +385,7 @@ function HomeDashboard() {
               <button
                 type="button"
                 className={styles.activityRefresh}
-                onClick={handleRefresh}
+                onClick={handleActivityRefresh}
                 aria-label="최근 활동 새로고침"
               >
                 <img

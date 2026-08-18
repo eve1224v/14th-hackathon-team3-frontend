@@ -34,8 +34,6 @@
 }
 
 
-/* 대한민국 · 서울 · 09:14 */
-
 .location {
   width: auto;
 
@@ -53,8 +51,6 @@
 }
 
 
-/* 좋은 아침이에요, 예티님 */
-
 .hero h1 {
   margin: 5px 0 0;
 
@@ -70,8 +66,6 @@
 }
 
 
-/* London 팀이 업무를 마쳤어요 */
-
 .heroDescription {
   margin: 31px 0 0;
 
@@ -80,7 +74,6 @@
   font-size: 16px;
   font-weight: 600;
 
-  /* 두 줄 사이 간격 */
   line-height: 125%;
 
   letter-spacing: 0;
@@ -266,6 +259,14 @@
   grid-template-columns: repeat(3, 224px);
 
   column-gap: 8px;
+  row-gap: 8px;
+}
+
+
+.projectCardWrapper {
+  width: 224px;
+
+  cursor: pointer;
 }
 
 
@@ -308,6 +309,13 @@
   flex-shrink: 0;
 
   object-fit: contain;
+
+  transition: transform 0.2s ease;
+}
+
+
+.arrowOpen {
+  transform: rotate(90deg);
 }
 
 
@@ -359,7 +367,6 @@
   display: flex;
   flex-direction: column;
 
-  /* 각 활동 사이 간격 */
   gap: 4px;
 }
 
