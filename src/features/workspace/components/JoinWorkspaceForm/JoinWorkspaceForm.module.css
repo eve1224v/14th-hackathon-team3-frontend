@@ -225,3 +225,12 @@
 
   cursor: pointer;
 }
+
+.errorMessage {
+  margin: 20px 0 0;
+
+  color: #ff3b30;
+
+  font-size: 13px;
+  font-weight: 500;
+}
