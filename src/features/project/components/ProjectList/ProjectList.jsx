@@ -328,12 +328,12 @@ function ProjectList() {
                   <div
                     className={styles.progressFill}
                     style={{
-                      width: "0%",
+                      width: "78%",
                     }}
                   />
                 </div>
 
-                <span className={styles.progressText}>-</span>
+                <span className={styles.progressText}>78%</span>
               </div>
             </article>
           ))}

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
 import { useTranslation } from "react-i18next";
 
 import styles from "./MessageModal.module.css";
@@ -7,6 +8,12 @@ import sendIcon from "../../assets/icons/sendIcon.svg";
 import chatIcon2 from "../../assets/icons/chatIcon2.svg";
 import searchIcon from "../../assets/icons/searchIcon.svg";
 import chatcheckIcon from "../../assets/icons/chatcheckIcon.svg";
+
+import {
+  getMessageRecipients,
+  getRecentConversations,
+  getOrCreateDirectConversation,
+} from "../../api/messageApi";
 
 function MessageModal({ onClose }) {
   const { t } = useTranslation();
@@ -17,16 +24,12 @@ function MessageModal({ onClose }) {
 
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const [hasMessageHistory] = useState(false);
-
   const [searchText, setSearchText] = useState("");
 
   const [selectedUsers, setSelectedUsers] = useState([]);
 
   /* =========================
      Filter
-
-     실제 상태값은 번역하지 않음
   ========================= */
 
   const [selectedCompany, setSelectedCompany] = useState("ALL");
@@ -37,101 +40,43 @@ function MessageModal({ onClose }) {
 
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  const companyOptions = ["기업 A", "기업 B"];
-
-  const teamOptions = ["Product Team", "Engineering Team", "Marketing Team"];
-
-  const positionOptions = ["직책 1", "직책 2", "직책 3", "직책 4"];
-
   /* =========================
-     사용자 데이터
-
-     실제 데이터라고 보고 번역하지 않음
+     조직도 구성원
   ========================= */
 
-  const recentUsers = [
-    {
-      id: 1,
-      name: "외국인°",
-      company: "기업 B",
-      team: "Engineering Team",
-      position: "직책 2",
-      detailPosition: "Backend Engineer",
-      time: "09:15",
-      city: "London",
-      activityMinutes: 5,
-    },
+  const [organizationMembers, setOrganizationMembers] = useState([]);
 
-    {
-      id: 2,
-      name: "외국인°",
-      company: "기업 A",
-      team: "Product Team",
-      position: "직책 1",
-      detailPosition: "Product Manager",
-      time: "09:15",
-      city: "London",
-      activityMinutes: 5,
-    },
-  ];
+  const [isMemberLoading, setIsMemberLoading] = useState(true);
 
-  const recommendedUsers = [
-    {
-      id: 3,
-      name: "외국인°",
-      company: "기업 B",
-      team: "Engineering Team",
-      position: "직책 2",
-      detailPosition: "Backend Engineer",
-      time: "09:15",
-      city: "London",
-    },
+  const [memberError, setMemberError] = useState("");
 
-    {
-      id: 4,
-      name: "외국인°",
-      company: "기업 A",
-      team: "Marketing Team",
-      position: "직책 4",
-      detailPosition: "Product Marketer",
-      time: "09:15",
-      city: "London",
-    },
+  /* =========================
+     최근 대화
+  ========================= */
 
-    {
-      id: 5,
-      name: "외국인°",
-      company: "기업 B",
-      team: "Product Team",
-      position: "직책 1",
-      detailPosition: "Product Manager",
-      time: "09:15",
-      city: "London",
-    },
+  const [recentConversations, setRecentConversations] = useState([]);
 
-    {
-      id: 6,
-      name: "외국인°",
-      company: "기업 A",
-      team: "Engineering Team",
-      position: "직책 3",
-      detailPosition: "Frontend Engineer",
-      time: "09:15",
-      city: "London",
-    },
-  ];
+  const [isRecentLoading, setIsRecentLoading] = useState(true);
 
-  const allUsers = [...recentUsers, ...recommendedUsers];
+  /* =========================
+     1:1 대화방
+  ========================= */
+
+  const [conversationTarget, setConversationTarget] = useState(null);
+
+  const [isConversationLoading, setIsConversationLoading] = useState(false);
+
+  const [conversationError, setConversationError] = useState("");
 
   /* =========================
      채팅 메시지
-
-     실제 메시지 데이터는 번역 대상 아님
+     아직 Mock
   ========================= */
 
   const [messages, setMessages] = useState([
     {
       id: 1,
+
       sender: "me",
 
       text: "내일까지 봐주시고, 문제 있으면 말씀해주세요!",
@@ -146,6 +91,7 @@ function MessageModal({ onClose }) {
 
     {
       id: 2,
+
       sender: "other",
 
       text: "API 연동 검토를 완료했습니다. 오류 처리 흐름에서 한 가지 이슈를 발견해 Issue #42에 댓글을 남겼습니다. 제가 바로 수정 작업을 진행할까요, 아니면 개발팀의 확인 후 진행할까요?",
@@ -160,6 +106,7 @@ function MessageModal({ onClose }) {
 
     {
       id: 3,
+
       sender: "me",
 
       text: "확인했습니다! 해당 부분은 바로 수정해주셔도 됩니다. 수정이 완료되면 Issue #42에 결과만 남겨주세요. 감사합니다!",
@@ -179,6 +126,7 @@ function MessageModal({ onClose }) {
 
   /* =========================
      Mock Translation
+     아직 번역 API 연결 전
   ========================= */
 
   const getMockTranslation = (text) => {
@@ -199,13 +147,278 @@ function MessageModal({ onClose }) {
       return predefined[text.trim()];
     }
 
-    return `${text}`;
+    return text;
   };
 
   const aiTranslation = getMockTranslation(messageInput);
 
   /* =========================
+     조직도 Response에서
+     memberId 객체 추출
+  ========================= */
+
+  const extractMembers = (value) => {
+    const result = [];
+
+    const visit = (item) => {
+      if (!item) {
+        return;
+      }
+
+      if (Array.isArray(item)) {
+        item.forEach(visit);
+
+        return;
+      }
+
+      if (typeof item !== "object") {
+        return;
+      }
+
+      if (item.memberId != null) {
+        result.push({
+          id: item.memberId,
+
+          memberId: item.memberId,
+
+          name: item.name || "",
+
+          email: item.email || "",
+
+          company: item.companyName || "",
+
+          team: item.teamName || "",
+
+          position: item.jobTitle || "",
+
+          activityStatus: item.activityStatus || "OFF",
+        });
+
+        return;
+      }
+
+      Object.values(item).forEach(visit);
+    };
+
+    visit(value);
+
+    return Array.from(
+      new Map(result.map((member) => [member.memberId, member])).values(),
+    );
+  };
+
+  /* =========================
+     조직도 조회
+  ========================= */
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const fetchRecipients = async () => {
+      const workspaceId = localStorage.getItem("workspaceId");
+
+      if (!workspaceId) {
+        if (!isCancelled) {
+          setMemberError("워크스페이스 정보가 없습니다.");
+
+          setIsMemberLoading(false);
+        }
+
+        return;
+      }
+
+      try {
+        const result = await getMessageRecipients(workspaceId);
+
+        if (isCancelled) {
+          return;
+        }
+
+        console.log("메시지 상대 조회 성공:", result);
+
+        const members = extractMembers(result?.data);
+
+        setOrganizationMembers(members);
+
+        setMemberError("");
+      } catch (error) {
+        if (isCancelled) {
+          return;
+        }
+
+        console.error("메시지 상대 조회 실패:", error);
+
+        if (error.status === 401) {
+          setMemberError("로그인이 필요합니다.");
+        } else {
+          setMemberError(error.message || "구성원 목록을 불러오지 못했습니다.");
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsMemberLoading(false);
+        }
+      }
+    };
+
+    fetchRecipients();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  /* =========================
+     최근 대화 조회
+  ========================= */
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const fetchRecent = async () => {
+      const workspaceId = localStorage.getItem("workspaceId");
+
+      if (!workspaceId) {
+        if (!isCancelled) {
+          setIsRecentLoading(false);
+        }
+
+        return;
+      }
+
+      try {
+        const result = await getRecentConversations(workspaceId);
+
+        if (isCancelled) {
+          return;
+        }
+
+        console.log("최근 대화 조회 성공:", result);
+
+        const conversations = Array.isArray(result?.data?.conversations)
+          ? result.data.conversations
+          : [];
+
+        setRecentConversations(conversations);
+      } catch (error) {
+        if (isCancelled) {
+          return;
+        }
+
+        console.error("최근 대화 조회 실패:", error);
+
+        setRecentConversations([]);
+      } finally {
+        if (!isCancelled) {
+          setIsRecentLoading(false);
+        }
+      }
+    };
+
+    fetchRecent();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  /* =========================
+     최근 대화 User 변환
+  ========================= */
+
+  const recentChatUsers = useMemo(
+    () =>
+      recentConversations.map((conversation) => ({
+        id: conversation.targetMemberId,
+
+        memberId: conversation.targetMemberId,
+
+        conversationId: conversation.conversationId,
+
+        name: conversation.targetName || "",
+
+        company: conversation.companyName || "",
+
+        team: conversation.teamName || "",
+
+        position: conversation.jobTitle || "",
+
+        activityStatus: conversation.activityStatus || "OFF",
+
+        lastMessageAt: conversation.lastMessageAt || null,
+      })),
+    [recentConversations],
+  );
+
+  const hasMessageHistory = recentChatUsers.length > 0;
+
+  /* =========================
+     Filter Option
+  ========================= */
+
+  const filterSource = hasMessageHistory
+    ? recentChatUsers
+    : organizationMembers;
+
+  const companyOptions = useMemo(
+    () => [
+      ...new Set(filterSource.map((member) => member.company).filter(Boolean)),
+    ],
+    [filterSource],
+  );
+
+  const teamOptions = useMemo(
+    () => [
+      ...new Set(filterSource.map((member) => member.team).filter(Boolean)),
+    ],
+    [filterSource],
+  );
+
+  const positionOptions = useMemo(
+    () => [
+      ...new Set(filterSource.map((member) => member.position).filter(Boolean)),
+    ],
+    [filterSource],
+  );
+
+  /* =========================
+     최근 대화 시간
+  ========================= */
+
+  const formatRecentTime = (value) => {
+    if (!value) {
+      return "";
+    }
+
+    const date = new Date(value);
+
+    const now = new Date();
+
+    const diffMs = now.getTime() - date.getTime();
+
+    const diffMinutes = Math.floor(diffMs / 1000 / 60);
+
+    if (diffMinutes < 1) {
+      return "방금 전";
+    }
+
+    if (diffMinutes < 60) {
+      return `${diffMinutes}분 전`;
+    }
+
+    const diffHours = Math.floor(diffMinutes / 60);
+
+    if (diffHours < 24) {
+      return `${diffHours}시간 전`;
+    }
+
+    const diffDays = Math.floor(diffHours / 24);
+
+    return `${diffDays}일 전`;
+  };
+
+  /* =========================
      메시지 보내기
+     아직 Mock
   ========================= */
 
   const handleSendMessage = () => {
@@ -260,7 +473,9 @@ function MessageModal({ onClose }) {
 
   const handleAllFilter = () => {
     setSelectedCompany("ALL");
+
     setSelectedTeam("ALL");
+
     setSelectedPosition("ALL");
 
     setOpenDropdown(null);
@@ -270,22 +485,97 @@ function MessageModal({ onClose }) {
      사용자 선택
   ========================= */
 
-  const handleUserClick = (id) => {
+  const handleUserClick = (memberId) => {
+    /*
+        1:1 대화이므로
+        한 명만 선택
+      */
+
     setSelectedUsers((prev) => {
-      if (prev.includes(id)) {
-        return prev.filter((userId) => userId !== id);
+      if (prev.includes(memberId)) {
+        return [];
       }
 
-      return [...prev, id];
+      return [memberId];
     });
+
+    setConversationError("");
   };
 
-  const handleComplete = () => {
+  /* =========================
+     선택 완료
+     1:1 대화방 조회/생성
+  ========================= */
+
+  const handleComplete = async () => {
     if (selectedUsers.length === 0) {
       return;
     }
 
-    setIsChatOpen(true);
+    const workspaceId = localStorage.getItem("workspaceId");
+
+    if (!workspaceId) {
+      setConversationError("워크스페이스 정보가 없습니다.");
+
+      return;
+    }
+
+    const targetMemberId = selectedUsers[0];
+
+    try {
+      setIsConversationLoading(true);
+
+      setConversationError("");
+
+      const result = await getOrCreateDirectConversation(
+        workspaceId,
+        targetMemberId,
+      );
+
+      console.log("1:1 대화방 조회/생성 성공:", result);
+
+      const data = result?.data;
+
+      if (!data?.conversationId) {
+        throw new Error("대화방 정보를 불러오지 못했습니다.");
+      }
+
+      localStorage.setItem("conversationId", String(data.conversationId));
+
+      if (data.targetMember) {
+        setConversationTarget({
+          id: data.targetMember.memberId,
+
+          memberId: data.targetMember.memberId,
+
+          name: data.targetMember.name || "",
+
+          company: data.targetMember.companyName || "",
+
+          team: data.targetMember.teamName || "",
+
+          position: data.targetMember.jobTitle || "",
+
+          activityStatus: data.targetMember.activityStatus || "OFF",
+        });
+      }
+
+      console.log("conversationId:", data.conversationId);
+
+      console.log(data.created ? "새 대화방 생성" : "기존 대화방 조회");
+
+      setIsChatOpen(true);
+    } catch (error) {
+      console.error("1:1 대화방 조회/생성 실패:", error);
+
+      if (error.status === 401) {
+        setConversationError("로그인이 필요합니다.");
+      } else {
+        setConversationError(error.message || "대화방을 불러오지 못했습니다.");
+      }
+    } finally {
+      setIsConversationLoading(false);
+    }
   };
 
   /* =========================
@@ -296,15 +586,8 @@ function MessageModal({ onClose }) {
     const keyword = searchText.trim().toLowerCase();
 
     return users.filter((user) => {
-      const searchTarget = `
-          ${user.name}
-          ${user.company}
-          ${user.team}
-          ${user.position}
-          ${user.detailPosition}
-        `.toLowerCase();
-
-      const matchesSearch = !keyword || searchTarget.includes(keyword);
+      const matchesSearch =
+        !keyword || user.name.toLowerCase().includes(keyword);
 
       const matchesCompany =
         selectedCompany === "ALL" || user.company === selectedCompany;
@@ -377,7 +660,10 @@ function MessageModal({ onClose }) {
   ========================= */
 
   const selectedUser =
-    allUsers.find((user) => user.id === selectedUsers[0]) || recentUsers[0];
+    conversationTarget ||
+    organizationMembers.find((user) => user.memberId === selectedUsers[0]) ||
+    recentChatUsers.find((user) => user.memberId === selectedUsers[0]) ||
+    null;
 
   return (
     <div className={styles.overlay} onMouseDown={onClose}>
@@ -385,7 +671,7 @@ function MessageModal({ onClose }) {
         className={`${styles.modal} ${isChatOpen ? styles.chatModal : ""}`}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        {isChatOpen ? (
+        {isChatOpen && selectedUser ? (
           <>
             {/* =========================
                 Header
@@ -409,16 +695,28 @@ function MessageModal({ onClose }) {
                   <strong>{selectedUser.name}</strong>
 
                   <span>
-                    {selectedUser.time} · {selectedUser.city}
+                    {selectedUser.activityStatus === "ACTIVE"
+                      ? "활동 중"
+                      : "오프라인"}
                   </span>
                 </div>
 
                 <p>
-                  {selectedUser.company}
-                  {" · "}
-                  {selectedUser.team.replace(" Team", "")}
-                  {" · "}
-                  {selectedUser.detailPosition}
+                  {selectedUser.company || "-"}
+
+                  {selectedUser.team && (
+                    <>
+                      {" · "}
+                      {selectedUser.team}
+                    </>
+                  )}
+
+                  {selectedUser.position && (
+                    <>
+                      {" · "}
+                      {selectedUser.position}
+                    </>
+                  )}
                 </p>
               </div>
             </div>
@@ -540,7 +838,7 @@ function MessageModal({ onClose }) {
         ) : (
           <>
             {/* =========================
-                사용자 선택
+                사용자 선택 Header
             ========================= */}
 
             <div className={styles.titleRow}>
@@ -551,7 +849,9 @@ function MessageModal({ onClose }) {
 
             <p className={styles.description}>{t("message.selectRecipient")}</p>
 
-            {/* Search */}
+            {/* =========================
+                Search
+            ========================= */}
 
             <div className={styles.searchBox}>
               <img src={searchIcon} alt="" className={styles.searchIcon} />
@@ -564,7 +864,9 @@ function MessageModal({ onClose }) {
               />
             </div>
 
-            {/* Filter */}
+            {/* =========================
+                Filter
+            ========================= */}
 
             <div className={styles.filters}>
               <button
@@ -605,7 +907,9 @@ function MessageModal({ onClose }) {
               />
             </div>
 
-            {/* 최근 */}
+            {/* =========================
+                최근 대화 / 최근 활동
+            ========================= */}
 
             <div className={styles.section}>
               <h2>
@@ -614,37 +918,62 @@ function MessageModal({ onClose }) {
                   : t("message.recentActivity")}
               </h2>
 
-              <div className={styles.userList}>
-                {filterUsers(recentUsers).map((user) => (
-                  <UserItem
-                    key={user.id}
-                    user={user}
-                    showActivity={!hasMessageHistory}
-                    selected={selectedUsers.includes(user.id)}
-                    onClick={() => handleUserClick(user.id)}
-                    t={t}
-                  />
-                ))}
-              </div>
+              {isMemberLoading || isRecentLoading ? (
+                <p>구성원을 불러오는 중입니다.</p>
+              ) : memberError ? (
+                <p>{memberError}</p>
+              ) : (
+                <div className={styles.userList}>
+                  {filterUsers(
+                    hasMessageHistory ? recentChatUsers : organizationMembers,
+                  ).map((user) => (
+                    <UserItem
+                      key={user.memberId}
+                      user={user}
+                      selected={selectedUsers.includes(user.memberId)}
+                      onClick={() => handleUserClick(user.memberId)}
+                      recentTime={
+                        user.lastMessageAt
+                          ? formatRecentTime(user.lastMessageAt)
+                          : ""
+                      }
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* 추천 */}
+            {/* =========================
+                추천 구성원
+            ========================= */}
 
-            <div className={styles.section}>
-              <h2>{t("message.recommended")}</h2>
+            {hasMessageHistory && !isMemberLoading && !memberError && (
+              <div className={styles.section}>
+                <h2>{t("message.recommended")}</h2>
 
-              <div className={styles.userList}>
-                {filterUsers(recommendedUsers).map((user) => (
-                  <UserItem
-                    key={user.id}
-                    user={user}
-                    selected={selectedUsers.includes(user.id)}
-                    onClick={() => handleUserClick(user.id)}
-                    t={t}
-                  />
-                ))}
+                <div className={styles.userList}>
+                  {filterUsers(
+                    organizationMembers.filter(
+                      (member) =>
+                        !recentChatUsers.some(
+                          (recent) => recent.memberId === member.memberId,
+                        ),
+                    ),
+                  ).map((user) => (
+                    <UserItem
+                      key={user.memberId}
+                      user={user}
+                      selected={selectedUsers.includes(user.memberId)}
+                      onClick={() => handleUserClick(user.memberId)}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* =========================
+                선택 인원
+            ========================= */}
 
             {selectedUsers.length > 0 && (
               <div className={styles.selectedCount}>
@@ -654,15 +983,29 @@ function MessageModal({ onClose }) {
               </div>
             )}
 
+            {/* =========================
+                대화방 Error
+            ========================= */}
+
+            {conversationError && (
+              <p className={styles.errorMessage}>{conversationError}</p>
+            )}
+
+            {/* =========================
+                선택 완료
+            ========================= */}
+
             <button
               type="button"
               className={styles.completeButton}
-              disabled={selectedUsers.length === 0}
+              disabled={selectedUsers.length === 0 || isConversationLoading}
               onClick={handleComplete}
             >
-              {t("message.completeSelection")}
+              {isConversationLoading
+                ? "대화방 불러오는 중..."
+                : t("message.completeSelection")}
 
-              <span>→</span>
+              {!isConversationLoading && <span>→</span>}
             </button>
           </>
         )}
@@ -677,10 +1020,15 @@ function MessageModal({ onClose }) {
 
 function FilterDropdown({
   label,
+
   open,
+
   onToggle,
+
   options,
+
   allLabel,
+
   onSelect,
 }) {
   return (
@@ -711,7 +1059,17 @@ function FilterDropdown({
    UserItem
 ========================================================= */
 
-function UserItem({ user, showActivity = false, selected, onClick, t }) {
+function UserItem({
+  user,
+
+  selected,
+
+  onClick,
+
+  recentTime = "",
+}) {
+  const isActive = user.activityStatus === "ACTIVE";
+
   return (
     <button
       type="button"
@@ -724,28 +1082,32 @@ function UserItem({ user, showActivity = false, selected, onClick, t }) {
         <div className={styles.userNameRow}>
           <strong>{user.name}</strong>
 
-          {showActivity && user.activityMinutes !== undefined && (
-            <span>
-              {t("message.activeMinutesAgo", {
-                count: user.activityMinutes,
-              })}
-            </span>
+          {recentTime ? (
+            <span>{recentTime}</span>
+          ) : (
+            <span>{isActive ? "활동 중" : "오프라인"}</span>
           )}
         </div>
 
         <p>
-          {user.company}
-          {" · "}
-          {user.team.replace(" Team", "")}
-          {" · "}
-          {user.detailPosition}
+          {user.company || "-"}
+
+          {user.team && (
+            <>
+              {" · "}
+              {user.team}
+            </>
+          )}
+
+          {user.position && (
+            <>
+              {" · "}
+              {user.position}
+            </>
+          )}
         </p>
 
-        <p>
-          {t("message.currentTime")} {user.time}
-          {" · "}
-          {user.city}
-        </p>
+        {!recentTime && user.email && <p>{user.email}</p>}
       </div>
     </button>
   );

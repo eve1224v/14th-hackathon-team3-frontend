@@ -16,20 +16,88 @@ function JoinWorkspaceModal({ onClose }) {
   const [inviteCode, setInviteCode] = useState("");
 
   /* =========================================
+     초대 링크 → 초대 토큰 추출
+  ========================================= */
+
+  const extractInviteToken = (value) => {
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+      return "";
+    }
+
+    try {
+      /*
+        전체 URL을 입력한 경우
+
+        예)
+        https://.../invite?token=ws_1234
+
+        ↓
+
+        ws_1234
+      */
+
+      if (
+        trimmedValue.startsWith("http://") ||
+        trimmedValue.startsWith("https://")
+      ) {
+        const url = new URL(trimmedValue);
+
+        const token = url.searchParams.get("token");
+
+        if (token) {
+          return token;
+        }
+
+        return "";
+      }
+    } catch (error) {
+      console.error("초대 링크 파싱 실패:", error);
+
+      return "";
+    }
+
+    /*
+      사용자가 토큰 자체를 입력한 경우
+
+      예)
+      ws_21967b227d714b91a3193f986f816a4c
+    */
+
+    return trimmedValue;
+  };
+
+  /* =========================================
      입장
   ========================================= */
 
   const handleEnter = () => {
-    /*
-      추후 API 연결 시
-      여기서 초대 코드 검증 가능
-    */
-
     if (!inviteCode.trim()) {
       return;
     }
 
-    navigate(ROUTES.JOIN_WORKSPACE);
+    const inviteToken = extractInviteToken(inviteCode);
+
+    if (!inviteToken) {
+      alert("올바른 초대 링크를 입력해주세요.");
+
+      return;
+    }
+
+    /*
+      JoinWorkspaceForm으로 초대 토큰 전달
+    */
+
+    navigate(ROUTES.JOIN_WORKSPACE, {
+      state: {
+        inviteToken,
+      },
+    });
+
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (

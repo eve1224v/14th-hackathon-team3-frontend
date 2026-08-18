@@ -32,10 +32,6 @@ function TimeSetting({
 
     const timezone = REGION_TIMEZONE_MAP[region] || "";
 
-    /*
-      부모의 systemForm.region 변경
-    */
-
     onChange({
       target: {
         name: "region",
@@ -43,20 +39,20 @@ function TimeSetting({
       },
     });
 
-    /*
-      화면 표시용 timezone 자동 변경
-
-      서버에는 timezone을 보내지 않음
-    */
-
     onChange({
       target: {
         name: "timezone",
         value: timezone,
       },
     });
-  };
 
+    // 사이드바에서 사용할 값 저장
+    localStorage.setItem("userRegion", region);
+    localStorage.setItem("userTimezone", timezone);
+
+    // Sidebar에 변경 사실 알림
+    window.dispatchEvent(new Event("timeZoneChanged"));
+  };
   return (
     <div className={styles.systemPage}>
       <h3>{t("time.title")}</h3>
@@ -88,13 +84,13 @@ function TimeSetting({
               >
                 <option value="">지역 선택</option>
 
-                <option value="SEOUL">서울</option>
+                <option value="SEOUL">[KR] 서울</option>
 
-                <option value="TOKYO">도쿄</option>
+                <option value="TOKYO">[JP] 도쿄</option>
 
-                <option value="NEW_YORK">뉴욕</option>
+                <option value="NEW_YORK">[US] 뉴욕</option>
 
-                <option value="LOS_ANGELES">로스앤젤레스</option>
+                <option value="LOS_ANGELES">[US] 로스앤젤레스</option>
               </select>
             </div>
 

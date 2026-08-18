@@ -27,12 +27,49 @@ import { getActivityStatus, updateActivityStatus } from "../../api/userApi";
 
 import { logout } from "../../api/authApi";
 
+/* ========================================
+   지역 정보
+======================================== */
+
+const REGION_INFO_MAP = {
+  SEOUL: {
+    name: "[KR] 서울, 대한민국",
+    timezone: "Asia/Seoul",
+  },
+
+  TOKYO: {
+    name: "[JP] 도쿄, 일본",
+    timezone: "Asia/Tokyo",
+  },
+
+  NEW_YORK: {
+    name: "[US] 뉴욕, 미국",
+    timezone: "America/New_York",
+  },
+
+  LOS_ANGELES: {
+    name: "[US] 로스앤젤레스, 미국",
+    timezone: "America/Los_Angeles",
+  },
+};
+
 function Sidebar() {
   const navigate = useNavigate();
 
   const { t } = useTranslation();
 
+  /* ========================================
+     로그인 정보
+
+     isLoggedIn만 true여도 로그인으로 판단하지 않음
+     accessToken까지 있어야 서버 API 호출
+  ======================================== */
+
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
+  const accessToken = localStorage.getItem("accessToken");
+
+  const isAuthenticated = isLoggedIn && Boolean(accessToken);
 
   /* ========================================
      사용자 정보
@@ -66,9 +103,6 @@ function Sidebar() {
 
   /* ========================================
      활동 상태
-
-     true  = ACTIVE
-     false = OFF
   ======================================== */
 
   const [isActive, setIsActive] = useState(() => {
@@ -96,18 +130,32 @@ function Sidebar() {
   const getTime = (timeZone) => {
     return new Intl.DateTimeFormat("en-GB", {
       timeZone,
-
       hour: "2-digit",
-
       minute: "2-digit",
-
       hour12: false,
     }).format(new Date());
   };
 
-  const [seoulTime, setSeoulTime] = useState(getTime("Asia/Seoul"));
+  /* ========================================
+     서울 시간
+  ======================================== */
 
-  const [londonTime, setLondonTime] = useState(getTime("Europe/London"));
+  const [seoulTime, setSeoulTime] = useState(() => getTime("Asia/Seoul"));
+
+  /* ========================================
+     사용자 설정 지역
+  ======================================== */
+
+  const [selectedRegion, setSelectedRegion] = useState(() => {
+    return localStorage.getItem("userRegion") || "SEOUL";
+  });
+
+  const selectedRegionInfo =
+    REGION_INFO_MAP[selectedRegion] || REGION_INFO_MAP.SEOUL;
+
+  const [selectedRegionTime, setSelectedRegionTime] = useState(() =>
+    getTime(selectedRegionInfo.timezone),
+  );
 
   /* ========================================
      시간 업데이트
@@ -117,7 +165,10 @@ function Sidebar() {
     const updateTime = () => {
       setSeoulTime(getTime("Asia/Seoul"));
 
-      setLondonTime(getTime("Europe/London"));
+      const regionInfo =
+        REGION_INFO_MAP[selectedRegion] || REGION_INFO_MAP.SEOUL;
+
+      setSelectedRegionTime(getTime(regionInfo.timezone));
     };
 
     updateTime();
@@ -127,17 +178,45 @@ function Sidebar() {
     return () => {
       clearInterval(timer);
     };
+  }, [selectedRegion]);
+
+  /* ========================================
+     시스템 설정 지역 변경 감지
+  ======================================== */
+
+  useEffect(() => {
+    const handleTimeZoneChanged = () => {
+      const savedRegion = localStorage.getItem("userRegion") || "SEOUL";
+
+      setSelectedRegion(savedRegion);
+    };
+
+    window.addEventListener("timeZoneChanged", handleTimeZoneChanged);
+
+    window.addEventListener("storage", handleTimeZoneChanged);
+
+    return () => {
+      window.removeEventListener("timeZoneChanged", handleTimeZoneChanged);
+
+      window.removeEventListener("storage", handleTimeZoneChanged);
+    };
   }, []);
 
   /* ========================================
      워크스페이스 목록 조회
      + 활동 상태 조회
+
+     accessToken 있을 때만 실행
   ======================================== */
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
       return;
     }
+
+    /* ===============================
+       워크스페이스 조회
+    =============================== */
 
     const fetchWorkspaces = async () => {
       try {
@@ -150,6 +229,10 @@ function Sidebar() {
         const workspaceList = Array.isArray(result?.data) ? result.data : [];
 
         setWorkspaces(workspaceList);
+
+        /* ===============================
+           워크스페이스 없는 경우
+        =============================== */
 
         if (workspaceList.length === 0) {
           setSelectedWorkspace(null);
@@ -165,6 +248,10 @@ function Sidebar() {
           return;
         }
 
+        /* ===============================
+           기존 선택 워크스페이스
+        =============================== */
+
         const savedWorkspaceId = localStorage.getItem("workspaceId");
 
         let workspaceToSelect = null;
@@ -175,6 +262,11 @@ function Sidebar() {
               String(workspace.workspaceId) === String(savedWorkspaceId),
           );
         }
+
+        /* ===============================
+           저장된 워크스페이스 없으면
+           첫 번째 워크스페이스 선택
+        =============================== */
 
         if (!workspaceToSelect) {
           workspaceToSelect = workspaceList[0];
@@ -215,6 +307,10 @@ function Sidebar() {
       }
     };
 
+    /* ===============================
+       활동 상태 조회
+    =============================== */
+
     const fetchActivityStatus = async () => {
       try {
         const result = await getActivityStatus();
@@ -242,7 +338,7 @@ function Sidebar() {
     return () => {
       window.removeEventListener("workspaceCreated", fetchWorkspaces);
     };
-  }, [isLoggedIn, t]);
+  }, [isAuthenticated, t]);
 
   /* ========================================
      Workspace 선택
@@ -296,12 +392,17 @@ function Sidebar() {
 
   /* ========================================
      활동 상태 변경
-
-     ON  → ACTIVE
-     OFF → OFF
   ======================================== */
 
   const handleActivityToggle = async (e) => {
+    /*
+      토큰 없으면 API 호출하지 않음
+    */
+
+    if (!isAuthenticated) {
+      return;
+    }
+
     const checked = e.target.checked;
 
     const newStatus = checked ? "ACTIVE" : "OFF";
@@ -335,10 +436,6 @@ function Sidebar() {
 
   /* ========================================
      로그아웃
-
-     1. 서버 로그아웃 API 호출
-     2. 서버에서 activityStatus = OFF
-     3. 성공 후 localStorage 정리
   ======================================== */
 
   const handleLogout = async () => {
@@ -349,9 +446,16 @@ function Sidebar() {
     try {
       setIsLoggingOut(true);
 
-      const result = await logout();
+      /*
+        accessToken이 있는 경우에만
+        서버 로그아웃 API 실행
+      */
 
-      console.log("로그아웃 성공:", result);
+      if (accessToken) {
+        const result = await logout();
+
+        console.log("로그아웃 성공:", result);
+      }
 
       setIsActive(false);
     } catch (error) {
@@ -388,6 +492,10 @@ function Sidebar() {
       localStorage.removeItem("selectedProject");
 
       localStorage.removeItem("activityStatus");
+
+      localStorage.removeItem("userRegion");
+
+      localStorage.removeItem("userTimezone");
 
       navigate("/");
 
@@ -436,6 +544,10 @@ function Sidebar() {
       </div>
 
       <div className={styles.sidebarContent}>
+        {/* ========================================
+            로그인 사용자 정보
+        ======================================== */}
+
         {isLoggedIn ? (
           <>
             <div className={styles.userArea}>
@@ -450,15 +562,21 @@ function Sidebar() {
               <button
                 type="button"
                 className={styles.workspaceButton}
-                disabled={isWorkspaceLoading || workspaces.length === 0}
+                disabled={
+                  !isAuthenticated ||
+                  isWorkspaceLoading ||
+                  workspaces.length === 0
+                }
                 onClick={() => setIsWorkspaceOpen((prev) => !prev)}
               >
                 <span>
-                  {isWorkspaceLoading
-                    ? t("common.loading")
-                    : selectedWorkspace
-                      ? selectedWorkspace.name
-                      : t("sidebar.noWorkspace")}
+                  {!isAuthenticated
+                    ? t("sidebar.noWorkspace")
+                    : isWorkspaceLoading
+                      ? t("common.loading")
+                      : selectedWorkspace
+                        ? selectedWorkspace.name
+                        : t("sidebar.noWorkspace")}
                 </span>
 
                 {workspaces.length > 0 && (
@@ -502,6 +620,10 @@ function Sidebar() {
           <p className={styles.loginText}>{t("sidebar.loginRequired")}</p>
         )}
 
+        {/* ========================================
+            메뉴
+        ======================================== */}
+
         <nav className={styles.menu}>
           <button
             type="button"
@@ -540,6 +662,10 @@ function Sidebar() {
           </button>
         </nav>
 
+        {/* ========================================
+            빠른 메뉴
+        ======================================== */}
+
         <div className={styles.actionMenu}>
           <button type="button">{t("sidebar.createIssue")}</button>
 
@@ -547,6 +673,13 @@ function Sidebar() {
             {t("sidebar.createProject")}
           </button>
         </div>
+
+        {/* ========================================
+            시간
+
+            첫 번째 = 서울
+            두 번째 = 사용자 설정 지역
+        ======================================== */}
 
         <div className={styles.timeSection}>
           <div>
@@ -556,11 +689,15 @@ function Sidebar() {
           </div>
 
           <div>
-            <p>{t("sidebar.london")}</p>
+            <p>{selectedRegionInfo.name}</p>
 
-            <strong>{londonTime}</strong>
+            <strong>{selectedRegionTime}</strong>
           </div>
         </div>
+
+        {/* ========================================
+            하단 메뉴
+        ======================================== */}
 
         {isLoggedIn && (
           <div className={styles.bottomMenu}>
@@ -588,7 +725,7 @@ function Sidebar() {
                 <input
                   type="checkbox"
                   checked={isActive}
-                  disabled={isActivityUpdating}
+                  disabled={isActivityUpdating || !isAuthenticated}
                   onChange={handleActivityToggle}
                   aria-label={
                     isActive ? t("sidebar.active") : t("sidebar.doNotDisturb")
@@ -598,6 +735,10 @@ function Sidebar() {
                 <span className={styles.toggleSlider} />
               </label>
             </div>
+
+            {/* ========================================
+                프로필
+            ======================================== */}
 
             <div className={styles.profileWrapper}>
               <button
