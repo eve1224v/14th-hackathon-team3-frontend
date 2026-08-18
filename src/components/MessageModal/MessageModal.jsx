@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { useTranslation } from "react-i18next";
-
 import styles from "./MessageModal.module.css";
 
 import sendIcon from "../../assets/icons/sendIcon.svg";
@@ -19,8 +17,6 @@ import {
 } from "../../api/messageApi";
 
 function MessageModal({ onClose }) {
-  const { t } = useTranslation();
-
   /* =========================
      화면 상태
   ========================= */
@@ -946,7 +942,7 @@ function MessageModal({ onClose }) {
 
   const getCompanyLabel = () => {
     if (selectedCompany === "ALL") {
-      return t("message.company");
+      return "소속 기업";
     }
 
     return selectedCompany;
@@ -954,7 +950,7 @@ function MessageModal({ onClose }) {
 
   const getTeamLabel = () => {
     if (selectedTeam === "ALL") {
-      return t("message.team");
+      return "소속 팀";
     }
 
     return selectedTeam;
@@ -962,7 +958,7 @@ function MessageModal({ onClose }) {
 
   const getPositionLabel = () => {
     if (selectedPosition === "ALL") {
-      return t("message.position");
+      return "직책";
     }
 
     return selectedPosition;
@@ -1014,7 +1010,7 @@ function MessageModal({ onClose }) {
             ========================= */}
 
             <div className={styles.titleRow}>
-              <h1>{t("message.title")}</h1>
+              <h1>Message</h1>
 
               <img src={chatIcon2} alt="" className={styles.titleIcon} />
             </div>
@@ -1071,9 +1067,9 @@ function MessageModal({ onClose }) {
               ) : (
                 messages.map((message, index) => {
                   /*
-                      상대방의 memberId와 다르면
-                      내 메시지로 판단
-                    */
+                    상대방의 memberId와 다르면
+                    내 메시지로 판단
+                  */
 
                   const isMe =
                     message.isTemporaryMine ||
@@ -1125,8 +1121,8 @@ function MessageModal({ onClose }) {
                       </div>
 
                       {/* =========================
-                            번역 결과
-                        ========================= */}
+                          번역 결과
+                      ========================= */}
 
                       {message.translationUsed && message.translatedText && (
                         <div className={styles.translationWrapper}>
@@ -1139,9 +1135,7 @@ function MessageModal({ onClose }) {
                               )
                             }
                           >
-                            {isMe
-                              ? t("message.viewTranslation")
-                              : t("message.viewOriginal")}
+                            {isMe ? "번역문 보기" : "원문 보기"}
 
                             <img src={chatcheckIcon} alt="" />
                           </button>
@@ -1172,7 +1166,7 @@ function MessageModal({ onClose }) {
             ========================= */}
 
             <div className={styles.messageComposer}>
-              <label>{t("message.messageLabel")}</label>
+              <label>메시지</label>
 
               <textarea
                 value={messageInput}
@@ -1180,9 +1174,7 @@ function MessageModal({ onClose }) {
                 onChange={handleMessageInputChange}
               />
 
-              <div className={styles.aiLabel}>
-                → {t("message.aiTranslation")}
-              </div>
+              <div className={styles.aiLabel}>→ AI 번역</div>
 
               <textarea
                 value={isTranslationLoading ? "번역 중..." : translationPreview}
@@ -1211,7 +1203,7 @@ function MessageModal({ onClose }) {
                 !messageInput.trim() || isTranslationLoading || isSendingMessage
               }
             >
-              <span>{isSendingMessage ? "전송 중..." : t("message.send")}</span>
+              <span>{isSendingMessage ? "전송 중..." : "보내기"}</span>
 
               {!isSendingMessage && <img src={sendIcon} alt="" />}
             </button>
@@ -1223,12 +1215,12 @@ function MessageModal({ onClose }) {
             ========================= */}
 
             <div className={styles.titleRow}>
-              <h1>{t("message.title")}</h1>
+              <h1>Message</h1>
 
               <img src={chatIcon2} alt="" className={styles.titleIcon} />
             </div>
 
-            <p className={styles.description}>{t("message.selectRecipient")}</p>
+            <p className={styles.description}>누구에게 메시지를 보낼까요?</p>
 
             {/* Search */}
 
@@ -1238,7 +1230,7 @@ function MessageModal({ onClose }) {
               <input
                 type="text"
                 value={searchText}
-                placeholder={t("message.searchPlaceholder")}
+                placeholder="이름, 회사, 팀, 직책 검색"
                 onChange={(e) => setSearchText(e.target.value)}
               />
             </div>
@@ -1253,7 +1245,7 @@ function MessageModal({ onClose }) {
                 }`}
                 onClick={handleAllFilter}
               >
-                {t("message.all")}
+                전체
               </button>
 
               <FilterDropdown
@@ -1261,7 +1253,7 @@ function MessageModal({ onClose }) {
                 open={openDropdown === "company"}
                 onToggle={() => handleDropdownToggle("company")}
                 options={companyDropdownOptions}
-                allLabel={t("message.company")}
+                allLabel="소속 기업"
                 onSelect={handleCompanySelect}
               />
 
@@ -1270,7 +1262,7 @@ function MessageModal({ onClose }) {
                 open={openDropdown === "team"}
                 onToggle={() => handleDropdownToggle("team")}
                 options={teamDropdownOptions}
-                allLabel={t("message.team")}
+                allLabel="소속 팀"
                 onSelect={handleTeamSelect}
               />
 
@@ -1279,7 +1271,7 @@ function MessageModal({ onClose }) {
                 open={openDropdown === "position"}
                 onToggle={() => handleDropdownToggle("position")}
                 options={positionDropdownOptions}
-                allLabel={t("message.position")}
+                allLabel="직책"
                 onSelect={handlePositionSelect}
               />
             </div>
@@ -1289,11 +1281,7 @@ function MessageModal({ onClose }) {
             ========================= */}
 
             <div className={styles.section}>
-              <h2>
-                {hasMessageHistory
-                  ? t("message.recentChats")
-                  : t("message.recentActivity")}
-              </h2>
+              <h2>{hasMessageHistory ? "최근 대화" : "최근 활동"}</h2>
 
               {isMemberLoading || isRecentLoading ? (
                 <p>구성원을 불러오는 중입니다.</p>
@@ -1326,7 +1314,7 @@ function MessageModal({ onClose }) {
 
             {hasMessageHistory && !isMemberLoading && !memberError && (
               <div className={styles.section}>
-                <h2>{t("message.recommended")}</h2>
+                <h2>추천</h2>
 
                 <div className={styles.userList}>
                   {filterUsers(
@@ -1352,9 +1340,7 @@ function MessageModal({ onClose }) {
 
             {selectedUsers.length > 0 && (
               <div className={styles.selectedCount}>
-                {t("message.selectedCount", {
-                  count: selectedUsers.length,
-                })}
+                {selectedUsers.length}명 선택
               </div>
             )}
 
@@ -1370,9 +1356,7 @@ function MessageModal({ onClose }) {
               disabled={selectedUsers.length === 0 || isConversationLoading}
               onClick={handleComplete}
             >
-              {isConversationLoading
-                ? "대화방 불러오는 중..."
-                : t("message.completeSelection")}
+              {isConversationLoading ? "대화방 불러오는 중..." : "선택 완료"}
 
               {!isConversationLoading && <span>→</span>}
             </button>

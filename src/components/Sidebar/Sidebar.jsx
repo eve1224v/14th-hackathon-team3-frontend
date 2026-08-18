@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { useTranslation } from "react-i18next";
-
 import styles from "./Sidebar.module.css";
 
 import homeIcon from "../../assets/icons/homeIcon.svg";
@@ -57,8 +55,6 @@ const REGION_INFO_MAP = {
 
 function Sidebar() {
   const navigate = useNavigate();
-
-  const { t } = useTranslation();
 
   /* ========================================
      로그인 정보
@@ -130,11 +126,8 @@ function Sidebar() {
     try {
       return new Intl.DateTimeFormat("en-GB", {
         timeZone,
-
         hour: "2-digit",
-
         minute: "2-digit",
-
         hour12: false,
       }).format(new Date());
     } catch (error) {
@@ -216,9 +209,9 @@ function Sidebar() {
       setSelectedTimezone(savedTimezone);
 
       /*
-          이벤트 받은 즉시
-          아래 시간도 바로 변경
-        */
+        이벤트 받은 즉시
+        아래 시간도 바로 변경
+      */
 
       setSelectedRegionTime(getTime(savedTimezone));
     };
@@ -266,7 +259,7 @@ function Sidebar() {
 
         /* ===============================
              워크스페이스 없는 경우
-          =============================== */
+        =============================== */
 
         if (workspaceList.length === 0) {
           setSelectedWorkspace(null);
@@ -284,7 +277,7 @@ function Sidebar() {
 
         /* ===============================
              기존 선택 워크스페이스
-          =============================== */
+        =============================== */
 
         const savedWorkspaceId = localStorage.getItem("workspaceId");
 
@@ -300,7 +293,7 @@ function Sidebar() {
         /* ===============================
              저장된 워크스페이스 없으면
              첫 번째 선택
-          =============================== */
+        =============================== */
 
         if (!workspaceToSelect) {
           workspaceToSelect = workspaceList[0];
@@ -330,12 +323,14 @@ function Sidebar() {
         console.error("워크스페이스 목록 조회 실패:", error);
 
         if (error.status === 401) {
-          setWorkspaceError(t("sidebar.loginExpired"));
+          setWorkspaceError("로그인이 만료되었습니다.");
 
           return;
         }
 
-        setWorkspaceError(error.message || t("sidebar.workspaceLoadError"));
+        setWorkspaceError(
+          error.message || "워크스페이스 목록을 불러오지 못했습니다.",
+        );
       } finally {
         setIsWorkspaceLoading(false);
       }
@@ -372,7 +367,7 @@ function Sidebar() {
     return () => {
       window.removeEventListener("workspaceCreated", fetchWorkspaces);
     };
-  }, [isAuthenticated, t]);
+  }, [isAuthenticated]);
 
   /* ========================================
      Workspace 선택
@@ -455,9 +450,9 @@ function Sidebar() {
       console.error("활동 상태 변경 실패:", error);
 
       if (error.status === 401) {
-        alert(t("sidebar.loginExpiredAgain"));
+        alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
       } else {
-        alert(error.message || t("sidebar.activityUpdateError"));
+        alert(error.message || "활동 상태 변경에 실패했습니다.");
       }
     } finally {
       setIsActivityUpdating(false);
@@ -487,7 +482,7 @@ function Sidebar() {
       console.error("로그아웃 API 실패:", error);
 
       if (error.status !== 401) {
-        alert(error.message || t("sidebar.logoutError"));
+        alert(error.message || "로그아웃에 실패했습니다.");
 
         return;
       }
@@ -544,7 +539,7 @@ function Sidebar() {
     setIsProfileOpen(false);
 
     if (!selectedWorkspace) {
-      console.error(t("sidebar.noSelectedWorkspace"));
+      console.error("선택된 워크스페이스가 없습니다.");
 
       return;
     }
@@ -580,11 +575,7 @@ function Sidebar() {
         {isLoggedIn ? (
           <>
             <div className={styles.userArea}>
-              <p className={styles.greeting}>
-                {t("sidebar.greeting", {
-                  name: userName,
-                })}
-              </p>
+              <p className={styles.greeting}>안녕하세요, {userName}님</p>
             </div>
 
             {/* Workspace */}
@@ -602,12 +593,12 @@ function Sidebar() {
               >
                 <span>
                   {!isAuthenticated
-                    ? t("sidebar.noWorkspace")
+                    ? "워크스페이스 없음"
                     : isWorkspaceLoading
-                      ? t("common.loading")
+                      ? "불러오는 중..."
                       : selectedWorkspace
                         ? selectedWorkspace.name
-                        : t("sidebar.noWorkspace")}
+                        : "워크스페이스 없음"}
                 </span>
 
                 {workspaces.length > 0 && (
@@ -648,7 +639,7 @@ function Sidebar() {
             </div>
           </>
         ) : (
-          <p className={styles.loginText}>{t("sidebar.loginRequired")}</p>
+          <p className={styles.loginText}>로그인이 필요합니다.</p>
         )}
 
         {/* ========================================
@@ -663,7 +654,7 @@ function Sidebar() {
           >
             <img src={homeIcon} alt="" />
 
-            <span>{t("sidebar.home")}</span>
+            <span>홈</span>
           </button>
 
           <button
@@ -673,13 +664,13 @@ function Sidebar() {
           >
             <img src={cycleIcon} alt="" />
 
-            <span>{t("sidebar.cycle")}</span>
+            <span>사이클</span>
           </button>
 
           <button type="button" className={styles.menuItem}>
             <img src={issueIcon} alt="" />
 
-            <span>{t("sidebar.issue")}</span>
+            <span>이슈</span>
           </button>
 
           <button
@@ -689,7 +680,7 @@ function Sidebar() {
           >
             <img src={projectIcon} alt="" />
 
-            <span>{t("sidebar.project")}</span>
+            <span>프로젝트</span>
           </button>
         </nav>
 
@@ -698,10 +689,10 @@ function Sidebar() {
         ======================================== */}
 
         <div className={styles.actionMenu}>
-          <button type="button">{t("sidebar.createIssue")}</button>
+          <button type="button">이슈 생성</button>
 
           <button type="button" onClick={() => navigate(ROUTES.CREATE_PROJECT)}>
-            {t("sidebar.createProject")}
+            프로젝트 생성
           </button>
         </div>
 
@@ -716,7 +707,7 @@ function Sidebar() {
           {/* 서울 */}
 
           <div>
-            <p>{t("sidebar.seoul")}</p>
+            <p>[KR] 서울, 대한민국</p>
 
             <strong>{seoulTime}</strong>
           </div>
@@ -739,10 +730,8 @@ function Sidebar() {
             <button
               type="button"
               className={styles.bottomButton}
-              aria-label={
-                isActive ? t("sidebar.active") : t("sidebar.doNotDisturb")
-              }
-              title={isActive ? t("sidebar.active") : t("sidebar.doNotDisturb")}
+              aria-label={isActive ? "활동 중" : "방해 금지"}
+              title={isActive ? "활동 중" : "방해 금지"}
             >
               <img src={isActive ? notifyIcon : notifyIcon2} alt="" />
             </button>
@@ -751,7 +740,7 @@ function Sidebar() {
               <button
                 type="button"
                 className={styles.bottomButton}
-                aria-label={t("sidebar.activityStatus")}
+                aria-label="활동 상태"
               >
                 <img src={moonIcon} alt="" />
               </button>
@@ -762,9 +751,7 @@ function Sidebar() {
                   checked={isActive}
                   disabled={isActivityUpdating || !isAuthenticated}
                   onChange={handleActivityToggle}
-                  aria-label={
-                    isActive ? t("sidebar.active") : t("sidebar.doNotDisturb")
-                  }
+                  aria-label={isActive ? "활동 중" : "방해 금지"}
                 />
 
                 <span className={styles.toggleSlider} />
@@ -779,7 +766,7 @@ function Sidebar() {
               <button
                 type="button"
                 className={styles.bottomButton}
-                aria-label={t("sidebar.profile")}
+                aria-label="프로필"
                 onClick={handleProfileClick}
               >
                 <img src={profileIcon} alt="" />
@@ -789,7 +776,7 @@ function Sidebar() {
                 <div className={styles.profilePopup}>
                   <div className={styles.profileInfo}>
                     <div className={styles.profileImage}>
-                      <img src={profileIcon} alt={t("sidebar.profile")} />
+                      <img src={profileIcon} alt="프로필" />
                     </div>
 
                     <div className={styles.profileText}>
@@ -802,9 +789,7 @@ function Sidebar() {
                   </div>
 
                   <div className={styles.accountSection}>
-                    <p className={styles.accountTitle}>
-                      {t("sidebar.myAccountSettings")}
-                    </p>
+                    <p className={styles.accountTitle}>내 계정 설정</p>
 
                     <button
                       type="button"
@@ -813,7 +798,7 @@ function Sidebar() {
                     >
                       <img src={profileIcon} alt="" />
 
-                      <span>{t("sidebar.profileSettings")}</span>
+                      <span>프로필 설정</span>
                     </button>
 
                     <button
@@ -823,7 +808,7 @@ function Sidebar() {
                     >
                       <img src={settingIcon} alt="" />
 
-                      <span>{t("sidebar.systemSettings")}</span>
+                      <span>시스템 설정</span>
                     </button>
                   </div>
 
@@ -837,11 +822,7 @@ function Sidebar() {
                   >
                     <img src={logoutIcon} alt="" />
 
-                    <span>
-                      {isLoggingOut
-                        ? t("sidebar.loggingOut")
-                        : t("sidebar.logout")}
-                    </span>
+                    <span>{isLoggingOut ? "로그아웃 중..." : "로그아웃"}</span>
                   </button>
                 </div>
               )}

@@ -1,55 +1,41 @@
-import { useTranslation } from "react-i18next";
-
 function NotificationSetting({
   notificationSettings = {},
   onChange = () => {},
   styles,
 }) {
-  const { t } = useTranslation();
-
   const notificationItems = [
     {
       key: "mention",
-
-      title: t("notification.mention"),
-
-      description: t("notification.mentionDescription"),
+      title: "멘션 및 댓글",
+      description: "누군가 나를 멘션하거나 댓글을 남길 때",
     },
     {
       key: "issue",
-
-      title: t("notification.issue"),
-
-      description: t("notification.issueDescription"),
+      title: "이슈 업데이트",
+      description: "이슈가 생성, 변경, 완료되었을 때",
     },
     {
       key: "deadline",
-
-      title: t("notification.deadline"),
-
-      description: t("notification.deadlineDescription"),
+      title: "마감일 및 진행률",
+      description: "마감일 임박 및 진행률 변경 시",
     },
     {
       key: "message",
-
-      title: t("notification.message"),
-
-      description: t("notification.messageDescription"),
+      title: "메시지",
+      description: "새로운 메시지를 받았을 때",
     },
     {
       key: "doNotDisturb",
-
-      title: t("notification.doNotDisturb"),
-
-      description: t("notification.doNotDisturbDescription"),
+      title: "방해 금지 모드",
+      description: "알림을 받지 않는 시간을 설정합니다.",
     },
   ];
 
   return (
     <div className={styles.systemPage}>
-      <h3>{t("notification.title")}</h3>
+      <h3>알림</h3>
 
-      <h4>{t("notification.items")}</h4>
+      <h4>알림 항목</h4>
 
       <div className={styles.notificationList}>
         {notificationItems.map(({ key, title, description }) => (

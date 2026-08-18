@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 
 import styles from "./OnboardingModal.module.css";
 
@@ -44,10 +43,6 @@ function OnboardingModal({ onClose, userName }) {
 
   const [isRegionOpen, setIsRegionOpen] = useState(false);
 
-  const [language, setLanguage] = useState("");
-
-  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
-
   /* =========================================
      API 상태
   ========================================= */
@@ -80,12 +75,6 @@ function OnboardingModal({ onClose, userName }) {
       return;
     }
 
-    if (!language) {
-      setErrorMessage("기본 언어를 선택해주세요.");
-
-      return;
-    }
-
     const accessToken = localStorage.getItem("accessToken");
 
     if (!accessToken) {
@@ -98,37 +87,8 @@ function OnboardingModal({ onClose, userName }) {
       setIsSavingSettings(true);
 
       /* =========================================
-           1. 기본 언어 저장
-        ========================================= */
-
-      const languageResponse = await fetch(
-        `${API_BASE_URL}/api/v1/users/me/language`,
-        {
-          method: "PATCH",
-
-          headers: {
-            "Content-Type": "application/json",
-
-            Authorization: `Bearer ${accessToken}`,
-          },
-
-          body: JSON.stringify({
-            language,
-          }),
-        },
-      );
-
-      const languageResult = await languageResponse.json().catch(() => null);
-
-      if (!languageResponse.ok) {
-        throw new Error(
-          languageResult?.message || "기본 언어 저장에 실패했습니다.",
-        );
-      }
-
-      /* =========================================
-           2. 사용자 지역 저장
-        ========================================= */
+         1. 사용자 지역 저장
+      ========================================= */
 
       const regionResponse = await fetch(
         `${API_BASE_URL}/api/v1/users/me/region`,
@@ -156,19 +116,17 @@ function OnboardingModal({ onClose, userName }) {
       }
 
       /* =========================================
-           3. LocalStorage 저장
-        ========================================= */
-
-      localStorage.setItem("userLanguage", language);
+         2. LocalStorage 저장
+      ========================================= */
 
       localStorage.setItem("userRegion", region);
 
       /* =========================================
-           4. WorkspaceMember 프로필 임시 저장
+         3. WorkspaceMember 프로필 임시 저장
 
-           workspaceId 생성 후
-           members/me/profile API에서 사용
-        ========================================= */
+         workspaceId 생성 후
+         members/me/profile API에서 사용
+      ========================================= */
 
       localStorage.setItem(
         "pendingWorkspaceProfile",
@@ -184,8 +142,8 @@ function OnboardingModal({ onClose, userName }) {
       );
 
       /*
-          기존 화면에서도 사용하는 값
-        */
+        기존 화면에서도 사용하는 값
+      */
 
       localStorage.setItem("userCompany", company.trim());
 
@@ -194,22 +152,20 @@ function OnboardingModal({ onClose, userName }) {
       localStorage.setItem("userJobTitle", position.trim());
 
       /* =========================================
-           5. Sidebar 지역 시간 갱신
-        ========================================= */
+         4. Sidebar 지역 시간 갱신
+      ========================================= */
 
       window.dispatchEvent(new Event("timeZoneChanged"));
 
       window.dispatchEvent(new Event("userInfoUpdated"));
 
       /* =========================================
-           6. Step 2
-        ========================================= */
+         5. Step 2
+      ========================================= */
 
       setStep(2);
 
       setIsRegionOpen(false);
-
-      setIsLanguageOpen(false);
     } catch (error) {
       console.error("온보딩 설정 저장 실패:", error);
 
@@ -228,8 +184,6 @@ function OnboardingModal({ onClose, userName }) {
       setStep(targetStep);
 
       setIsRegionOpen(false);
-
-      setIsLanguageOpen(false);
     }
   };
 
@@ -328,10 +282,6 @@ function OnboardingModal({ onClose, userName }) {
               setRegion={setRegion}
               isRegionOpen={isRegionOpen}
               setIsRegionOpen={setIsRegionOpen}
-              language={language}
-              setLanguage={setLanguage}
-              isLanguageOpen={isLanguageOpen}
-              setIsLanguageOpen={setIsLanguageOpen}
             />
           )}
 
@@ -396,15 +346,7 @@ function StepOne({
 
   isRegionOpen,
   setIsRegionOpen,
-
-  language,
-  setLanguage,
-
-  isLanguageOpen,
-  setIsLanguageOpen,
 }) {
-  const { t } = useTranslation();
-
   const regionOptions = [
     {
       value: "SEOUL",
@@ -427,44 +369,14 @@ function StepOne({
     },
   ];
 
-  const languageOptions = [
-    {
-      value: "ko",
-      label: t("languages.korean"),
-    },
-
-    {
-      value: "en",
-      label: t("languages.english"),
-    },
-
-    {
-      value: "ja",
-      label: t("languages.japanese"),
-    },
-  ];
-
   const handleRegionSelect = (option) => {
     setRegion(option.value);
-
-    setIsRegionOpen(false);
-
-    setIsLanguageOpen(false);
-  };
-
-  const handleLanguageSelect = (option) => {
-    setLanguage(option.value);
-
-    setIsLanguageOpen(false);
 
     setIsRegionOpen(false);
   };
 
   const selectedRegionLabel =
     regionOptions.find((option) => option.value === region)?.label || "";
-
-  const selectedLanguageLabel =
-    languageOptions.find((option) => option.value === language)?.label || "";
 
   return (
     <div className={styles.stepContent}>
@@ -521,7 +433,7 @@ function StepOne({
           </div>
 
           <div className={styles.field}>
-            <label>사용자 지역 및 기본 언어 설정</label>
+            <label>사용자 지역 설정</label>
 
             {/* Region */}
 
@@ -531,8 +443,6 @@ function StepOne({
                 className={styles.dropdownButton}
                 onClick={() => {
                   setIsRegionOpen((prev) => !prev);
-
-                  setIsLanguageOpen(false);
                 }}
               >
                 <span
@@ -562,53 +472,6 @@ function StepOne({
                       type="button"
                       className={styles.dropdownOption}
                       onClick={() => handleRegionSelect(option)}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Language */}
-
-            <div className={styles.customDropdown}>
-              <button
-                type="button"
-                className={styles.dropdownButton}
-                onClick={() => {
-                  setIsLanguageOpen((prev) => !prev);
-
-                  setIsRegionOpen(false);
-                }}
-              >
-                <span
-                  className={
-                    language
-                      ? styles.selectedDropdownText
-                      : styles.dropdownPlaceholder
-                  }
-                >
-                  {selectedLanguageLabel || "기본 언어 선택"}
-                </span>
-
-                <img
-                  src={dropdownIcon}
-                  alt=""
-                  className={`${styles.dropdownIcon} ${
-                    isLanguageOpen ? styles.dropdownIconOpen : ""
-                  }`}
-                />
-              </button>
-
-              {isLanguageOpen && (
-                <div className={styles.dropdownMenu}>
-                  {languageOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      className={styles.dropdownOption}
-                      onClick={() => handleLanguageSelect(option)}
                     >
                       {option.label}
                     </button>

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 
 import styles from "./MainHero.module.css";
 
@@ -10,8 +9,6 @@ import { ROUTES } from "../../../../router/routes.constant";
 
 function MainHero({ onLoginClick, onSignupClick }) {
   const navigate = useNavigate();
-
-  const { t } = useTranslation();
 
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
@@ -24,13 +21,16 @@ function MainHero({ onLoginClick, onSignupClick }) {
             TITLE
         ========================================= */}
 
-        <h2 className={styles.title}>{t("mainHero.title")}</h2>
+        <h2 className={styles.title}>글로벌 협업, 끊김 없이 이어가보세요</h2>
 
         {/* =========================================
             DESCRIPTION
         ========================================= */}
 
-        <p className={styles.description}>{t("mainHero.description")}</p>
+        <p className={styles.description}>
+          언어와 시간대를 넘어 인수인계·소통·프로젝트 관리를 하나의
+          워크스페이스에서 관리하세요.
+        </p>
 
         {/* =========================================
             LOGIN 상태
@@ -43,7 +43,7 @@ function MainHero({ onLoginClick, onSignupClick }) {
               className={styles.createWorkspaceButton}
               onClick={() => navigate(ROUTES.CREATE_WORKSPACE)}
             >
-              {t("mainHero.createNewWorkspace")}
+              새 워크스페이스 만들기
             </button>
 
             <button
@@ -51,22 +51,22 @@ function MainHero({ onLoginClick, onSignupClick }) {
               className={styles.joinWorkspaceButton}
               onClick={() => setIsJoinModalOpen(true)}
             >
-              {t("mainHero.joinInvitedWorkspace")}
+              초대받은 워크스페이스 참여하기
             </button>
           </div>
         ) : (
           <>
             <button type="button" className={styles.workspaceButton}>
-              {t("mainHero.createWorkspace")}
+              워크스페이스 만들기
             </button>
 
             <div className={styles.authArea}>
               <button type="button" onClick={onLoginClick}>
-                {t("login.login")}
+                로그인
               </button>
 
               <button type="button" onClick={onSignupClick}>
-                {t("login.signup")}
+                회원가입
               </button>
             </div>
           </>

@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { useTranslation } from "react-i18next";
-
 import styles from "./SignupModal.module.css";
 
 import logoIcon2 from "../../../../assets/icons/logo2.svg";
@@ -48,9 +46,7 @@ const signup = async ({ name, email, password, passwordConfirm }) => {
     const error = new Error(data?.message || "회원가입에 실패했습니다.");
 
     error.status = response.status;
-
     error.code = data?.code;
-
     error.data = data?.data;
 
     throw error;
@@ -60,8 +56,6 @@ const signup = async ({ name, email, password, passwordConfirm }) => {
 };
 
 function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
-  const { t } = useTranslation();
-
   /* =========================================
      기본 입력값
   ========================================= */
@@ -164,7 +158,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
 
       setVerificationCode("");
 
-      setVerificationMessage(t("signup.errors.emailChanged"));
+      setVerificationMessage("이메일이 변경되었습니다. 다시 인증해주세요.");
 
       setVerificationMessageType("error");
     }
@@ -178,7 +172,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
     const trimmedEmail = email.trim();
 
     if (!trimmedEmail) {
-      setEmailMessage(t("signup.errors.emailRequired"));
+      setEmailMessage("이메일을 입력해주세요.");
 
       setEmailMessageType("error");
 
@@ -206,7 +200,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
 
       setRemainingSeconds(60);
 
-      setEmailMessage(result?.message || t("signup.messages.codeSent"));
+      setEmailMessage(result?.message || "인증번호가 이메일로 발송되었습니다.");
 
       setEmailMessageType("success");
     } catch (error) {
@@ -214,23 +208,23 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
 
       switch (error.code) {
         case "400INVALID_INPUT_VALUE":
-          setEmailMessage(t("signup.errors.invalidEmail"));
+          setEmailMessage("올바른 이메일 형식을 입력해주세요.");
           break;
 
         case "409DUPLICATE_EMAIL":
-          setEmailMessage(t("signup.errors.duplicateEmail"));
+          setEmailMessage("이미 가입된 이메일입니다.");
           break;
 
         case "429VERIFICATION_REQUEST_TOO_FREQUENT":
-          setEmailMessage(t("signup.errors.tooFrequent"));
+          setEmailMessage("잠시 후 다시 요청해주세요.");
           break;
 
         case "500EMAIL_SEND_FAILED":
-          setEmailMessage(t("signup.errors.emailSendFailed"));
+          setEmailMessage("이메일 발송에 실패했습니다.");
           break;
 
         default:
-          setEmailMessage(error.message || t("signup.errors.codeSendFailed"));
+          setEmailMessage(error.message || "인증번호 발송에 실패했습니다.");
       }
 
       setEmailMessageType("error");
@@ -249,7 +243,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
     const trimmedCode = verificationCode.trim();
 
     if (!trimmedEmail) {
-      setVerificationMessage(t("signup.errors.emailRequired"));
+      setVerificationMessage("이메일을 입력해주세요.");
 
       setVerificationMessageType("error");
 
@@ -257,7 +251,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
     }
 
     if (!trimmedCode) {
-      setVerificationMessage(t("signup.errors.codeRequired"));
+      setVerificationMessage("인증번호를 입력해주세요.");
 
       setVerificationMessageType("error");
 
@@ -265,7 +259,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
     }
 
     if (!/^\d{6}$/.test(trimmedCode)) {
-      setVerificationMessage(t("signup.errors.codeSixDigits"));
+      setVerificationMessage("인증번호 6자리를 입력해주세요.");
 
       setVerificationMessageType("error");
 
@@ -279,7 +273,6 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
 
       const result = await verifyEmailVerification({
         email: trimmedEmail,
-
         verificationCode: trimmedCode,
       });
 
@@ -287,7 +280,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
         setIsEmailVerified(true);
 
         setVerificationMessage(
-          result?.message || t("signup.messages.emailVerified"),
+          result?.message || "이메일 인증이 완료되었습니다.",
         );
 
         setVerificationMessageType("success");
@@ -295,7 +288,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
         return;
       }
 
-      setVerificationMessage(t("signup.errors.verificationFailed"));
+      setVerificationMessage("이메일 인증에 실패했습니다.");
 
       setVerificationMessageType("error");
     } catch (error) {
@@ -305,28 +298,30 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
 
       switch (error.code) {
         case "400INVALID_INPUT_VALUE":
-          setVerificationMessage(t("signup.errors.invalidVerificationInput"));
+          setVerificationMessage("입력한 정보를 확인해주세요.");
           break;
 
         case "400INVALID_VERIFICATION_CODE":
-          setVerificationMessage(t("signup.errors.invalidCode"));
+          setVerificationMessage("인증번호가 일치하지 않습니다.");
           break;
 
         case "400EXPIRED_VERIFICATION_CODE":
-          setVerificationMessage(t("signup.errors.expiredCode"));
+          setVerificationMessage(
+            "인증번호가 만료되었습니다. 다시 요청해주세요.",
+          );
           break;
 
         case "400VERIFICATION_ATTEMPTS_EXCEEDED":
-          setVerificationMessage(t("signup.errors.attemptsExceeded"));
+          setVerificationMessage("인증번호 입력 가능 횟수를 초과했습니다.");
           break;
 
         case "404EMAIL_VERIFICATION_NOT_FOUND":
-          setVerificationMessage(t("signup.errors.requestNotFound"));
+          setVerificationMessage("이메일 인증 요청을 찾을 수 없습니다.");
           break;
 
         default:
           setVerificationMessage(
-            error.message || t("signup.errors.verificationFailed"),
+            error.message || "이메일 인증에 실패했습니다.",
           );
       }
 
@@ -356,43 +351,43 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
     ========================================= */
 
     if (!trimmedName) {
-      setSignupMessage(t("signup.errors.nameRequired"));
+      setSignupMessage("이름을 입력해주세요.");
 
       return;
     }
 
     if (!trimmedEmail) {
-      setSignupMessage(t("signup.errors.workEmailRequired"));
+      setSignupMessage("업무용 이메일을 입력해주세요.");
 
       return;
     }
 
     if (!isEmailVerified) {
-      setSignupMessage(t("signup.errors.emailVerificationRequired"));
+      setSignupMessage("이메일 인증을 완료해주세요.");
 
       return;
     }
 
     if (!password) {
-      setSignupMessage(t("signup.errors.passwordRequired"));
+      setSignupMessage("비밀번호를 입력해주세요.");
 
       return;
     }
 
     if (password.length < 8) {
-      setSignupMessage(t("signup.errors.passwordTooShort"));
+      setSignupMessage("비밀번호는 8자 이상 입력해주세요.");
 
       return;
     }
 
     if (!passwordCheck) {
-      setSignupMessage(t("signup.errors.passwordCheckRequired"));
+      setSignupMessage("비밀번호 확인을 입력해주세요.");
 
       return;
     }
 
     if (password !== passwordCheck) {
-      setSignupMessage(t("signup.errors.passwordMismatch"));
+      setSignupMessage("비밀번호가 일치하지 않습니다.");
 
       return;
     }
@@ -521,16 +516,18 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
       >
         <img className={styles.logo} src={logoIcon2} alt="RelAi" />
 
-        <h2>{t("signup.title")}</h2>
+        <h2>함께 시작해볼까요?</h2>
 
-        <p className={styles.description}>{t("signup.description")}</p>
+        <p className={styles.description}>
+          글로벌 협업을 위한 계정을 만들어보세요.
+        </p>
 
         <div className={styles.formGrid}>
           {/* LEFT */}
 
           <div className={styles.leftColumn}>
             <div className={styles.field}>
-              <label htmlFor="signupName">{t("signup.name")}</label>
+              <label htmlFor="signupName">이름</label>
 
               <input
                 id="signupName"
@@ -541,7 +538,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="signupEmail">{t("signup.workEmail")}</label>
+              <label htmlFor="signupEmail">업무용 이메일</label>
 
               <div className={styles.inlineInput}>
                 <input
@@ -561,14 +558,12 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
                   }
                 >
                   {isEmailVerified
-                    ? t("signup.verified")
+                    ? "인증 완료"
                     : isSendingEmail
-                      ? t("signup.sending")
+                      ? "전송 중..."
                       : remainingSeconds > 0
-                        ? t("signup.seconds", {
-                            count: remainingSeconds,
-                          })
-                        : t("signup.verify")}
+                        ? `${remainingSeconds}초`
+                        : "인증"}
                 </button>
               </div>
 
@@ -591,7 +586,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
                   type="text"
                   inputMode="numeric"
                   maxLength={6}
-                  placeholder={t("signup.codePlaceholder")}
+                  placeholder="인증번호 6자리"
                   value={verificationCode}
                   disabled={!isVerificationSent || isEmailVerified}
                   onChange={(e) => {
@@ -609,10 +604,10 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
                   }
                 >
                   {isEmailVerified
-                    ? t("signup.complete")
+                    ? "완료"
                     : isVerifyingEmail
-                      ? t("signup.checking")
-                      : t("signup.complete")}
+                      ? "확인 중..."
+                      : "완료"}
                 </button>
               </div>
 
@@ -634,13 +629,13 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
 
           <div className={styles.rightColumn}>
             <div className={styles.field}>
-              <label htmlFor="signupPassword">{t("signup.password")}</label>
+              <label htmlFor="signupPassword">비밀번호</label>
 
               <div className={styles.passwordWrapper}>
                 <input
                   id="signupPassword"
                   type={showPassword ? "text" : "password"}
-                  placeholder={t("signup.passwordPlaceholder")}
+                  placeholder="8자 이상"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -649,9 +644,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
                   type="button"
                   className={styles.eyeButton}
                   aria-label={
-                    showPassword
-                      ? t("signup.hidePassword")
-                      : t("signup.showPassword")
+                    showPassword ? "비밀번호 숨기기" : "비밀번호 보기"
                   }
                   onClick={() => setShowPassword((prev) => !prev)}
                 >
@@ -661,15 +654,13 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="signupPasswordCheck">
-                {t("signup.passwordCheck")}
-              </label>
+              <label htmlFor="signupPasswordCheck">비밀번호 확인</label>
 
               <div className={styles.passwordWrapper}>
                 <input
                   id="signupPasswordCheck"
                   type={showPasswordCheck ? "text" : "password"}
-                  placeholder={t("signup.passwordCheckPlaceholder")}
+                  placeholder="비밀번호 다시 입력"
                   value={passwordCheck}
                   onChange={(e) => setPasswordCheck(e.target.value)}
                 />
@@ -678,9 +669,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
                   type="button"
                   className={styles.eyeButton}
                   aria-label={
-                    showPasswordCheck
-                      ? t("signup.hidePassword")
-                      : t("signup.showPassword")
+                    showPasswordCheck ? "비밀번호 숨기기" : "비밀번호 보기"
                   }
                   onClick={() => setShowPasswordCheck((prev) => !prev)}
                 >
@@ -699,7 +688,7 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
               onClick={handleSignup}
               disabled={isSigningUp}
             >
-              {isSigningUp ? "가입 중..." : t("signup.signup")}
+              {isSigningUp ? "가입 중..." : "회원가입"}
             </button>
           </div>
         </div>
@@ -707,16 +696,16 @@ function SignupModal({ onClose, onLoginClick, onSignupComplete }) {
         <div className={styles.divider}>
           <span />
 
-          <p>{t("signup.or")}</p>
+          <p>또는</p>
 
           <span />
         </div>
 
         <div className={styles.loginArea}>
-          <span>{t("signup.alreadyHaveAccount")}</span>
+          <span>이미 계정이 있으신가요?</span>
 
           <button type="button" onClick={onLoginClick}>
-            {t("login.login")}
+            로그인
           </button>
         </div>
       </section>
