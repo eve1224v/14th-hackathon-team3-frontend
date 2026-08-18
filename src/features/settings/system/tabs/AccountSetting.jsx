@@ -1,27 +1,24 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 
 import PasswordChangeModal from "../components/PasswordChangeModal";
 
 import pencilIcon from "../../../../assets/icons/pencilIcon.svg";
 
 function AccountSetting({ userEmail, onLogout, styles }) {
-  const { t } = useTranslation();
-
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   return (
     <>
       <div className={styles.systemPage}>
-        <h3>{t("account.title")}</h3>
+        <h3>계정</h3>
 
-        <h4>{t("account.basicInfo")}</h4>
+        <h4>기본 정보</h4>
 
         <div className={styles.systemGroup}>
           <div className={styles.systemRow}>
             <div>
               <strong>
-                {t("account.id")} <span>(Email)</span>
+                아이디 <span>(Email)</span>
               </strong>
             </div>
 
@@ -30,7 +27,7 @@ function AccountSetting({ userEmail, onLogout, styles }) {
 
           <div className={styles.systemRow}>
             <div>
-              <strong>{t("account.password")}</strong>
+              <strong>비밀번호</strong>
             </div>
 
             <div className={styles.passwordArea}>
@@ -43,7 +40,7 @@ function AccountSetting({ userEmail, onLogout, styles }) {
               >
                 <img src={pencilIcon} alt="" />
 
-                <span>{t("account.change")}</span>
+                <span>변경</span>
               </button>
             </div>
           </div>
@@ -52,13 +49,13 @@ function AccountSetting({ userEmail, onLogout, styles }) {
         <div className={styles.dangerSection}>
           <div className={styles.dangerRow}>
             <div>
-              <strong>{t("account.logout")}</strong>
+              <strong>로그아웃</strong>
 
-              <p>{t("account.logoutDescription")}</p>
+              <p>현재 계정에서 로그아웃합니다.</p>
             </div>
 
             <button type="button" onClick={onLogout}>
-              {t("account.logout")}
+              로그아웃
             </button>
           </div>
         </div>

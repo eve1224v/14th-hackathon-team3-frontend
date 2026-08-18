@@ -1,5 +1,3 @@
-import { useTranslation } from "react-i18next";
-
 function GeneralSetting({
   systemForm,
   onChange,
@@ -7,31 +5,43 @@ function GeneralSetting({
   errorMessage,
   styles,
 }) {
-  const { t } = useTranslation();
-
   return (
     <div className={styles.systemPage}>
-      <h3>{t("settings.general")}</h3>
+      <h3>일반</h3>
 
-      <h4>{t("settings.workspaceInfo")}</h4>
+      <h4>워크스페이스 정보</h4>
+
+      {/* =========================
+          Loading
+      ========================= */}
 
       {isLoading && (
         <p className={styles.generalStateText}>
-          {t("settings.workspaceLoading")}
+          워크스페이스 정보를 불러오는 중입니다.
         </p>
       )}
+
+      {/* =========================
+          Error
+      ========================= */}
 
       {!isLoading && errorMessage && (
         <p className={styles.generalErrorText}>{errorMessage}</p>
       )}
 
+      {/* =========================
+          Workspace
+      ========================= */}
+
       {!isLoading && !errorMessage && (
         <div className={styles.systemGroup}>
+          {/* 워크스페이스 이름 */}
+
           <div className={styles.systemRow}>
             <div>
-              <strong>{t("settings.workspaceName")}</strong>
+              <strong>워크스페이스 이름</strong>
 
-              <p>{t("settings.workspaceNameDescription")}</p>
+              <p>워크스페이스 이름을 설정합니다.</p>
             </div>
 
             <input
@@ -41,11 +51,13 @@ function GeneralSetting({
             />
           </div>
 
+          {/* 회사명 */}
+
           <div className={styles.systemRow}>
             <div>
-              <strong>{t("settings.companyName")}</strong>
+              <strong>회사명</strong>
 
-              <p>{t("settings.companyNameDescription")}</p>
+              <p>소속 회사명을 설정합니다.</p>
             </div>
 
             <input
@@ -55,11 +67,13 @@ function GeneralSetting({
             />
           </div>
 
+          {/* 파트너사 */}
+
           <div className={styles.systemRow}>
             <div>
-              <strong>{t("settings.partnerCompany")}</strong>
+              <strong>파트너사</strong>
 
-              <p>{t("settings.partnerCompanyDescription")}</p>
+              <p>협업 중인 파트너사를 설정합니다.</p>
             </div>
 
             <input
@@ -70,32 +84,6 @@ function GeneralSetting({
           </div>
         </div>
       )}
-
-      <div className={styles.systemSection}>
-        <h4>{t("settings.basicSettings")}</h4>
-
-        <div className={styles.systemGroup}>
-          <div className={styles.systemRow}>
-            <div>
-              <strong>{t("settings.language")}</strong>
-
-              <p>{t("settings.languageDescription")}</p>
-            </div>
-
-            <select
-              name="language"
-              value={systemForm.language}
-              onChange={onChange}
-            >
-              <option value="ko">한국어</option>
-
-              <option value="en">English</option>
-
-              <option value="ja">日本語</option>
-            </select>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

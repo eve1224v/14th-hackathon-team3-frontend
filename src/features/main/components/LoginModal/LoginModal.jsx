@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 
 import styles from "./LoginModal.module.css";
 
@@ -7,13 +6,10 @@ import logoIcon2 from "../../../../assets/icons/logo2.svg";
 import eyeIcon from "../../../../assets/icons/eyeIcon.svg";
 
 import { login } from "../../../../api/authApi";
-import { getUserLanguage } from "../../../../api/userApi";
 
 import FindPasswordModal from "../FindPasswordModal/FindPasswordModal";
 
 function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
-  const { t, i18n } = useTranslation();
-
   const [email, setEmail] = useState("");
 
   const [password, setPassword] = useState("");
@@ -36,13 +32,13 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
     setErrorMessage("");
 
     if (!trimmedEmail) {
-      setErrorMessage(t("login.errors.emailRequired"));
+      setErrorMessage("이메일을 입력해주세요.");
 
       return;
     }
 
     if (!password) {
-      setErrorMessage(t("login.errors.passwordRequired"));
+      setErrorMessage("비밀번호를 입력해주세요.");
 
       return;
     }
@@ -63,7 +59,7 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
       const userId = result?.data?.userId;
 
       if (!accessToken) {
-        setErrorMessage(t("login.errors.noAccessToken"));
+        setErrorMessage("로그인 토큰을 받지 못했습니다.");
 
         return;
       }
@@ -111,35 +107,7 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
       localStorage.removeItem("selectedWorkspace");
 
       /* =========================================
-         5. 사용자 기본 언어 조회
-      ========================================= */
-
-      try {
-        const languageResult = await getUserLanguage();
-
-        console.log("로그인 후 기본 언어 조회 성공:", languageResult);
-
-        const language = languageResult?.data?.language || "ko";
-
-        localStorage.setItem("userLanguage", language);
-
-        if (i18n.language !== language) {
-          await i18n.changeLanguage(language);
-        }
-      } catch (languageError) {
-        console.error("로그인 후 기본 언어 조회 실패:", languageError);
-
-        const fallbackLanguage = localStorage.getItem("userLanguage") || "ko";
-
-        localStorage.setItem("userLanguage", fallbackLanguage);
-
-        if (i18n.language !== fallbackLanguage) {
-          await i18n.changeLanguage(fallbackLanguage);
-        }
-      }
-
-      /* =========================================
-         6. 사용자 정보 갱신
+         5. 사용자 정보 갱신
       ========================================= */
 
       window.dispatchEvent(new Event("userInfoUpdated"));
@@ -147,7 +115,7 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
       window.dispatchEvent(new Event("authChanged"));
 
       /* =========================================
-         7. 기존 사용자 → 메인
+         6. 기존 사용자 → 메인
       ========================================= */
 
       if (onLoginComplete) {
@@ -162,18 +130,18 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
 
       switch (error.code) {
         case "400INVALID_INPUT_VALUE":
-          setErrorMessage(t("login.errors.invalidInput"));
+          setErrorMessage("이메일 또는 비밀번호를 확인해주세요.");
 
           break;
 
         case "401UNAUTHORIZED":
         case "401INVALID_LOGIN_CREDENTIALS":
-          setErrorMessage(t("login.errors.unauthorized"));
+          setErrorMessage("이메일 또는 비밀번호가 일치하지 않습니다.");
 
           break;
 
         default:
-          setErrorMessage(error.message || t("login.errors.loginFailed"));
+          setErrorMessage(error.message || "로그인에 실패했습니다.");
       }
     } finally {
       setIsLoading(false);
@@ -206,15 +174,15 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
       >
         <img className={styles.logo} src={logoIcon2} alt="RelAi" />
 
-        <h2>{t("login.title")}</h2>
+        <h2>다시 만나서 반가워요.</h2>
 
-        <p className={styles.description}>{t("login.description")}</p>
+        <p className={styles.description}>글로벌 협업을 계속하세요.</p>
 
         <div className={styles.form}>
           {/* 이메일 */}
 
           <div className={styles.field}>
-            <label htmlFor="loginEmail">{t("login.workEmail")}</label>
+            <label htmlFor="loginEmail">업무용 이메일</label>
 
             <input
               id="loginEmail"
@@ -234,13 +202,13 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
           {/* 비밀번호 */}
 
           <div className={styles.field}>
-            <label htmlFor="loginPassword">{t("login.password")}</label>
+            <label htmlFor="loginPassword">비밀번호</label>
 
             <div className={styles.passwordWrapper}>
               <input
                 id="loginPassword"
                 type={showPassword ? "text" : "password"}
-                placeholder={t("login.passwordPlaceholder")}
+                placeholder="비밀번호 입력"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -254,11 +222,7 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
               <button
                 type="button"
                 className={styles.eyeButton}
-                aria-label={
-                  showPassword
-                    ? t("login.hidePassword")
-                    : t("login.showPassword")
-                }
+                aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
                 onClick={() => setShowPassword((prev) => !prev)}
               >
                 <img src={eyeIcon} alt="" />
@@ -274,7 +238,7 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
               className={styles.findPassword}
               onClick={() => setShowFindPassword(true)}
             >
-              {t("login.forgotPassword")}
+              비밀번호를 잊으셨나요?
             </button>
           </div>
 
@@ -288,15 +252,15 @@ function LoginModal({ onClose, onSignupClick, onLoginComplete }) {
             onClick={handleLogin}
             disabled={isLoading}
           >
-            {isLoading ? t("login.loggingIn") : t("login.login")}
+            {isLoading ? "로그인 중..." : "로그인"}
           </button>
         </div>
 
         <div className={styles.signupArea}>
-          <span>{t("login.noAccount")}</span>
+          <span>아직 계정이 없으신가요?</span>
 
           <button type="button" onClick={onSignupClick}>
-            {t("login.signup")}
+            회원가입
           </button>
         </div>
       </section>

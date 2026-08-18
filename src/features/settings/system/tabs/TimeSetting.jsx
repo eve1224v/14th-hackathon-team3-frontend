@@ -1,5 +1,3 @@
-import { useTranslation } from "react-i18next";
-
 /* =========================================
    지역 → 시간대
 ========================================= */
@@ -21,8 +19,6 @@ function TimeSetting({
   isLoading,
   errorMessage,
 }) {
-  const { t } = useTranslation();
-
   /* =========================================
      지역 변경
   ========================================= */
@@ -71,9 +67,9 @@ function TimeSetting({
 
   return (
     <div className={styles.systemPage}>
-      <h3>{t("time.title")}</h3>
+      <h3>국가 및 시간</h3>
 
-      <h4>{t("time.regionSettings")}</h4>
+      <h4>지역 설정</h4>
 
       {isLoading ? (
         <p className={styles.generalStateText}>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 
 import styles from "./SystemSettingModal.module.css";
 
@@ -17,14 +16,10 @@ import closeIcon from "../../../assets/icons/closeIcon.svg";
 
 import { getWorkspaceDetail } from "../../../api/workspaceApi";
 
-import { updateUserLanguage } from "../../../api/userApi";
-
 import { getMyRegion, updateMyRegion } from "../../../api/regionApi";
 
 function SystemSettingModal() {
   const navigate = useNavigate();
-
-  const { t, i18n } = useTranslation();
 
   /* =========================================
      현재 탭
@@ -40,12 +35,6 @@ function SystemSettingModal() {
     workspaceName: "",
     companyName: "",
     partnerCompany: "",
-
-    /*
-      서버 조회 없이 localStorage에서
-      바로 사용하는 언어
-    */
-    language: localStorage.getItem("userLanguage") || "ko",
 
     /*
       업무 지역 API
@@ -288,33 +277,16 @@ function SystemSettingModal() {
       setIsSaving(true);
 
       /* =====================================
-         일반 설정 저장
+         일반 설정
+
+         현재는 별도의 저장 API 없음.
+         조회된 정보만 보여주는 상태.
       ===================================== */
 
       if (activeTab === "general") {
-        const savedLanguage = localStorage.getItem("userLanguage") || "ko";
+        navigate(-1);
 
-        /*
-          같은 언어면 API 호출 안 함
-        */
-
-        if (savedLanguage !== systemForm.language) {
-          const result = await updateUserLanguage(systemForm.language);
-
-          const changedLanguage = result?.data?.language;
-
-          if (changedLanguage) {
-            localStorage.setItem("userLanguage", changedLanguage);
-
-            await i18n.changeLanguage(changedLanguage);
-
-            setSystemForm((prev) => ({
-              ...prev,
-
-              language: changedLanguage,
-            }));
-          }
-        }
+        return;
       }
 
       /* =====================================
@@ -348,6 +320,17 @@ function SystemSettingModal() {
       }
 
       /* =====================================
+         알림 탭
+
+         현재 별도 저장 API 없으면
+         화면 상태만 유지
+      ===================================== */
+
+      if (activeTab === "notification") {
+        console.log("알림 설정:", notificationSettings);
+      }
+
+      /* =====================================
          저장 완료 → 모달 닫기
       ===================================== */
 
@@ -377,7 +360,7 @@ function SystemSettingModal() {
         }
       }
 
-      alert(error.message || t("common.saveError"));
+      alert(error.message || "설정을 저장하지 못했습니다.");
     } finally {
       setIsSaving(false);
     }
@@ -408,7 +391,7 @@ function SystemSettingModal() {
         ================================= */}
 
         <div className={styles.systemSidebar}>
-          <h2>{t("settings.title")}</h2>
+          <h2>시스템 설정</h2>
 
           <nav className={styles.systemNavigation}>
             {/* 일반 */}
@@ -422,7 +405,7 @@ function SystemSettingModal() {
             >
               <img src={settingIcon} alt="" className={styles.systemNavIcon} />
 
-              <span>{t("settings.general")}</span>
+              <span>일반</span>
             </button>
 
             {/* 알림 */}
@@ -436,7 +419,7 @@ function SystemSettingModal() {
             >
               <img src={notifyIcon2} alt="" className={styles.systemNavIcon} />
 
-              <span>{t("settings.notification")}</span>
+              <span>알림</span>
             </button>
 
             {/* 국가 및 시간 */}
@@ -450,7 +433,7 @@ function SystemSettingModal() {
             >
               <img src={clockIcon} alt="" className={styles.systemNavIcon} />
 
-              <span>{t("settings.countryTime")}</span>
+              <span>국가 및 시간</span>
             </button>
 
             {/* 계정 */}
@@ -464,7 +447,7 @@ function SystemSettingModal() {
             >
               <img src={profileIcon} alt="" className={styles.systemNavIcon} />
 
-              <span>{t("settings.account")}</span>
+              <span>계정</span>
             </button>
           </nav>
         </div>
@@ -480,7 +463,7 @@ function SystemSettingModal() {
             type="button"
             className={styles.closeButton}
             onClick={handleClose}
-            aria-label={t("common.close")}
+            aria-label="닫기"
           >
             <img src={closeIcon} alt="" />
           </button>
@@ -551,7 +534,7 @@ function SystemSettingModal() {
                 onClick={handleClose}
                 disabled={isSaving}
               >
-                {t("common.cancel")}
+                취소
               </button>
 
               <button
@@ -564,7 +547,7 @@ function SystemSettingModal() {
                   (activeTab === "time" && isRegionLoading)
                 }
               >
-                {isSaving ? t("common.saving") : t("common.save")}
+                {isSaving ? "저장 중..." : "저장"}
               </button>
             </div>
           )}

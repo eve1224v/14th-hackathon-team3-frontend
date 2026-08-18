@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 
 import styles from "./FindPasswordModal.module.css";
 
@@ -10,8 +9,6 @@ import {
 } from "../../../../api/authApi";
 
 function FindPasswordModal({ onClose }) {
-  const { t } = useTranslation();
-
   const [step, setStep] = useState("verify");
 
   const [email, setEmail] = useState("");
@@ -45,7 +42,7 @@ function FindPasswordModal({ onClose }) {
     setSuccessMessage("");
 
     if (!trimmedEmail) {
-      setErrorMessage(t("findPassword.errors.emailRequired"));
+      setErrorMessage("이메일을 입력해주세요.");
 
       return;
     }
@@ -60,24 +57,22 @@ function FindPasswordModal({ onClose }) {
       setCodeSent(true);
 
       setSuccessMessage(
-        result?.message || t("findPassword.messages.checkResetGuide"),
+        result?.message || "비밀번호 재설정 안내를 확인해주세요.",
       );
     } catch (error) {
       console.error("인증번호 요청 실패:", error);
 
       switch (error.code) {
         case "400INVALID_INPUT_VALUE":
-          setErrorMessage(t("findPassword.errors.invalidEmail"));
+          setErrorMessage("이메일 형식을 확인해주세요.");
           break;
 
         case "500EMAIL_SEND_FAILED":
-          setErrorMessage(t("findPassword.errors.emailSendFailed"));
+          setErrorMessage("이메일 발송에 실패했습니다.");
           break;
 
         default:
-          setErrorMessage(
-            error.message || t("findPassword.errors.codeRequestFailed"),
-          );
+          setErrorMessage(error.message || "인증번호 요청에 실패했습니다.");
       }
     } finally {
       setIsSendingCode(false);
@@ -97,13 +92,13 @@ function FindPasswordModal({ onClose }) {
     setSuccessMessage("");
 
     if (!trimmedEmail) {
-      setErrorMessage(t("findPassword.errors.emailRequired"));
+      setErrorMessage("이메일을 입력해주세요.");
 
       return;
     }
 
     if (!trimmedCode) {
-      setErrorMessage(t("findPassword.errors.verificationCodeRequired"));
+      setErrorMessage("인증 코드를 입력해주세요.");
 
       return;
     }
@@ -121,7 +116,7 @@ function FindPasswordModal({ onClose }) {
       const token = result?.data?.resetToken;
 
       if (!token) {
-        setErrorMessage(t("findPassword.errors.noResetToken"));
+        setErrorMessage("비밀번호 재설정 토큰을 받지 못했습니다.");
 
         return;
       }
@@ -134,31 +129,27 @@ function FindPasswordModal({ onClose }) {
 
       switch (error.code) {
         case "400INVALID_INPUT_VALUE":
-          setErrorMessage(t("findPassword.errors.invalidInput"));
+          setErrorMessage("입력한 정보를 확인해주세요.");
           break;
 
         case "400INVALID_VERIFICATION_CODE":
-          setErrorMessage(t("findPassword.errors.invalidVerificationCode"));
+          setErrorMessage("인증번호가 일치하지 않습니다.");
           break;
 
         case "400EXPIRED_VERIFICATION_CODE":
-          setErrorMessage(t("findPassword.errors.expiredVerificationCode"));
+          setErrorMessage("인증번호가 만료되었거나 이미 사용되었습니다.");
           break;
 
         case "400VERIFICATION_ATTEMPTS_EXCEEDED":
-          setErrorMessage(
-            t("findPassword.errors.verificationAttemptsExceeded"),
-          );
+          setErrorMessage("인증번호 입력 가능 횟수를 초과했습니다.");
           break;
 
         case "400PASSWORD_RESET_NOT_VERIFIED":
-          setErrorMessage(t("findPassword.errors.resetRequestNotFound"));
+          setErrorMessage("비밀번호 재설정 인증 요청을 찾을 수 없습니다.");
           break;
 
         default:
-          setErrorMessage(
-            error.message || t("findPassword.errors.verificationFailed"),
-          );
+          setErrorMessage(error.message || "인증번호 확인에 실패했습니다.");
       }
     } finally {
       setIsVerifying(false);
@@ -174,13 +165,13 @@ function FindPasswordModal({ onClose }) {
     setSuccessMessage("");
 
     if (!newPassword) {
-      setErrorMessage(t("findPassword.errors.newPasswordRequired"));
+      setErrorMessage("새 비밀번호를 입력해주세요.");
 
       return;
     }
 
     if (newPassword.length < 8) {
-      setErrorMessage(t("findPassword.errors.passwordTooShort"));
+      setErrorMessage("비밀번호는 8자 이상 입력해주세요.");
 
       return;
     }
@@ -188,25 +179,27 @@ function FindPasswordModal({ onClose }) {
     const passwordByteLength = new TextEncoder().encode(newPassword).length;
 
     if (passwordByteLength > 72) {
-      setErrorMessage(t("findPassword.errors.passwordTooLong"));
+      setErrorMessage("비밀번호는 72바이트 이하로 입력해주세요.");
 
       return;
     }
 
     if (!newPasswordConfirm) {
-      setErrorMessage(t("findPassword.errors.passwordConfirmRequired"));
+      setErrorMessage("새 비밀번호를 다시 입력해주세요.");
 
       return;
     }
 
     if (newPassword !== newPasswordConfirm) {
-      setErrorMessage(t("findPassword.errors.passwordMismatch"));
+      setErrorMessage("비밀번호가 일치하지 않습니다.");
 
       return;
     }
 
     if (!resetToken) {
-      setErrorMessage(t("findPassword.errors.noResetVerification"));
+      setErrorMessage(
+        "비밀번호 재설정 인증 정보가 없습니다. 다시 인증해주세요.",
+      );
 
       return;
     }
@@ -223,9 +216,7 @@ function FindPasswordModal({ onClose }) {
 
       console.log("비밀번호 변경 성공:", result);
 
-      setSuccessMessage(
-        result?.message || t("findPassword.messages.passwordChanged"),
-      );
+      setSuccessMessage(result?.message || "비밀번호가 변경되었습니다.");
 
       setStep("success");
     } catch (error) {
@@ -233,29 +224,31 @@ function FindPasswordModal({ onClose }) {
 
       switch (error.code) {
         case "400INVALID_INPUT_VALUE":
-          setErrorMessage(t("findPassword.errors.invalidPassword"));
+          setErrorMessage("입력한 비밀번호를 확인해주세요.");
           break;
 
         case "400PASSWORD_MISMATCH":
-          setErrorMessage(t("findPassword.errors.passwordMismatch"));
+          setErrorMessage("비밀번호가 일치하지 않습니다.");
           break;
 
         case "400PASSWORD_RESET_NOT_VERIFIED":
-          setErrorMessage(t("findPassword.errors.resetNotVerified"));
+          setErrorMessage(
+            "비밀번호 재설정 인증이 완료되지 않았거나 이미 사용되었습니다.",
+          );
           break;
 
         case "400INVALID_PASSWORD_RESET_TOKEN":
-          setErrorMessage(t("findPassword.errors.invalidResetToken"));
+          setErrorMessage("비밀번호 재설정 인증 정보가 올바르지 않습니다.");
           break;
 
         case "400EXPIRED_PASSWORD_RESET_TOKEN":
-          setErrorMessage(t("findPassword.errors.expiredResetToken"));
+          setErrorMessage(
+            "비밀번호 재설정 인증 시간이 만료되었습니다. 다시 인증해주세요.",
+          );
           break;
 
         default:
-          setErrorMessage(
-            error.message || t("findPassword.errors.resetFailed"),
-          );
+          setErrorMessage(error.message || "비밀번호 변경에 실패했습니다.");
       }
     } finally {
       setIsResetting(false);
@@ -273,12 +266,10 @@ function FindPasswordModal({ onClose }) {
           className={styles.modal}
           onMouseDown={(e) => e.stopPropagation()}
         >
-          <h2 className={styles.title}>{t("findPassword.title")}</h2>
+          <h2 className={styles.title}>비밀번호 찾기</h2>
 
           <div className={styles.emailArea}>
-            <label htmlFor="findPasswordEmail">
-              {t("findPassword.emailVerification")}
-            </label>
+            <label htmlFor="findPasswordEmail">이메일 인증</label>
 
             <input
               id="findPasswordEmail"
@@ -300,10 +291,10 @@ function FindPasswordModal({ onClose }) {
               disabled={isSendingCode}
             >
               {isSendingCode
-                ? t("findPassword.sending")
+                ? "전송 중..."
                 : codeSent
-                  ? t("findPassword.resend")
-                  : t("findPassword.getCode")}
+                  ? "다시 받기"
+                  : "코드 받기"}
             </button>
 
             {successMessage && (
@@ -312,14 +303,12 @@ function FindPasswordModal({ onClose }) {
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="verificationCode">
-              {t("findPassword.verificationCode")}
-            </label>
+            <label htmlFor="verificationCode">인증 코드</label>
 
             <input
               id="verificationCode"
               type="text"
-              placeholder={t("findPassword.verificationCodePlaceholder")}
+              placeholder="인증 코드 입력"
               value={verificationCode}
               onChange={(e) => {
                 setVerificationCode(e.target.value);
@@ -344,7 +333,7 @@ function FindPasswordModal({ onClose }) {
               className={styles.cancelButton}
               onClick={onClose}
             >
-              {t("common.cancel")}
+              취소
             </button>
 
             <button
@@ -353,9 +342,7 @@ function FindPasswordModal({ onClose }) {
               onClick={handleVerify}
               disabled={isVerifying}
             >
-              {isVerifying
-                ? t("findPassword.verifying")
-                : t("findPassword.verify")}
+              {isVerifying ? "인증 중..." : "인증"}
             </button>
           </div>
         </section>
@@ -374,15 +361,15 @@ function FindPasswordModal({ onClose }) {
           className={styles.modal}
           onMouseDown={(e) => e.stopPropagation()}
         >
-          <h2 className={styles.title}>{t("findPassword.title")}</h2>
+          <h2 className={styles.title}>비밀번호 찾기</h2>
 
           <div className={styles.field}>
-            <label htmlFor="newPassword">{t("findPassword.newPassword")}</label>
+            <label htmlFor="newPassword">새 비밀번호</label>
 
             <input
               id="newPassword"
               type="password"
-              placeholder={t("findPassword.passwordPlaceholder")}
+              placeholder="8자 이상"
               value={newPassword}
               onChange={(e) => {
                 setNewPassword(e.target.value);
@@ -394,7 +381,7 @@ function FindPasswordModal({ onClose }) {
             <input
               id="newPasswordConfirm"
               type="password"
-              placeholder={t("findPassword.passwordConfirmPlaceholder")}
+              placeholder="새 비밀번호 확인"
               value={newPasswordConfirm}
               onChange={(e) => {
                 setNewPasswordConfirm(e.target.value);
@@ -419,7 +406,7 @@ function FindPasswordModal({ onClose }) {
               className={styles.cancelButton}
               onClick={onClose}
             >
-              {t("common.cancel")}
+              취소
             </button>
 
             <button
@@ -428,9 +415,7 @@ function FindPasswordModal({ onClose }) {
               onClick={handleResetPassword}
               disabled={isResetting}
             >
-              {isResetting
-                ? t("findPassword.changing")
-                : t("findPassword.complete")}
+              {isResetting ? "변경 중..." : "완료"}
             </button>
           </div>
         </section>
@@ -448,14 +433,11 @@ function FindPasswordModal({ onClose }) {
         className={styles.successModal}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <h2>{t("findPassword.successTitle")}</h2>
+        <h2>비밀번호 변경 완료</h2>
 
         <p>
-          {successMessage || t("findPassword.messages.passwordChanged")}
-
-          <br />
-
-          {t("findPassword.loginWithNewPassword")}
+          {successMessage || "비밀번호가 변경되었습니다."}
+          <br />새 비밀번호로 로그인해주세요.
         </p>
 
         <button
@@ -463,7 +445,7 @@ function FindPasswordModal({ onClose }) {
           className={styles.successButton}
           onClick={onClose}
         >
-          {t("common.confirm")}
+          확인
         </button>
       </section>
     </div>

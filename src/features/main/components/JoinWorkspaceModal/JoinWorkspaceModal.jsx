@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 
 import styles from "./JoinWorkspaceModal.module.css";
 
@@ -10,8 +9,6 @@ import { ROUTES } from "../../../../router/routes.constant";
 
 function JoinWorkspaceModal({ onClose }) {
   const navigate = useNavigate();
-
-  const { t } = useTranslation();
 
   const [inviteCode, setInviteCode] = useState("");
 
@@ -111,26 +108,26 @@ function JoinWorkspaceModal({ onClose }) {
               TITLE
           ========================================= */}
 
-          <h2 className={styles.title}>{t("joinWorkspace.title")}</h2>
+          <h2 className={styles.title}>초대 코드로 입장하기</h2>
 
           {/* =========================================
               DESCRIPTION
           ========================================= */}
 
-          <p className={styles.description}>{t("joinWorkspace.description")}</p>
+          <p className={styles.description}>받은 초대 코드를 입력해 주세요.</p>
 
           {/* =========================================
               FORM
           ========================================= */}
 
           <div className={styles.formArea}>
-            <label htmlFor="inviteCode">{t("joinWorkspace.inviteCode")}</label>
+            <label htmlFor="inviteCode">초대 코드</label>
 
             <input
               id="inviteCode"
               type="text"
               value={inviteCode}
-              placeholder={t("joinWorkspace.inviteCodePlaceholder")}
+              placeholder="초대 링크 또는 초대 코드를 입력해주세요."
               onChange={(e) => setInviteCode(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -145,7 +142,7 @@ function JoinWorkspaceModal({ onClose }) {
               onClick={handleEnter}
               disabled={!inviteCode.trim()}
             >
-              {t("joinWorkspace.enter")}
+              입장
             </button>
           </div>
         </div>
