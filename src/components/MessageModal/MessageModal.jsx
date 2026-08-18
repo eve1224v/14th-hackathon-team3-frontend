@@ -13,6 +13,9 @@ import {
   getMessageRecipients,
   getRecentConversations,
   getOrCreateDirectConversation,
+  getConversationMessages,
+  previewTranslation,
+  sendConversationMessage,
 } from "../../api/messageApi";
 
 function MessageModal({ onClose }) {
@@ -69,92 +72,43 @@ function MessageModal({ onClose }) {
   const [conversationError, setConversationError] = useState("");
 
   /* =========================
-     채팅 메시지
-     아직 Mock
+     메시지
   ========================= */
 
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
+  const [messages, setMessages] = useState([]);
 
-      sender: "me",
+  const [isMessagesLoading, setIsMessagesLoading] = useState(false);
 
-      text: "내일까지 봐주시고, 문제 있으면 말씀해주세요!",
-
-      translatedText:
-        "Hi Emily, Could you please review this by 3PM tomorrow (BST)? If you find any issues, let me know!",
-
-      time: "14:00 KST",
-
-      otherTime: "06:00 BST",
-    },
-
-    {
-      id: 2,
-
-      sender: "other",
-
-      text: "API 연동 검토를 완료했습니다. 오류 처리 흐름에서 한 가지 이슈를 발견해 Issue #42에 댓글을 남겼습니다. 제가 바로 수정 작업을 진행할까요, 아니면 개발팀의 확인 후 진행할까요?",
-
-      originalText:
-        "I finished reviewing the API integration. I found one issue in the error-handling flow and left a comment on Issue #42. Should I fix it right away, or wait for the development team's confirmation?",
-
-      time: "14:00 KST",
-
-      otherTime: "06:00 BST",
-    },
-
-    {
-      id: 3,
-
-      sender: "me",
-
-      text: "확인했습니다! 해당 부분은 바로 수정해주셔도 됩니다. 수정이 완료되면 Issue #42에 결과만 남겨주세요. 감사합니다!",
-
-      translatedText:
-        "Confirmed! You can go ahead and fix that part. Once it's completed, please leave the result on Issue #42. Thank you!",
-
-      time: "14:00 KST",
-
-      otherTime: "06:00 BST",
-    },
-  ]);
+  const [messagesError, setMessagesError] = useState("");
 
   const [openedTranslationId, setOpenedTranslationId] = useState(null);
+
+  /* =========================
+     메시지 입력
+  ========================= */
 
   const [messageInput, setMessageInput] = useState("");
 
   /* =========================
-     Mock Translation
-     아직 번역 API 연결 전
+     AI 번역 미리보기
   ========================= */
 
-  const getMockTranslation = (text) => {
-    if (!text.trim()) {
-      return "";
-    }
+  const [translationPreview, setTranslationPreview] = useState("");
 
-    const predefined = {
-      안녕하세요: "Hello!",
+  const [translationNuance, setTranslationNuance] = useState("");
 
-      "내일까지 확인 부탁드립니다.": "Please check it by tomorrow.",
+  const [isTranslationLoading, setIsTranslationLoading] = useState(false);
 
-      "문제 있으면 말씀해주세요.":
-        "Please let me know if there are any issues.",
-    };
-
-    if (predefined[text.trim()]) {
-      return predefined[text.trim()];
-    }
-
-    return text;
-  };
-
-  const aiTranslation = getMockTranslation(messageInput);
+  const [translationError, setTranslationError] = useState("");
 
   /* =========================
-     조직도 Response에서
-     memberId 객체 추출
+     메시지 전송
+  ========================= */
+
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
+
+  /* =========================
+     조직도 Response 정리
   ========================= */
 
   const extractMembers = (value) => {
@@ -417,32 +371,414 @@ function MessageModal({ onClose }) {
   };
 
   /* =========================
-     메시지 보내기
-     아직 Mock
+     메시지 시간
   ========================= */
 
-  const handleSendMessage = () => {
-    if (!messageInput.trim()) {
+  const formatMessageTime = (value) => {
+    if (!value) {
+      return "";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+
+    return new Intl.DateTimeFormat("ko-KR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(date);
+  };
+
+  /* =========================
+     메시지 날짜
+  ========================= */
+
+  const formatMessageDate = (value) => {
+    if (!value) {
+      return "";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+
+    return new Intl.DateTimeFormat("ko-KR", {
+      month: "2-digit",
+      day: "2-digit",
+    }).format(date);
+  };
+
+  /* =========================
+     대화 메시지 조회
+  ========================= */
+
+  const fetchConversationMessages = async (conversationId, page = 0) => {
+    const workspaceId = localStorage.getItem("workspaceId");
+
+    if (!workspaceId) {
+      setMessagesError("워크스페이스 정보가 없습니다.");
+
       return;
     }
 
-    const newMessage = {
-      id: Date.now(),
+    if (!conversationId) {
+      setMessagesError("대화방 정보가 없습니다.");
 
-      sender: "me",
+      return;
+    }
 
-      text: messageInput.trim(),
+    try {
+      setIsMessagesLoading(true);
 
-      translatedText: aiTranslation,
+      setMessagesError("");
 
-      time: "14:00 KST",
+      const result = await getConversationMessages(
+        workspaceId,
+        conversationId,
+        {
+          page,
+          size: 50,
+        },
+      );
 
-      otherTime: "06:00 BST",
+      console.log("메시지 대화 내용 조회 성공:", result);
+
+      const apiMessages = Array.isArray(result?.data?.messages)
+        ? result.data.messages
+        : [];
+
+      const normalizedMessages = [...apiMessages].reverse().map((message) => ({
+        id: message.messageId,
+
+        messageId: message.messageId,
+
+        senderMemberId: message.senderMemberId,
+
+        senderName: message.senderName || "알 수 없는 사용자",
+
+        text: message.originalContent || "",
+
+        originalText: message.originalContent || "",
+
+        translatedText: message.translatedContent || "",
+
+        translationUsed: Boolean(message.translationUsed),
+
+        createdAt: message.createdAt,
+      }));
+
+      setMessages(normalizedMessages);
+    } catch (error) {
+      console.error("메시지 조회 실패:", error);
+
+      setMessages([]);
+
+      if (
+        error.code === "INVALID_INPUT_VALUE" ||
+        error.code === "400INVALID_INPUT_VALUE"
+      ) {
+        setMessagesError("메시지 조회 정보가 올바르지 않습니다.");
+      } else if (error.status === 401) {
+        setMessagesError("로그인이 필요합니다.");
+      } else {
+        setMessagesError(error.message || "메시지를 불러오지 못했습니다.");
+      }
+    } finally {
+      setIsMessagesLoading(false);
+    }
+  };
+
+  /* =========================
+     메시지 입력
+  ========================= */
+
+  const handleMessageInputChange = (e) => {
+    const value = e.target.value;
+
+    setMessageInput(value);
+
+    if (!value.trim()) {
+      setTranslationPreview("");
+
+      setTranslationNuance("");
+
+      setTranslationError("");
+
+      setIsTranslationLoading(false);
+    }
+  };
+
+  /* =========================
+     AI 번역 Preview
+  ========================= */
+
+  useEffect(() => {
+    if (!isChatOpen) {
+      return undefined;
+    }
+
+    const trimmedContent = messageInput.trim();
+
+    if (!trimmedContent) {
+      return undefined;
+    }
+
+    const workspaceId = localStorage.getItem("workspaceId");
+
+    const conversationId = localStorage.getItem("conversationId");
+
+    if (!workspaceId || !conversationId) {
+      return undefined;
+    }
+
+    let isCancelled = false;
+
+    const timer = setTimeout(() => {
+      const fetchTranslationPreview = async () => {
+        try {
+          setIsTranslationLoading(true);
+
+          setTranslationError("");
+
+          const result = await previewTranslation(
+            workspaceId,
+            conversationId,
+            trimmedContent,
+          );
+
+          if (isCancelled) {
+            return;
+          }
+
+          console.log("AI 번역 미리보기 성공:", result);
+
+          const data = result?.data;
+
+          setTranslationPreview(data?.translatedContent || "");
+
+          setTranslationNuance(data?.nuance || "");
+        } catch (error) {
+          if (isCancelled) {
+            return;
+          }
+
+          console.error("AI 번역 미리보기 실패:", error);
+
+          setTranslationPreview("");
+
+          setTranslationNuance("");
+
+          switch (error.code) {
+            case "TRANSLATION_LANGUAGE_NOT_CONFIGURED":
+              setTranslationError(
+                "번역에 필요한 상대방 언어가 설정되어 있지 않습니다.",
+              );
+
+              break;
+
+            case "TEMPORAL_CONTEXT_NOT_CONFIGURED":
+              setTranslationError(
+                "날짜·시간 변환에 필요한 업무 지역이 설정되어 있지 않습니다.",
+              );
+
+              break;
+
+            case "AI_TRANSLATION_FAILED":
+              setTranslationError("AI 번역 처리에 실패했습니다.");
+
+              break;
+
+            case "AI_TRANSLATION_TIMEOUT":
+              setTranslationError("AI 번역 요청 시간이 초과되었습니다.");
+
+              break;
+
+            case "MEMBER_NOT_FOUND":
+              setTranslationError(
+                "현재 상대방에게 번역 미리보기를 사용할 수 없습니다.",
+              );
+
+              break;
+
+            default:
+              setTranslationError(
+                error.message || "번역 미리보기에 실패했습니다.",
+              );
+          }
+        } finally {
+          if (!isCancelled) {
+            setIsTranslationLoading(false);
+          }
+        }
+      };
+
+      fetchTranslationPreview();
+    }, 600);
+
+    return () => {
+      isCancelled = true;
+
+      clearTimeout(timer);
     };
+  }, [messageInput, isChatOpen]);
 
-    setMessages((prev) => [...prev, newMessage]);
+  /* =========================
+     메시지 전송
+  ========================= */
 
-    setMessageInput("");
+  const handleSendMessage = async () => {
+    const trimmedContent = messageInput.trim();
+
+    if (!trimmedContent) {
+      return;
+    }
+
+    if (trimmedContent.length > 4000) {
+      alert("메시지는 최대 4000자까지 입력할 수 있습니다.");
+
+      return;
+    }
+
+    const workspaceId = localStorage.getItem("workspaceId");
+
+    const conversationId = localStorage.getItem("conversationId");
+
+    if (!workspaceId) {
+      alert("워크스페이스 정보가 없습니다.");
+
+      return;
+    }
+
+    if (!conversationId) {
+      alert("대화방 정보가 없습니다.");
+
+      return;
+    }
+
+    /*
+      현재 UI에는 번역 사용 여부 토글이 없으므로
+      Preview 결과가 있으면 AI 번역 요청으로 전송
+    */
+
+    const translationRequested = Boolean(translationPreview);
+
+    try {
+      setIsSendingMessage(true);
+
+      const result = await sendConversationMessage(
+        workspaceId,
+        conversationId,
+        {
+          originalContent: trimmedContent,
+
+          translationUsed: translationRequested,
+        },
+      );
+
+      console.log("메시지 전송 성공:", result);
+
+      const data = result?.data;
+
+      if (!data?.messageId) {
+        throw new Error("전송된 메시지 정보를 확인할 수 없습니다.");
+      }
+
+      /*
+        서버 Response 그대로 사용
+      */
+
+      const newMessage = {
+        id: data.messageId,
+
+        messageId: data.messageId,
+
+        senderMemberId: data.senderMemberId,
+
+        senderName: null,
+
+        text: data.originalContent || "",
+
+        originalText: data.originalContent || "",
+
+        translatedText: data.translatedContent || "",
+
+        translationUsed: Boolean(data.translationUsed),
+
+        createdAt: data.createdAt,
+
+        isTemporaryMine: true,
+      };
+
+      setMessages((prev) => [...prev, newMessage]);
+
+      setMessageInput("");
+
+      setTranslationPreview("");
+
+      setTranslationNuance("");
+
+      setTranslationError("");
+
+      /*
+        메시지가 생겼으므로
+        최근 대화 다시 조회
+      */
+
+      try {
+        const recentResult = await getRecentConversations(workspaceId);
+
+        const conversations = Array.isArray(recentResult?.data?.conversations)
+          ? recentResult.data.conversations
+          : [];
+
+        setRecentConversations(conversations);
+      } catch (recentError) {
+        console.error("최근 대화 새로고침 실패:", recentError);
+      }
+    } catch (error) {
+      console.error("메시지 전송 실패:", error);
+
+      switch (error.code) {
+        case "TRANSLATION_LANGUAGE_NOT_CONFIGURED":
+          alert("번역에 필요한 사용자 언어가 설정되어 있지 않습니다.");
+
+          break;
+
+        case "TEMPORAL_CONTEXT_NOT_CONFIGURED":
+          alert("날짜·시간 변환에 필요한 업무 지역이 설정되어 있지 않습니다.");
+
+          break;
+
+        case "AI_TRANSLATION_FAILED":
+          alert("AI 번역 처리에 실패했습니다.");
+
+          break;
+
+        case "AI_TRANSLATION_TIMEOUT":
+          alert("AI 번역 요청 시간이 초과되었습니다.");
+
+          break;
+
+        case "MEMBER_NOT_FOUND":
+          alert("현재 상대방에게 새 메시지를 보낼 수 없습니다.");
+
+          break;
+
+        default:
+          if (error.status === 401) {
+            alert("로그인이 필요합니다.");
+          } else {
+            alert(error.message || "메시지 전송에 실패했습니다.");
+          }
+      }
+    } finally {
+      setIsSendingMessage(false);
+    }
   };
 
   /* =========================
@@ -486,11 +822,6 @@ function MessageModal({ onClose }) {
   ========================= */
 
   const handleUserClick = (memberId) => {
-    /*
-        1:1 대화이므로
-        한 명만 선택
-      */
-
     setSelectedUsers((prev) => {
       if (prev.includes(memberId)) {
         return [];
@@ -504,7 +835,6 @@ function MessageModal({ onClose }) {
 
   /* =========================
      선택 완료
-     1:1 대화방 조회/생성
   ========================= */
 
   const handleComplete = async () => {
@@ -558,11 +888,19 @@ function MessageModal({ onClose }) {
 
           activityStatus: data.targetMember.activityStatus || "OFF",
         });
+      } else {
+        const target =
+          organizationMembers.find(
+            (member) => member.memberId === targetMemberId,
+          ) ||
+          recentChatUsers.find((member) => member.memberId === targetMemberId);
+
+        if (target) {
+          setConversationTarget(target);
+        }
       }
 
-      console.log("conversationId:", data.conversationId);
-
-      console.log(data.created ? "새 대화방 생성" : "기존 대화방 조회");
+      await fetchConversationMessages(data.conversationId);
 
       setIsChatOpen(true);
     } catch (error) {
@@ -587,7 +925,7 @@ function MessageModal({ onClose }) {
 
     return users.filter((user) => {
       const matchesSearch =
-        !keyword || user.name.toLowerCase().includes(keyword);
+        !keyword || (user.name || "").toLowerCase().includes(keyword);
 
       const matchesCompany =
         selectedCompany === "ALL" || user.company === selectedCompany;
@@ -635,7 +973,6 @@ function MessageModal({ onClose }) {
       ? companyOptions
       : [
           ...companyOptions.filter((company) => company !== selectedCompany),
-
           "ALL",
         ];
 
@@ -651,7 +988,6 @@ function MessageModal({ onClose }) {
           ...positionOptions.filter(
             (position) => position !== selectedPosition,
           ),
-
           "ALL",
         ];
 
@@ -722,88 +1058,117 @@ function MessageModal({ onClose }) {
             </div>
 
             {/* =========================
-                Chat
+                채팅 내용
             ========================= */}
 
             <div className={styles.chatArea}>
-              {messages.map((message, index) => {
-                const isMe = message.sender === "me";
+              {isMessagesLoading ? (
+                <p>메시지를 불러오는 중입니다.</p>
+              ) : messagesError ? (
+                <p className={styles.errorMessage}>{messagesError}</p>
+              ) : messages.length === 0 ? (
+                <p>아직 주고받은 메시지가 없습니다.</p>
+              ) : (
+                messages.map((message, index) => {
+                  /*
+                      상대방의 memberId와 다르면
+                      내 메시지로 판단
+                    */
 
-                return (
-                  <div
-                    key={message.id}
-                    className={`${styles.messageRow} ${
-                      isMe ? styles.myMessageRow : styles.otherMessageRow
-                    }`}
-                  >
-                    {index === 2 && (
-                      <div className={styles.dateDivider}>
-                        <span />
+                  const isMe =
+                    message.isTemporaryMine ||
+                    message.senderMemberId !== selectedUser.memberId;
 
-                        <p>08/10 {t("message.today")}</p>
+                  const previousMessage =
+                    index > 0 ? messages[index - 1] : null;
 
-                        <span />
-                      </div>
-                    )}
+                  const currentDate = formatMessageDate(message.createdAt);
 
-                    <div className={styles.senderName}>
-                      {isMe
-                        ? t("message.me", {
-                            name: "홍길동",
-                          })
-                        : selectedUser.name}
-                    </div>
+                  const previousDate = previousMessage
+                    ? formatMessageDate(previousMessage.createdAt)
+                    : null;
 
+                  const showDateDivider =
+                    !previousMessage || currentDate !== previousDate;
+
+                  return (
                     <div
-                      className={`${styles.messageBubble} ${
-                        isMe ? styles.myBubble : styles.otherBubble
+                      key={message.id}
+                      className={`${styles.messageRow} ${
+                        isMe ? styles.myMessageRow : styles.otherMessageRow
                       }`}
                     >
-                      {message.text}
-                    </div>
+                      {showDateDivider && (
+                        <div className={styles.dateDivider}>
+                          <span />
 
-                    <div className={styles.messageMeta}>
-                      <span>{message.time}</span>
+                          <p>{currentDate}</p>
 
-                      <span>{message.otherTime}</span>
-                    </div>
+                          <span />
+                        </div>
+                      )}
 
-                    <div className={styles.translationWrapper}>
-                      <button
-                        type="button"
-                        className={styles.translationButton}
-                        onClick={() =>
-                          setOpenedTranslationId((prev) =>
-                            prev === message.id ? null : message.id,
-                          )
-                        }
+                      <div className={styles.senderName}>
+                        {isMe ? "나" : message.senderName || selectedUser.name}
+                      </div>
+
+                      <div
+                        className={`${styles.messageBubble} ${
+                          isMe ? styles.myBubble : styles.otherBubble
+                        }`}
                       >
-                        {isMe
-                          ? t("message.viewTranslation")
-                          : t("message.viewOriginal")}
+                        {message.text}
+                      </div>
 
-                        <img src={chatcheckIcon} alt="" />
-                      </button>
+                      <div className={styles.messageMeta}>
+                        <span>{formatMessageTime(message.createdAt)}</span>
+                      </div>
 
-                      {openedTranslationId === message.id && (
-                        <div
-                          className={`${styles.translationBubble} ${
-                            isMe
-                              ? styles.myTranslationBubble
-                              : styles.otherTranslationBubble
-                          }`}
-                        >
-                          {isMe ? message.translatedText : message.originalText}
+                      {/* =========================
+                            번역 결과
+                        ========================= */}
+
+                      {message.translationUsed && message.translatedText && (
+                        <div className={styles.translationWrapper}>
+                          <button
+                            type="button"
+                            className={styles.translationButton}
+                            onClick={() =>
+                              setOpenedTranslationId((prev) =>
+                                prev === message.id ? null : message.id,
+                              )
+                            }
+                          >
+                            {isMe
+                              ? t("message.viewTranslation")
+                              : t("message.viewOriginal")}
+
+                            <img src={chatcheckIcon} alt="" />
+                          </button>
+
+                          {openedTranslationId === message.id && (
+                            <div
+                              className={`${styles.translationBubble} ${
+                                isMe
+                                  ? styles.myTranslationBubble
+                                  : styles.otherTranslationBubble
+                              }`}
+                            >
+                              {isMe
+                                ? message.translatedText
+                                : message.originalText}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
 
             {/* =========================
-                입력
+                메시지 작성
             ========================= */}
 
             <div className={styles.messageComposer}>
@@ -811,7 +1176,8 @@ function MessageModal({ onClose }) {
 
               <textarea
                 value={messageInput}
-                onChange={(e) => setMessageInput(e.target.value)}
+                maxLength={4000}
+                onChange={handleMessageInputChange}
               />
 
               <div className={styles.aiLabel}>
@@ -819,26 +1185,41 @@ function MessageModal({ onClose }) {
               </div>
 
               <textarea
-                value={aiTranslation}
+                value={isTranslationLoading ? "번역 중..." : translationPreview}
                 readOnly
                 className={styles.translationInput}
               />
+
+              {translationNuance && (
+                <p className={styles.translationNuance}>{translationNuance}</p>
+              )}
+
+              {translationError && (
+                <p className={styles.errorMessage}>{translationError}</p>
+              )}
             </div>
+
+            {/* =========================
+                전송
+            ========================= */}
 
             <button
               type="button"
               className={styles.sendButton}
               onClick={handleSendMessage}
+              disabled={
+                !messageInput.trim() || isTranslationLoading || isSendingMessage
+              }
             >
-              <span>{t("message.send")}</span>
+              <span>{isSendingMessage ? "전송 중..." : t("message.send")}</span>
 
-              <img src={sendIcon} alt="" />
+              {!isSendingMessage && <img src={sendIcon} alt="" />}
             </button>
           </>
         ) : (
           <>
             {/* =========================
-                사용자 선택 Header
+                사용자 선택
             ========================= */}
 
             <div className={styles.titleRow}>
@@ -849,9 +1230,7 @@ function MessageModal({ onClose }) {
 
             <p className={styles.description}>{t("message.selectRecipient")}</p>
 
-            {/* =========================
-                Search
-            ========================= */}
+            {/* Search */}
 
             <div className={styles.searchBox}>
               <img src={searchIcon} alt="" className={styles.searchIcon} />
@@ -864,9 +1243,7 @@ function MessageModal({ onClose }) {
               />
             </div>
 
-            {/* =========================
-                Filter
-            ========================= */}
+            {/* Filter */}
 
             <div className={styles.filters}>
               <button
@@ -908,7 +1285,7 @@ function MessageModal({ onClose }) {
             </div>
 
             {/* =========================
-                최근 대화 / 최근 활동
+                최근 대화
             ========================= */}
 
             <div className={styles.section}>
@@ -971,9 +1348,7 @@ function MessageModal({ onClose }) {
               </div>
             )}
 
-            {/* =========================
-                선택 인원
-            ========================= */}
+            {/* 선택 수 */}
 
             {selectedUsers.length > 0 && (
               <div className={styles.selectedCount}>
@@ -983,17 +1358,11 @@ function MessageModal({ onClose }) {
               </div>
             )}
 
-            {/* =========================
-                대화방 Error
-            ========================= */}
-
             {conversationError && (
               <p className={styles.errorMessage}>{conversationError}</p>
             )}
 
-            {/* =========================
-                선택 완료
-            ========================= */}
+            {/* 선택 완료 */}
 
             <button
               type="button"
@@ -1020,15 +1389,10 @@ function MessageModal({ onClose }) {
 
 function FilterDropdown({
   label,
-
   open,
-
   onToggle,
-
   options,
-
   allLabel,
-
   onSelect,
 }) {
   return (
@@ -1059,15 +1423,7 @@ function FilterDropdown({
    UserItem
 ========================================================= */
 
-function UserItem({
-  user,
-
-  selected,
-
-  onClick,
-
-  recentTime = "",
-}) {
+function UserItem({ user, selected, onClick, recentTime = "" }) {
   const isActive = user.activityStatus === "ACTIVE";
 
   return (
