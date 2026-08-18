@@ -206,3 +206,338 @@
   font-weight: 300;
   line-height: 110%;
 }
+
+/* ========================================
+   NEW SERVICE MODAL
+======================================== */
+
+.serviceModalOverlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  box-sizing: border-box;
+
+  background: rgba(4, 7, 20, 0.72);
+
+  z-index: 2000;
+}
+
+.serviceModal {
+  width: 460px;
+  max-width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 24px;
+
+  border: 1px solid #2b314f;
+  border-radius: 12px;
+
+  background: #171b32;
+
+  color: #ffffff;
+
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.38);
+}
+
+/* ========================================
+   MODAL HEADER
+======================================== */
+
+.serviceModalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 22px;
+}
+
+.serviceModalHeader h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.serviceModalHeader p {
+  margin: 7px 0 0;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.serviceModalClose {
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.65);
+
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.serviceModalClose:hover {
+  color: #ffffff;
+}
+
+.serviceModalClose:disabled {
+  opacity: 0.4;
+
+  cursor: default;
+}
+
+/* ========================================
+   SERVICE LIST
+======================================== */
+
+.serviceSelectList {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.serviceSelectItem {
+  width: 100%;
+  min-height: 64px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  box-sizing: border-box;
+
+  padding: 11px 14px;
+
+  border: 1px solid #292f4a;
+  border-radius: 8px;
+
+  background: #1c213c;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.serviceSelectItem:hover:not(:disabled) {
+  border-color: #4d67ff;
+
+  background: #202642;
+}
+
+.serviceSelectItemActive {
+  border-color: #536cff;
+
+  background: rgba(83, 108, 255, 0.12);
+}
+
+.serviceSelectItem:disabled {
+  opacity: 0.5;
+
+  cursor: default;
+}
+
+.serviceSelectIcon {
+  width: 28px;
+  height: 28px;
+
+  display: block;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+}
+
+.serviceSelectText {
+  min-width: 0;
+
+  flex: 1;
+}
+
+.serviceSelectText strong {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.serviceSelectText p {
+  margin: 4px 0 0;
+
+  overflow: hidden;
+
+  color: rgba(255, 255, 255, 0.5);
+
+  font-size: 10px;
+  font-weight: 400;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ========================================
+   RADIO
+======================================== */
+
+.serviceRadio {
+  width: 17px;
+  height: 17px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  flex-shrink: 0;
+
+  border: 1px solid #6d738d;
+  border-radius: 50%;
+}
+
+.serviceRadioActive {
+  border-color: #536cff;
+}
+
+.serviceRadioActive span {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: #536cff;
+}
+
+/* ========================================
+   CONNECTED BADGE
+======================================== */
+
+.connectedBadge {
+  flex-shrink: 0;
+
+  padding: 4px 7px;
+
+  border-radius: 5px;
+
+  background: rgba(55, 196, 123, 0.12);
+
+  color: #59d493;
+
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* ========================================
+   MODAL FOOTER
+======================================== */
+
+.serviceModalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  margin-top: 22px;
+}
+
+.modalCancelButton,
+.modalConnectButton {
+  height: 34px;
+
+  box-sizing: border-box;
+
+  padding: 0 15px;
+
+  border-radius: 7px;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.modalCancelButton {
+  border: 1px solid #343a58;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.modalCancelButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.modalConnectButton {
+  border: none;
+
+  background: #536cff;
+
+  color: #ffffff;
+}
+
+.modalConnectButton:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.modalCancelButton:disabled,
+.modalConnectButton:disabled {
+  opacity: 0.45;
+
+  cursor: default;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 600px) {
+  .serviceModalOverlay {
+    padding: 16px;
+  }
+
+  .serviceModal {
+    padding: 20px;
+  }
+
+  .serviceSelectItem {
+    min-height: 60px;
+  }
+}
