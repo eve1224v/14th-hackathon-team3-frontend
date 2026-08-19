@@ -16,19 +16,13 @@ function MemberSettings() {
      기본 State
   ========================= */
 
-  const [email, setEmail] = useState("");
-
   const [members, setMembers] = useState([]);
 
   const [pendingInvitations, setPendingInvitations] = useState([]);
 
   const [teamId, setTeamId] = useState(null);
 
-  const [teamName, setTeamName] = useState("");
-
   const [isLoading, setIsLoading] = useState(true);
-
-  const [isInviting, setIsInviting] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -47,7 +41,7 @@ function MemberSettings() {
 
   /* =========================
      프로젝트 상세 조회
-     → 실제 teamId 확보
+     → teamId 확보
   ========================= */
 
   useEffect(() => {
@@ -83,14 +77,8 @@ function MemberSettings() {
           const firstTeam = teamSchedules[0];
 
           setTeamId(firstTeam.teamId);
-
-          setTeamName(firstTeam.teamName || "");
         } else {
           setTeamId(null);
-
-          setTeamName("");
-
-          setErrorMessage("프로젝트에 등록된 팀이 없습니다.");
         }
       } catch (error) {
         if (isCancelled) {
@@ -196,171 +184,6 @@ function MemberSettings() {
   }, []);
 
   /* =========================
-     멤버 다시 조회
-  ========================= */
-
-  const refreshMembers = async (projectId) => {
-    const result = await getProjectMembers(projectId);
-
-    const data = result?.data || {};
-
-    setMembers(Array.isArray(data.members) ? data.members : []);
-
-    setPendingInvitations(
-      Array.isArray(data.pendingInvitations) ? data.pendingInvitations : [],
-    );
-  };
-
-  /* =========================
-     이메일 유효성 검사
-  ========================= */
-
-  const isValidEmail = (value) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    return emailRegex.test(value);
-  };
-
-  /* =========================
-     멤버 초대
-  ========================= */
-
-  const handleInviteMember = async () => {
-    const trimmedEmail = email.trim();
-
-    if (!trimmedEmail) {
-      alert("초대할 이메일을 입력해주세요.");
-
-      return;
-    }
-
-    if (!isValidEmail(trimmedEmail)) {
-      alert("올바른 이메일 주소를 입력해주세요.");
-
-      return;
-    }
-
-    const projectId = localStorage.getItem("projectId");
-
-    if (!projectId) {
-      alert("프로젝트 정보가 없습니다.");
-
-      return;
-    }
-
-    if (!teamId) {
-      alert("프로젝트 팀 정보를 확인할 수 없습니다.");
-
-      return;
-    }
-
-    /*
-        새 명세 기준 INVITE Payload
-
-        {
-          type: "INVITE",
-          email: "...",
-          teamId: 실제 teamId,
-          role: "MEMBER",
-          accessScope: "TEAM_ONLY"
-        }
-      */
-
-    const actions = [
-      {
-        type: "INVITE",
-
-        email: trimmedEmail,
-
-        teamId: Number(teamId),
-
-        role: "MEMBER",
-
-        accessScope: "TEAM_ONLY",
-      },
-    ];
-
-    console.log("멤버 초대 Payload:", {
-      actions,
-    });
-
-    try {
-      setIsInviting(true);
-
-      setErrorMessage("");
-
-      const result = await manageProjectMembers(projectId, actions);
-
-      console.log("멤버 초대 성공:", result);
-
-      /*
-          일부 action 실패 여부 확인
-        */
-
-      const failedActions = result?.data?.failedActions || [];
-
-      if (failedActions.length > 0) {
-        console.error("일부 멤버 작업 실패:", failedActions);
-
-        alert("일부 멤버 초대 작업에 실패했습니다.");
-
-        return;
-      }
-
-      setEmail("");
-
-      await refreshMembers(projectId);
-
-      alert("멤버를 초대했습니다.");
-    } catch (error) {
-      console.error("멤버 초대 실패:", error);
-
-      switch (error.code) {
-        case "400INVALID_MEMBER_ACTION":
-          alert("멤버 작업 정보가 올바르지 않습니다.");
-
-          break;
-
-        case "403PROJECT_ADMIN_REQUIRED":
-          alert("프로젝트 관리 권한이 없습니다.");
-
-          break;
-
-        case "404MEMBER_OR_TEAM_NOT_FOUND":
-          alert("멤버 또는 팀을 찾을 수 없습니다.");
-
-          break;
-
-        case "409LAST_PROJECT_ADMIN_CANNOT_CHANGE":
-          alert("마지막 프로젝트 관리자는 변경할 수 없습니다.");
-
-          break;
-
-        default:
-          if (error.status === 401) {
-            alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
-          } else {
-            alert(error.message || "멤버 초대에 실패했습니다.");
-          }
-      }
-    } finally {
-      setIsInviting(false);
-    }
-  };
-
-  /* =========================
-     Enter로 초대
-  ========================= */
-
-  const handleEmailKeyDown = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-
-      handleInviteMember();
-    }
-  };
-
-  /* =========================
      역할 Dropdown
   ========================= */
 
@@ -463,71 +286,13 @@ function MemberSettings() {
     }
   };
 
-  /* =========================
-     초대 코드 복사
-
-     현재 실제 초대 코드 API 없음
-  ========================= */
-
-  const handleCopyInviteCode = () => {
-    alert("초대 코드 API가 아직 연결되지 않았습니다.");
-  };
-
   return (
     <section className={styles.container}>
-      <h1 className={styles.title}>멤버 초대·권한 관리</h1>
-
       {/* =========================
-          새 멤버 초대
+          Title
       ========================= */}
 
-      <section className={styles.inviteCard}>
-        <h2>새 멤버 초대</h2>
-
-        <label htmlFor="memberEmail">이메일 주소</label>
-
-        <div className={styles.emailRow}>
-          <input
-            id="memberEmail"
-            type="email"
-            value={email}
-            placeholder="example@company.com"
-            onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={handleEmailKeyDown}
-            disabled={isInviting}
-          />
-
-          <button
-            type="button"
-            className={styles.inviteButton}
-            onClick={handleInviteMember}
-            disabled={isInviting || !teamId}
-          >
-            {isInviting ? "초대 중..." : "초대"}
-          </button>
-        </div>
-
-        {/* 현재 프로젝트에서 사용하는 팀 */}
-
-        {teamName && <p>배정 팀: {teamName}</p>}
-
-        {/* =========================
-            초대 코드
-            현재 API 미연결
-        ========================= */}
-
-        <div className={styles.inviteLinkRow}>
-          <button
-            type="button"
-            className={styles.copyButton}
-            onClick={handleCopyInviteCode}
-          >
-            초대 코드 복사
-          </button>
-
-          <div className={styles.inviteLink}>초대 코드 API 연결 필요</div>
-        </div>
-      </section>
+      <h1 className={styles.title}>멤버 초대·권한 관리</h1>
 
       {/* =========================
           Error

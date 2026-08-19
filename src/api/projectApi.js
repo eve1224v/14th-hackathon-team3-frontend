@@ -556,3 +556,44 @@ export const completeProjectIntegrationOAuth = async (
 
   return parseResponse(response);
 };
+
+/* ========================================
+   프로젝트 참가
+
+   POST
+   /api/v1/projects/{projectId}/join
+======================================== */
+
+export const joinProject = async (projectId) => {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    const error = new Error("로그인 정보가 없습니다.");
+
+    error.status = 401;
+    error.code = "401UNAUTHORIZED";
+
+    throw error;
+  }
+
+  if (!projectId) {
+    const error = new Error("프로젝트 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/projects/${projectId}/join`,
+    {
+      method: "POST",
+
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  return parseResponse(response);
+};

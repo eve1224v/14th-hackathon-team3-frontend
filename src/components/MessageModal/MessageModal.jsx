@@ -1113,7 +1113,11 @@ function MessageModal({ onClose }) {
                           isMe ? styles.myBubble : styles.otherBubble
                         }`}
                       >
-                        {message.text}
+                        {isMe
+                          ? message.originalText
+                          : message.translationUsed && message.translatedText
+                            ? message.translatedText
+                            : message.originalText}
                       </div>
 
                       <div className={styles.messageMeta}>
@@ -1135,7 +1139,13 @@ function MessageModal({ onClose }) {
                               )
                             }
                           >
-                            {isMe ? "번역문 보기" : "원문 보기"}
+                            {isMe
+                              ? openedTranslationId === message.id
+                                ? "번역문 닫기"
+                                : "번역문 보기"
+                              : openedTranslationId === message.id
+                                ? "원문 닫기"
+                                : "원문 보기"}
 
                             <img src={chatcheckIcon} alt="" />
                           </button>

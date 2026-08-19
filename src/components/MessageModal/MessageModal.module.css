@@ -726,7 +726,8 @@
 
   top: calc(100% + 8px);
 
-  width: 320px;
+  width: max-content;
+  max-width: 320px;
 
   box-sizing: border-box;
 
@@ -741,9 +742,21 @@
   font-size: 11px;
   line-height: 145%;
 
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
+
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 
   z-index: 100;
+}
+
+.myTranslationBubble {
+  right: 0;
+}
+
+.otherTranslationBubble {
+  left: 0;
 }
 
 .myTranslationBubble {

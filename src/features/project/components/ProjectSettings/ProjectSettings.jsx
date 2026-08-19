@@ -666,7 +666,7 @@ function ProjectSettings() {
         <div className={styles.managementMeta}>
           <span>연동 중 {integrationCount}개</span>
 
-          <span>마지막 동기화 {formatLastSyncedAt(lastSyncedAt)}</span>
+          <span>{formatLastSyncedAt(lastSyncedAt)}</span>
         </div>
 
         <button
