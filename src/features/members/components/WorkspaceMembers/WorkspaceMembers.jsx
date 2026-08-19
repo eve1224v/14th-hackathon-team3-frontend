@@ -263,9 +263,6 @@ function WorkspaceMembers() {
 
           /* ==================================================
              1. 조직도 데이터
-
-             기존 코드와 동일하게
-             response.data.teams 사용
           ================================================== */
 
           const teams =
@@ -310,10 +307,6 @@ function WorkspaceMembers() {
 
           /* ==================================================
              memberId 기준 Map
-
-             조직도 memberId
-                     ↕
-             워크스페이스 memberId
           ================================================== */
 
           const workspaceMemberMap =
@@ -330,15 +323,8 @@ function WorkspaceMembers() {
           /* ==================================================
              조직도 데이터를 화면용으로 변환
 
-             ★ 이름 / 이메일 / 기업 / 직책 / 활동상태는
-               조직도 조회 데이터를 우선 사용
-
-             ★ teamName은
-               workspace member의 teamName을 우선 사용
-               → 팀 수정 후 바로 반영 가능
-
-             ★ workspaceRole만
-               워크스페이스 멤버 조회에서 가져옴
+             이메일은 화면에는 표시하지 않지만
+             현재 사용자 판별을 위해 내부 데이터에는 유지
           ================================================== */
 
           const formattedMembers =
@@ -401,16 +387,9 @@ function WorkspaceMembers() {
                           ?.status ===
                           "ACTIVE",
 
-                      /*
-                        기존 역할 드롭다운은
-                        API workspace role과 별개
-                      */
                       displayRole:
                         "담당자",
 
-                      /*
-                        실제 워크스페이스 권한
-                      */
                       workspaceRole:
                         workspaceMember
                           ?.role ??
@@ -422,10 +401,6 @@ function WorkspaceMembers() {
                         member.activityStatus ??
                         null,
 
-                      /*
-                        아래에서 현재 사용자 판단 후
-                        다시 값을 넣음
-                      */
                       isMe:
                         false,
                     };
@@ -439,8 +414,6 @@ function WorkspaceMembers() {
 
              1순위: 이메일
              2순위: 이름 + 기업
-
-             조직도 정보 기준
           ================================================== */
 
           let currentMember =
@@ -452,11 +425,6 @@ function WorkspaceMembers() {
                   userEmail
             );
 
-
-          /*
-            이메일로 못 찾았을 경우
-            현재 localStorage의 userName + userCompany 사용
-          */
 
           if (!currentMember) {
             currentMember =
@@ -479,10 +447,6 @@ function WorkspaceMembers() {
             currentMember
           );
 
-
-          /*
-            같은 memberId로 워크스페이스 권한 가져오기
-          */
 
           const currentWorkspaceMember =
             currentMember
@@ -649,8 +613,6 @@ function WorkspaceMembers() {
 
   /* ==================================================
      멤버 수정 가능 여부
-
-     OWNER / ADMIN만 가능
   ================================================== */
 
   const canManageMembers =
@@ -662,10 +624,6 @@ function WorkspaceMembers() {
 
   /* ==================================================
      기존 역할 선택
-
-     담당자 / 검토자 / 승인자 / 참조자
-
-     기존 UI 상태 유지
   ================================================== */
 
   const handleRoleSelect = (
@@ -785,9 +743,6 @@ function WorkspaceMembers() {
 
   /* ==================================================
      실제 멤버 수정 저장
-
-     PUT
-     /api/v1/workspaces/{workspaceId}/members
   ================================================== */
 
   const handleEditSave =
@@ -818,10 +773,6 @@ function WorkspaceMembers() {
       };
 
 
-      /* ==================================================
-         소속 팀
-      ================================================== */
-
       const newTeamName =
         editTeamName.trim();
 
@@ -843,10 +794,6 @@ function WorkspaceMembers() {
       }
 
 
-      /* ==================================================
-         직책
-      ================================================== */
-
       const newJobTitle =
         editJobTitle.trim();
 
@@ -867,12 +814,6 @@ function WorkspaceMembers() {
       }
 
 
-      /* ==================================================
-         워크스페이스 권한
-
-         OWNER는 변경 불가
-      ================================================== */
-
       if (
         member.workspaceRole !==
           "OWNER" &&
@@ -883,10 +824,6 @@ function WorkspaceMembers() {
           editWorkspaceRole;
       }
 
-
-      /* ==================================================
-         변경사항 확인
-      ================================================== */
 
       const hasChanges =
         Object.keys(
@@ -938,10 +875,6 @@ function WorkspaceMembers() {
 
         handleEditCancel();
 
-
-        /*
-          서버 값 다시 조회
-        */
 
         setLoading(true);
 
@@ -1156,10 +1089,6 @@ function WorkspaceMembers() {
                         : ""
                     }`}
                   >
-                    {/* ==================================================
-                        기존 카드
-                    ================================================== */}
-
                     <div
                       className={
                         styles.memberMain
@@ -1252,28 +1181,13 @@ function WorkspaceMembers() {
                         </p>
 
 
-                        {/* 이메일 + 기존 역할 */}
+                        {/* 기존 역할 */}
 
                         <div
                           className={
                             styles.bottomRow
                           }
                         >
-                          <span
-                            className={
-                              styles.email
-                            }
-                          >
-                            {
-                              member.email
-                            }
-                          </span>
-
-
-                          {/* ==================================================
-                              기존 역할 드롭다운
-                          ================================================== */}
-
                           <div
                             className={
                               styles.roleDropdown
@@ -1365,12 +1279,6 @@ function WorkspaceMembers() {
                           </div>
 
 
-                          {/* ==================================================
-                              정보 수정 버튼
-
-                              OWNER / ADMIN만 표시
-                          ================================================== */}
-
                           {canManageMembers && (
                             <button
                               type="button"
@@ -1426,8 +1334,6 @@ function WorkspaceMembers() {
                           styles.editArea
                         }
                       >
-                        {/* 소속 팀 */}
-
                         <div
                           className={
                             styles.editField
@@ -1457,8 +1363,6 @@ function WorkspaceMembers() {
                         </div>
 
 
-                        {/* 직책 */}
-
                         <div
                           className={
                             styles.editField
@@ -1487,8 +1391,6 @@ function WorkspaceMembers() {
                           />
                         </div>
 
-
-                        {/* 워크스페이스 권한 */}
 
                         <div
                           className={
@@ -1591,8 +1493,6 @@ function WorkspaceMembers() {
                         </div>
 
 
-                        {/* 취소 / 저장 */}
-
                         <div
                           className={
                             styles.editActions
@@ -1642,10 +1542,6 @@ function WorkspaceMembers() {
         </div>
       </main>
 
-
-      {/* ==================================================
-          기존 채팅 모달
-      ================================================== */}
 
       {isMessageOpen && (
         <MessageModal
