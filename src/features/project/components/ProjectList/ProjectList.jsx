@@ -30,9 +30,6 @@ function ProjectList() {
 
   /* =========================
      프로젝트 목록 조회
-
-     selectedStatus 변경
-     또는 refreshKey 변경 시 조회
   ========================= */
 
   useEffect(() => {
@@ -54,10 +51,6 @@ function ProjectList() {
       }
 
       try {
-        /*
-          API 요청 시작
-        */
-
         const result = await getProjects({
           workspaceId,
 
@@ -87,12 +80,10 @@ function ProjectList() {
         switch (error.code) {
           case "403WORKSPACE_ACCESS_DENIED":
             setErrorMessage("워크스페이스 접근 권한이 없습니다.");
-
             break;
 
           case "404WORKSPACE_NOT_FOUND":
             setErrorMessage("워크스페이스를 찾을 수 없습니다.");
-
             break;
 
           default:
@@ -111,11 +102,6 @@ function ProjectList() {
       }
     };
 
-    /*
-      effect가 실행될 때는
-      loading 상태로 변경
-    */
-
     queueMicrotask(() => {
       if (!isCancelled) {
         setIsLoading(true);
@@ -130,7 +116,7 @@ function ProjectList() {
   }, [selectedStatus, refreshKey]);
 
   /* =========================
-     새 프로젝트 등록
+     프로젝트 생성
   ========================= */
 
   const handleCreateProject = () => {
@@ -138,10 +124,7 @@ function ProjectList() {
   };
 
   /* =========================
-     새로 고침
-
-     API 함수를 직접 호출하지 않고
-     refreshKey 변경
+     새로고침
   ========================= */
 
   const handleRefresh = () => {
@@ -165,37 +148,44 @@ function ProjectList() {
   };
 
   /* =========================
-     상태 한글 변환
+     카드 클릭
   ========================= */
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case "DRAFT":
-        return "초안";
+  const handleProjectClick = (project) => {
+    localStorage.setItem("projectId", String(project.projectId));
 
-      case "ACTIVE":
-        return "진행 중";
+    localStorage.setItem("projectName", project.name);
 
-      case "ENDED":
-        return "종료";
+    localStorage.setItem("selectedProject", JSON.stringify(project));
 
-      default:
-        return status;
-    }
+    window.dispatchEvent(new Event("projectChanged"));
+
+    navigate(ROUTES.PROJECT_HOME);
   };
+
+  /* =========================
+     진행 중 프로젝트 수
+  ========================= */
+
+  const activeProjectCount = projects.filter(
+    (project) => !project.status || project.status === "ACTIVE",
+  ).length;
 
   return (
     <section className={styles.container}>
       {/* =========================
-          Header
+          HEADER
       ========================= */}
 
       <div className={styles.header}>
-        <div>
+        <div className={styles.headerText}>
           <h1 className={styles.title}>프로젝트</h1>
 
           <p className={styles.summary}>
-            총 {projects.length}
+            총{" "}
+            {selectedStatus === "ACTIVE"
+              ? projects.length
+              : activeProjectCount || projects.length}
             개의 프로젝트가 진행 중입니다.
           </p>
         </div>
@@ -221,7 +211,7 @@ function ProjectList() {
       </div>
 
       {/* =========================
-          Section Header
+          SECTION HEADER
       ========================= */}
 
       <div className={styles.sectionHeader}>
@@ -246,7 +236,7 @@ function ProjectList() {
       </div>
 
       {/* =========================
-          Loading
+          LOADING
       ========================= */}
 
       {isLoading && (
@@ -254,7 +244,7 @@ function ProjectList() {
       )}
 
       {/* =========================
-          Error
+          ERROR
       ========================= */}
 
       {!isLoading && errorMessage && (
@@ -262,7 +252,7 @@ function ProjectList() {
       )}
 
       {/* =========================
-          Empty
+          EMPTY
       ========================= */}
 
       {!isLoading && !errorMessage && projects.length === 0 && (
@@ -270,73 +260,97 @@ function ProjectList() {
       )}
 
       {/* =========================
-          Project List
+          PROJECT LIST
       ========================= */}
 
       {!isLoading && !errorMessage && projects.length > 0 && (
         <div className={styles.projectList}>
-          {projects.map((project) => (
-            <article key={project.projectId} className={styles.projectCard}>
-              {/* =========================
-                      Card Top
+          {projects.map((project) => {
+            /*
+                목록 API에 값이 없는 경우
+                디자인 확인용 fallback
+              */
+
+            const cycleText =
+              project.cycleName ||
+              (project.cycleNumber
+                ? `Cycle ${project.cycleNumber}`
+                : "Cycle 3");
+
+            const progress = project.progressRate ?? project.progress ?? 78;
+
+            return (
+              <article
+                key={project.projectId}
+                className={styles.projectCard}
+                onClick={() => handleProjectClick(project)}
+              >
+                {/* =========================
+                      CARD TOP
                   ========================= */}
 
-              <div className={styles.cardTop}>
-                <div>
-                  <h3>{project.name}</h3>
+                <div className={styles.cardTop}>
+                  <div className={styles.projectInfo}>
+                    <h3>{project.name}</h3>
 
-                  <p>{getStatusText(project.status)}</p>
-                </div>
+                    <p>{project.description || "프로젝트가 진행 중"}</p>
+                  </div>
 
-                <button
-                  type="button"
-                  className={styles.settingButton}
-                  onClick={() => handleProjectSettings(project)}
-                  aria-label="프로젝트 설정"
-                >
-                  <img src={settingIcon} alt="" />
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    className={styles.settingButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
 
-              {/* =========================
-                      프로젝트 기간
-                  ========================= */}
-
-              <div className={styles.projectPeriod}>
-                <span>{project.startDate}</span>
-
-                <span>~</span>
-
-                <span>{project.endDate}</span>
-              </div>
-
-              {/* =========================
-                      멤버
-                  ========================= */}
-
-              <p className={styles.memberCount}>멤버 {project.memberCount}명</p>
-
-              {/* =========================
-                      목록 API에는
-                      진행률 값이 없음
-
-                      디자인 유지용 표시
-                  ========================= */}
-
-              <div className={styles.progressRow}>
-                <div className={styles.progressBar}>
-                  <div
-                    className={styles.progressFill}
-                    style={{
-                      width: "78%",
+                      handleProjectSettings(project);
                     }}
-                  />
+                    aria-label="프로젝트 설정"
+                  >
+                    <img src={settingIcon} alt="" />
+                  </button>
                 </div>
 
-                <span className={styles.progressText}>78%</span>
-              </div>
-            </article>
-          ))}
+                {/* =========================
+                      CYCLE
+                  ========================= */}
+
+                <p className={styles.cycleText}>{cycleText}</p>
+
+                {/* =========================
+                      PROGRESS
+                  ========================= */}
+
+                <div className={styles.progressRow}>
+                  <div className={styles.progressBar}>
+                    <div
+                      className={styles.progressFill}
+                      style={{
+                        width: `${Math.min(Number(progress) || 0, 100)}%`,
+                      }}
+                    />
+                  </div>
+
+                  <span className={styles.progressText}>{progress}%</span>
+                </div>
+
+                {/* =========================
+                      CARD BOTTOM
+                  ========================= */}
+
+                <div className={styles.cardBottom}>
+                  {project.participantCount !== undefined && (
+                    <>
+                      <span>참여 {project.participantCount}</span>
+
+                      <span className={styles.separator}>·</span>
+                    </>
+                  )}
+
+                  <span>멤버 {project.memberCount ?? 0}</span>
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
     </section>
