@@ -1,5 +1,5 @@
 .container {
-  margin-left: 234px;
+  margin-left: 89px;
 
   width: calc(100% - 234px);
   min-height: 100vh;
@@ -53,6 +53,37 @@
 
 .backButton:hover {
   color: rgba(255, 255, 255, 0.8);
+}
+.addMemberButton {
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.plusMemberIcon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.addMemberButton:hover .plusMemberIcon {
+  transform: scale(1.08);
+}
+
+.plusMemberIcon {
+  transition: transform 0.15s ease;
 }
 
 .title {
@@ -299,4 +330,49 @@
   opacity: 0.55;
 
   cursor: not-allowed;
+}
+
+/* =========================
+   초대 팀원 이메일
+========================= */
+
+.memberEmailList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inviteEmailRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inviteEmailRow input {
+  flex: 1;
+  min-width: 0;
+}
+
+.addMemberButton {
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  background-color: transparent;
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+
+  cursor: pointer;
+}
+
+.addMemberButton:hover {
+  background-color: rgba(77, 103, 255, 0.12);
 }

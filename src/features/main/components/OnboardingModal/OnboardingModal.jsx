@@ -18,33 +18,25 @@ import JoinWorkspaceModal from "../JoinWorkspaceModal/JoinWorkspaceModal";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://api.likelion-bato.cloud";
 
-/* =========================================================
-   Onboarding Modal
-========================================================= */
-
 function OnboardingModal({ onClose, userName }) {
   const navigate = useNavigate();
 
   const [step, setStep] = useState(1);
 
   /* =========================================
-     Step 1 State
+     Step 1
   ========================================= */
 
-  const [company, setCompany] = useState("");
-
-  const [department, setDepartment] = useState("");
-
-  const [team, setTeam] = useState("");
-
-  const [position, setPosition] = useState("");
+  const [name, setName] = useState(
+    userName || localStorage.getItem("userName") || "",
+  );
 
   const [region, setRegion] = useState("");
 
   const [isRegionOpen, setIsRegionOpen] = useState(false);
 
   /* =========================================
-     API 상태
+     상태
   ========================================= */
 
   const [isSavingSettings, setIsSavingSettings] = useState(false);
@@ -52,7 +44,7 @@ function OnboardingModal({ onClose, userName }) {
   const [errorMessage, setErrorMessage] = useState("");
 
   /* =========================================
-     Join Workspace Modal
+     Join Workspace
   ========================================= */
 
   const [isJoinWorkspaceModalOpen, setIsJoinWorkspaceModalOpen] =
@@ -68,6 +60,14 @@ function OnboardingModal({ onClose, userName }) {
     }
 
     setErrorMessage("");
+
+    const trimmedName = name.trim();
+
+    if (!trimmedName) {
+      setErrorMessage("이름을 입력해주세요.");
+
+      return;
+    }
 
     if (!region) {
       setErrorMessage("사용자 지역을 선택해주세요.");
@@ -87,7 +87,7 @@ function OnboardingModal({ onClose, userName }) {
       setIsSavingSettings(true);
 
       /* =========================================
-         1. 사용자 지역 저장
+         1. 지역 저장
       ========================================= */
 
       const regionResponse = await fetch(
@@ -119,40 +119,12 @@ function OnboardingModal({ onClose, userName }) {
          2. LocalStorage 저장
       ========================================= */
 
+      localStorage.setItem("userName", trimmedName);
+
       localStorage.setItem("userRegion", region);
 
       /* =========================================
-         3. WorkspaceMember 프로필 임시 저장
-
-         workspaceId 생성 후
-         members/me/profile API에서 사용
-      ========================================= */
-
-      localStorage.setItem(
-        "pendingWorkspaceProfile",
-        JSON.stringify({
-          companyName: company.trim(),
-
-          departmentName: department.trim(),
-
-          teamName: team.trim(),
-
-          jobTitle: position.trim(),
-        }),
-      );
-
-      /*
-        기존 화면에서도 사용하는 값
-      */
-
-      localStorage.setItem("userCompany", company.trim());
-
-      localStorage.setItem("userTeam", team.trim());
-
-      localStorage.setItem("userJobTitle", position.trim());
-
-      /* =========================================
-         4. Sidebar 지역 시간 갱신
+         3. 이벤트
       ========================================= */
 
       window.dispatchEvent(new Event("timeZoneChanged"));
@@ -160,14 +132,14 @@ function OnboardingModal({ onClose, userName }) {
       window.dispatchEvent(new Event("userInfoUpdated"));
 
       /* =========================================
-         5. Step 2
+         4. Step 2
       ========================================= */
 
       setStep(2);
 
       setIsRegionOpen(false);
     } catch (error) {
-      console.error("온보딩 설정 저장 실패:", error);
+      console.error("온보딩 저장 실패:", error);
 
       setErrorMessage(error.message || "설정 저장에 실패했습니다.");
     } finally {
@@ -188,7 +160,7 @@ function OnboardingModal({ onClose, userName }) {
   };
 
   /* =========================================
-     새 워크스페이스
+     새 워크스페이스 생성
   ========================================= */
 
   const handleCreateWorkspace = () => {
@@ -200,7 +172,7 @@ function OnboardingModal({ onClose, userName }) {
   };
 
   /* =========================================
-     초대 워크스페이스 참여
+     워크스페이스 참여
   ========================================= */
 
   const handleJoinWorkspace = () => {
@@ -216,17 +188,14 @@ function OnboardingModal({ onClose, userName }) {
           <div className={styles.header}>
             <div>
               <h1>
-                환영합니다,{" "}
-                <strong>
-                  {userName || localStorage.getItem("userName") || "사용자"}!
-                </strong>
+                환영합니다, <strong>{name || "사용자"}!</strong>
               </h1>
 
               {step === 1 && (
                 <>
                   <h2>업무 시작 전, 기본 정보를 입력해주세요.</h2>
 
-                  <p>함께 일할 팀이나 다른 사람이 이해할 수 있어요.</p>
+                  <p>글로벌 협업을 위한 기본 정보를 설정합니다.</p>
                 </>
               )}
 
@@ -270,14 +239,8 @@ function OnboardingModal({ onClose, userName }) {
 
           {step === 1 && (
             <StepOne
-              company={company}
-              setCompany={setCompany}
-              department={department}
-              setDepartment={setDepartment}
-              team={team}
-              setTeam={setTeam}
-              position={position}
-              setPosition={setPosition}
+              name={name}
+              setName={setName}
               region={region}
               setRegion={setRegion}
               isRegionOpen={isRegionOpen}
@@ -300,7 +263,7 @@ function OnboardingModal({ onClose, userName }) {
             <p className={styles.errorMessage}>{errorMessage}</p>
           )}
 
-          {/* 다음 */}
+          {/* Next */}
 
           {step === 1 && (
             <button
@@ -329,17 +292,8 @@ function OnboardingModal({ onClose, userName }) {
 ========================================================= */
 
 function StepOne({
-  company,
-  setCompany,
-
-  department,
-  setDepartment,
-
-  team,
-  setTeam,
-
-  position,
-  setPosition,
+  name,
+  setName,
 
   region,
   setRegion,
@@ -385,34 +339,14 @@ function StepOne({
 
         <div className={styles.column}>
           <div className={styles.field}>
-            <label htmlFor="company">소속 기업</label>
+            <label htmlFor="name">이름</label>
 
             <input
-              id="company"
+              id="name"
               type="text"
-              placeholder="기업 이름을 입력하세요."
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label htmlFor="department">부서/팀</label>
-
-            <input
-              id="department"
-              type="text"
-              placeholder="부서 이름을 입력하세요."
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-            />
-
-            <input
-              id="team"
-              type="text"
-              placeholder="팀 이름을 입력하세요."
-              value={team}
-              onChange={(e) => setTeam(e.target.value)}
+              placeholder="이름을 입력하세요."
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
         </div>
@@ -421,29 +355,13 @@ function StepOne({
 
         <div className={styles.column}>
           <div className={styles.field}>
-            <label htmlFor="position">직책</label>
-
-            <input
-              id="position"
-              type="text"
-              placeholder="직책 이름을 입력하세요."
-              value={position}
-              onChange={(e) => setPosition(e.target.value)}
-            />
-          </div>
-
-          <div className={styles.field}>
             <label>사용자 지역 설정</label>
-
-            {/* Region */}
 
             <div className={styles.customDropdown}>
               <button
                 type="button"
                 className={styles.dropdownButton}
-                onClick={() => {
-                  setIsRegionOpen((prev) => !prev);
-                }}
+                onClick={() => setIsRegionOpen((prev) => !prev)}
               >
                 <span
                   className={

@@ -1,11 +1,6 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 
-import {
-  useNavigate,
-} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import styles from "./Sidebar.module.css";
 
@@ -15,7 +10,6 @@ import issueIcon from "../../assets/icons/issueIcon.svg";
 import projectIcon from "../../assets/icons/projectIcon.svg";
 import logoIcon from "../../assets/icons/logo.svg";
 
-import notifyIcon from "../../assets/icons/notifyIcon.svg";
 import notifyIcon2 from "../../assets/icons/notifyIcon2.svg";
 import moonIcon from "../../assets/icons/moonIcon.svg";
 import profileIcon from "../../assets/icons/profileIcon.svg";
@@ -24,188 +18,163 @@ import settingIcon from "../../assets/icons/settingIcon.svg";
 import logoutIcon from "../../assets/icons/logoutIcon.svg";
 import dropdownIcon from "../../assets/icons/dropdownIcon.svg";
 
-import {
-  ROUTES,
-} from "../../router/routes.constant";
+import { ROUTES } from "../../router/routes.constant";
 
-import {
-  getWorkspaces,
-} from "../../api/workspaceApi";
+import { getWorkspaces } from "../../api/workspaceApi";
 
 import {
   getActivityStatus,
   updateActivityStatus,
 } from "../../api/userApi";
 
-import {
-  logout,
-} from "../../api/authApi";
-
+import { logout } from "../../api/authApi";
 
 /* ========================================
    지역 정보
+   사이드바에서는 항상 영어로 표시
 ======================================== */
 
 const REGION_INFO_MAP = {
   SEOUL: {
-    name:
-      "[KR] 서울, 대한민국",
-
-    timezone:
-      "Asia/Seoul",
+    name: "[KR] Seoul, Korea",
+    timezone: "Asia/Seoul",
   },
 
   TOKYO: {
-    name:
-      "[JP] 도쿄, 일본",
-
-    timezone:
-      "Asia/Tokyo",
+    name: "[JP] Tokyo, Japan",
+    timezone: "Asia/Tokyo",
   },
 
   NEW_YORK: {
-    name:
-      "[US] 뉴욕, 미국",
-
-    timezone:
-      "America/New_York",
+    name: "[US] New York, USA",
+    timezone: "America/New_York",
   },
 
   LOS_ANGELES: {
-    name:
-      "[US] 로스앤젤레스, 미국",
-
-    timezone:
-      "America/Los_Angeles",
+    name: "[US] Los Angeles, USA",
+    timezone: "America/Los_Angeles",
   },
 };
 
+/*
+  routes.constant.js에
+  ROUTES.MEMBER가 이미 있다면 그 값을 사용.
+
+  없다면 "/member" 사용.
+*/
+
+const MEMBER_ROUTE = ROUTES.MEMBER || "/member";
 
 function Sidebar() {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
+  const location = useLocation();
+
+  /* ========================================
+     현재 경로
+  ======================================== */
+
+  const pathname = location.pathname;
+
+  /* ========================================
+     메뉴 선택 여부
+  ======================================== */
+
+  const isDashboardActive =
+    pathname === ROUTES.DASHBOARD;
+
+  const isCycleActive =
+    pathname === ROUTES.CYCLE;
+
+  const isIssueActive =
+    pathname === ROUTES.ISSUE;
+
+  const isProjectActive =
+    pathname === ROUTES.PROJECT_HOME ||
+    pathname.startsWith(
+      `${ROUTES.PROJECT_HOME}/`,
+    );
+
+  const isMemberActive =
+    pathname === MEMBER_ROUTE ||
+    pathname.startsWith(
+      `${MEMBER_ROUTE}/`,
+    );
 
   /* ========================================
      로그인 정보
   ======================================== */
 
   const isLoggedIn =
-    localStorage.getItem(
-      "isLoggedIn"
-    ) === "true";
-
+    localStorage.getItem("isLoggedIn") === "true";
 
   const accessToken =
-    localStorage.getItem(
-      "accessToken"
-    );
-
+    localStorage.getItem("accessToken");
 
   const isAuthenticated =
-    isLoggedIn &&
-    Boolean(accessToken);
-
+    isLoggedIn && Boolean(accessToken);
 
   /* ========================================
      사용자 정보
   ======================================== */
 
-  const [
-    userName,
-    setUserName,
-  ] = useState(
-    localStorage.getItem(
-      "userName"
-    ) || "사용자"
+  const [userName, setUserName] = useState(
+    localStorage.getItem("userName") || "사용자",
   );
 
-
-  const [
-    userEmail,
-    setUserEmail,
-  ] = useState(
-    localStorage.getItem(
-      "userEmail"
-    ) || ""
+  const [userEmail, setUserEmail] = useState(
+    localStorage.getItem("userEmail") || "",
   );
 
-
-  const [
-    userCompany,
-    setUserCompany,
-  ] = useState(
-    localStorage.getItem(
-      "userCompany"
-    ) || ""
+  const [userCompany, setUserCompany] = useState(
+    localStorage.getItem("userCompany") || "",
   );
-
 
   /* ========================================
      Workspace
   ======================================== */
 
-  const [
-    workspaces,
-    setWorkspaces,
-  ] = useState([]);
-
+  const [workspaces, setWorkspaces] =
+    useState([]);
 
   const [
     selectedWorkspace,
     setSelectedWorkspace,
   ] = useState(null);
 
-
   const [
     isWorkspaceOpen,
     setIsWorkspaceOpen,
   ] = useState(false);
-
 
   const [
     isWorkspaceLoading,
     setIsWorkspaceLoading,
   ] = useState(false);
 
-
   const [
     workspaceError,
     setWorkspaceError,
   ] = useState("");
 
-
-  /* ========================================
-     Project Hover
-  ======================================== */
-
-  const [
-    isProjectOpen,
-    setIsProjectOpen,
-  ] = useState(false);
-
-
   /* ========================================
      활동 상태
   ======================================== */
 
-  const [
-    isActive,
-    setIsActive,
-  ] = useState(() => {
-    return (
-      localStorage.getItem(
-        "activityStatus"
-      ) === "ACTIVE"
-    );
-  });
-
+  const [isActive, setIsActive] = useState(
+    () => {
+      return (
+        localStorage.getItem(
+          "activityStatus",
+        ) === "ACTIVE"
+      );
+    },
+  );
 
   const [
     isActivityUpdating,
     setIsActivityUpdating,
   ] = useState(false);
-
 
   /* ========================================
      로그아웃
@@ -216,7 +185,6 @@ function Sidebar() {
     setIsLoggingOut,
   ] = useState(false);
 
-
   /* ========================================
      Profile
   ======================================== */
@@ -226,57 +194,38 @@ function Sidebar() {
     setIsProfileOpen,
   ] = useState(false);
 
-
   /* ========================================
      시간 계산
   ======================================== */
 
-  const getTime = (
-    timeZone
-  ) => {
+  const getTime = (timeZone) => {
     try {
-      return new Intl.DateTimeFormat(
-        "en-GB",
-        {
-          timeZone,
+      return new Intl.DateTimeFormat("en-GB", {
+        timeZone,
 
-          hour:
-            "2-digit",
+        hour: "2-digit",
 
-          minute:
-            "2-digit",
+        minute: "2-digit",
 
-          hour12:
-            false,
-        }
-      ).format(
-        new Date()
-      );
+        hour12: false,
+      }).format(new Date());
     } catch (error) {
       console.error(
         "시간대 변환 실패:",
-        error
+        error,
       );
 
       return "--:--";
     }
   };
 
-
   /* ========================================
      서울 시간
   ======================================== */
 
-  const [
-    seoulTime,
-    setSeoulTime,
-  ] = useState(
-    () =>
-      getTime(
-        "Asia/Seoul"
-      )
+  const [seoulTime, setSeoulTime] = useState(
+    () => getTime("Asia/Seoul"),
   );
-
 
   /* ========================================
      사용자 설정 지역
@@ -287,175 +236,125 @@ function Sidebar() {
     setSelectedRegion,
   ] = useState(
     () =>
-      localStorage.getItem(
-        "userRegion"
-      ) || "SEOUL"
+      localStorage.getItem("userRegion") ||
+      "SEOUL",
   );
-
 
   const [
     selectedTimezone,
     setSelectedTimezone,
   ] = useState(
     () =>
-      localStorage.getItem(
-        "userTimezone"
-      ) ||
-      "Asia/Seoul"
+      localStorage.getItem("userTimezone") ||
+      "Asia/Seoul",
   );
 
-
   const selectedRegionInfo =
-    REGION_INFO_MAP[
-      selectedRegion
-    ] || {
+    REGION_INFO_MAP[selectedRegion] || {
       name:
         selectedRegion ||
-        "[KR] 서울, 대한민국",
+        "[KR] Seoul, Korea",
 
-      timezone:
-        selectedTimezone,
+      timezone: selectedTimezone,
     };
-
 
   const [
     selectedRegionTime,
     setSelectedRegionTime,
-  ] = useState(
-    () =>
-      getTime(
-        selectedTimezone
-      )
+  ] = useState(() =>
+    getTime(selectedTimezone),
   );
-
 
   /* ========================================
      시간 업데이트
   ======================================== */
 
   useEffect(() => {
-    const updateTime =
-      () => {
-        /*
-          서울은 항상 고정
-        */
+    const updateTime = () => {
+      /*
+        서울은 항상 고정
+      */
 
-        setSeoulTime(
-          getTime(
-            "Asia/Seoul"
-          )
-        );
+      setSeoulTime(
+        getTime("Asia/Seoul"),
+      );
 
+      /*
+        아래 시간은 사용자 설정 지역
+      */
 
-        /*
-          아래 시간은 사용자 설정 지역
-        */
-
-        setSelectedRegionTime(
-          getTime(
-            selectedTimezone
-          )
-        );
-      };
-
+      setSelectedRegionTime(
+        getTime(selectedTimezone),
+      );
+    };
 
     updateTime();
 
-
-    const timer =
-      setInterval(
-        updateTime,
-        60 * 1000
-      );
-
+    const timer = setInterval(
+      updateTime,
+      60 * 1000,
+    );
 
     return () => {
-      clearInterval(
-        timer
-      );
+      clearInterval(timer);
     };
-  }, [
-    selectedTimezone,
-  ]);
-
+  }, [selectedTimezone]);
 
   /* ========================================
      시스템 설정 지역 변경 감지
   ======================================== */
 
   useEffect(() => {
-    const handleTimeZoneChanged =
-      () => {
-        const savedRegion =
-          localStorage.getItem(
-            "userRegion"
-          ) ||
-          "SEOUL";
+    const handleTimeZoneChanged = () => {
+      const savedRegion =
+        localStorage.getItem("userRegion") ||
+        "SEOUL";
 
+      const savedTimezone =
+        localStorage.getItem("userTimezone") ||
+        "Asia/Seoul";
 
-        const savedTimezone =
-          localStorage.getItem(
-            "userTimezone"
-          ) ||
-          "Asia/Seoul";
+      console.log(
+        "Sidebar 지역 변경:",
+        savedRegion,
+      );
 
+      console.log(
+        "Sidebar 시간대 변경:",
+        savedTimezone,
+      );
 
-        console.log(
-          "Sidebar 지역 변경:",
-          savedRegion
-        );
+      setSelectedRegion(savedRegion);
 
+      setSelectedTimezone(savedTimezone);
 
-        console.log(
-          "Sidebar 시간대 변경:",
-          savedTimezone
-        );
-
-
-        setSelectedRegion(
-          savedRegion
-        );
-
-
-        setSelectedTimezone(
-          savedTimezone
-        );
-
-
-        setSelectedRegionTime(
-          getTime(
-            savedTimezone
-          )
-        );
-      };
-
+      setSelectedRegionTime(
+        getTime(savedTimezone),
+      );
+    };
 
     window.addEventListener(
       "timeZoneChanged",
-      handleTimeZoneChanged
+      handleTimeZoneChanged,
     );
-
 
     window.addEventListener(
       "storage",
-      handleTimeZoneChanged
+      handleTimeZoneChanged,
     );
-
 
     return () => {
       window.removeEventListener(
         "timeZoneChanged",
-        handleTimeZoneChanged
+        handleTimeZoneChanged,
       );
-
 
       window.removeEventListener(
         "storage",
-        handleTimeZoneChanged
+        handleTimeZoneChanged,
       );
     };
   }, []);
-
 
   /* ========================================
      워크스페이스 / 활동 상태 조회
@@ -466,202 +365,123 @@ function Sidebar() {
       return undefined;
     }
 
+    const fetchWorkspaces = async () => {
+      try {
+        setIsWorkspaceLoading(true);
 
-    /* ===============================
-       워크스페이스 조회
-    =============================== */
+        setWorkspaceError("");
 
-    const fetchWorkspaces =
-      async () => {
-        try {
-          setIsWorkspaceLoading(
-            true
-          );
+        const result =
+          await getWorkspaces("ACTIVE");
 
+        const workspaceList =
+          Array.isArray(result?.data)
+            ? result.data
+            : [];
 
-          setWorkspaceError(
-            ""
-          );
+        setWorkspaces(workspaceList);
 
+        if (workspaceList.length === 0) {
+          setSelectedWorkspace(null);
 
-          const result =
-            await getWorkspaces(
-              "ACTIVE"
-            );
-
-
-          const workspaceList =
-            Array.isArray(
-              result?.data
-            )
-              ? result.data
-              : [];
-
-
-          setWorkspaces(
-            workspaceList
-          );
-
-
-          /* ===============================
-             워크스페이스 없는 경우
-          =============================== */
-
-          if (
-            workspaceList.length ===
-            0
-          ) {
-            setSelectedWorkspace(
-              null
-            );
-
-
-            localStorage.removeItem(
-              "workspaceId"
-            );
-
-
-            localStorage.removeItem(
-              "workspaceName"
-            );
-
-
-            localStorage.removeItem(
-              "workspaceCompanyName"
-            );
-
-
-            localStorage.removeItem(
-              "selectedWorkspace"
-            );
-
-
-            return;
-          }
-
-
-          /* ===============================
-             기존 선택 워크스페이스 확인
-          =============================== */
-
-          const savedWorkspaceId =
-            localStorage.getItem(
-              "workspaceId"
-            );
-
-
-          let workspaceToSelect =
-            null;
-
-
-          if (
-            savedWorkspaceId
-          ) {
-            workspaceToSelect =
-              workspaceList.find(
-                (
-                  workspace
-                ) =>
-                  String(
-                    workspace.workspaceId
-                  ) ===
-                  String(
-                    savedWorkspaceId
-                  )
-              ) ||
-              null;
-          }
-
-
-          /* ===============================
-             기존 선택값이 없으면
-             첫 번째 워크스페이스 선택
-          =============================== */
-
-          if (
-            !workspaceToSelect
-          ) {
-            workspaceToSelect =
-              workspaceList[0];
-          }
-
-
-          setSelectedWorkspace(
-            workspaceToSelect
-          );
-
-
-          localStorage.setItem(
+          localStorage.removeItem(
             "workspaceId",
-            String(
-              workspaceToSelect
-                .workspaceId
-            )
           );
 
-
-          localStorage.setItem(
+          localStorage.removeItem(
             "workspaceName",
-            workspaceToSelect
-              .name
           );
 
-
-          localStorage.setItem(
+          localStorage.removeItem(
             "workspaceCompanyName",
-            workspaceToSelect
-              .companyName ||
-              ""
           );
 
-
-          localStorage.setItem(
+          localStorage.removeItem(
             "selectedWorkspace",
-            JSON.stringify(
-              workspaceToSelect
-            )
           );
 
-
-          window.dispatchEvent(
-            new Event(
-              "workspaceChanged"
-            )
-          );
-        } catch (error) {
-          console.error(
-            "워크스페이스 목록 조회 실패:",
-            error
-          );
-
-
-          if (
-            error.status ===
-            401
-          ) {
-            setWorkspaceError(
-              "로그인이 만료되었습니다."
-            );
-
-            return;
-          }
-
-
-          setWorkspaceError(
-            error.message ||
-              "워크스페이스 목록을 불러오지 못했습니다."
-          );
-        } finally {
-          setIsWorkspaceLoading(
-            false
-          );
+          return;
         }
-      };
 
+        const savedWorkspaceId =
+          localStorage.getItem(
+            "workspaceId",
+          );
 
-    /* ===============================
-       활동 상태 조회
-    =============================== */
+        let workspaceToSelect = null;
+
+        if (savedWorkspaceId) {
+          workspaceToSelect =
+            workspaceList.find(
+              (workspace) =>
+                String(
+                  workspace.workspaceId,
+                ) ===
+                String(
+                  savedWorkspaceId,
+                ),
+            ) || null;
+        }
+
+        if (!workspaceToSelect) {
+          workspaceToSelect =
+            workspaceList[0];
+        }
+
+        setSelectedWorkspace(
+          workspaceToSelect,
+        );
+
+        localStorage.setItem(
+          "workspaceId",
+          String(
+            workspaceToSelect.workspaceId,
+          ),
+        );
+
+        localStorage.setItem(
+          "workspaceName",
+          workspaceToSelect.name,
+        );
+
+        localStorage.setItem(
+          "workspaceCompanyName",
+          workspaceToSelect.companyName ||
+            "",
+        );
+
+        localStorage.setItem(
+          "selectedWorkspace",
+          JSON.stringify(
+            workspaceToSelect,
+          ),
+        );
+
+        window.dispatchEvent(
+          new Event("workspaceChanged"),
+        );
+      } catch (error) {
+        console.error(
+          "워크스페이스 목록 조회 실패:",
+          error,
+        );
+
+        if (error.status === 401) {
+          setWorkspaceError(
+            "로그인이 만료되었습니다.",
+          );
+
+          return;
+        }
+
+        setWorkspaceError(
+          error.message ||
+            "워크스페이스 목록을 불러오지 못했습니다.",
+        );
+      } finally {
+        setIsWorkspaceLoading(false);
+      }
+    };
 
     const fetchActivityStatus =
       async () => {
@@ -669,192 +489,140 @@ function Sidebar() {
           const result =
             await getActivityStatus();
 
-
           const status =
             result?.data?.status;
 
-
           const active =
-            status ===
-            "ACTIVE";
+            status === "ACTIVE";
 
-
-          setIsActive(
-            active
-          );
-
+          setIsActive(active);
 
           if (status) {
             localStorage.setItem(
               "activityStatus",
-              status
+              status,
             );
           }
         } catch (error) {
           console.error(
             "활동 상태 조회 실패:",
-            error
+            error,
           );
         }
       };
-
 
     void fetchWorkspaces();
 
     void fetchActivityStatus();
 
-
     window.addEventListener(
       "workspaceCreated",
-      fetchWorkspaces
+      fetchWorkspaces,
     );
-
 
     return () => {
       window.removeEventListener(
         "workspaceCreated",
-        fetchWorkspaces
+        fetchWorkspaces,
       );
     };
-  }, [
-    isAuthenticated,
-  ]);
-
+  }, [isAuthenticated]);
 
   /* ========================================
      Workspace 선택
   ======================================== */
 
-  const handleWorkspaceSelect =
-    (
-      workspace
-    ) => {
-      setSelectedWorkspace(
-        workspace
-      );
+  const handleWorkspaceSelect = (
+    workspace,
+  ) => {
+    setSelectedWorkspace(workspace);
 
+    setIsWorkspaceOpen(false);
 
-      setIsWorkspaceOpen(
-        false
-      );
+    localStorage.setItem(
+      "workspaceId",
+      String(workspace.workspaceId),
+    );
 
+    localStorage.setItem(
+      "workspaceName",
+      workspace.name,
+    );
 
-      localStorage.setItem(
-        "workspaceId",
-        String(
-          workspace.workspaceId
-        )
-      );
+    localStorage.setItem(
+      "workspaceCompanyName",
+      workspace.companyName || "",
+    );
 
+    localStorage.setItem(
+      "selectedWorkspace",
+      JSON.stringify(workspace),
+    );
 
-      localStorage.setItem(
-        "workspaceName",
-        workspace.name
-      );
-
-
-      localStorage.setItem(
-        "workspaceCompanyName",
-        workspace.companyName ||
-          ""
-      );
-
-
-      localStorage.setItem(
-        "selectedWorkspace",
-        JSON.stringify(
-          workspace
-        )
-      );
-
-
-      window.dispatchEvent(
-        new Event(
-          "workspaceChanged"
-        )
-      );
-    };
-
+    window.dispatchEvent(
+      new Event("workspaceChanged"),
+    );
+  };
 
   /* ========================================
      사용자 정보 업데이트
   ======================================== */
 
   useEffect(() => {
-    const updateUserInfo =
-      () => {
-        const savedName =
-          localStorage.getItem(
-            "userName"
-          );
+    const updateUserInfo = () => {
+      const savedName =
+        localStorage.getItem("userName");
 
+      const savedEmail =
+        localStorage.getItem("userEmail");
 
-        const savedEmail =
-          localStorage.getItem(
-            "userEmail"
-          );
-
-
-        const savedCompany =
-          localStorage.getItem(
-            "userCompany"
-          );
-
-
-        setUserName(
-          savedName ||
-            "사용자"
+      const savedCompany =
+        localStorage.getItem(
+          "userCompany",
         );
 
+      setUserName(
+        savedName || "사용자",
+      );
 
-        setUserEmail(
-          savedEmail ||
-            ""
-        );
+      setUserEmail(
+        savedEmail || "",
+      );
 
-
-        setUserCompany(
-          savedCompany ||
-            ""
-        );
-      };
-
+      setUserCompany(
+        savedCompany || "",
+      );
+    };
 
     window.addEventListener(
       "userInfoUpdated",
-      updateUserInfo
+      updateUserInfo,
     );
-
 
     window.addEventListener(
       "storage",
-      updateUserInfo
+      updateUserInfo,
     );
-
 
     return () => {
       window.removeEventListener(
         "userInfoUpdated",
-        updateUserInfo
+        updateUserInfo,
       );
-
 
       window.removeEventListener(
         "storage",
-        updateUserInfo
+        updateUserInfo,
       );
     };
   }, []);
-
 
   /* ========================================
      활동 상태 변경
   ======================================== */
 
   const handleActivityToggle =
-    async (
-      event
-    ) => {
+    async (event) => {
       if (
         !isAuthenticated ||
         isActivityUpdating
@@ -862,301 +630,207 @@ function Sidebar() {
         return;
       }
 
-
       const checked =
         event.target.checked;
 
-
       const newStatus =
-        checked
-          ? "ACTIVE"
-          : "OFF";
-
+        checked ? "ACTIVE" : "OFF";
 
       try {
-        setIsActivityUpdating(
-          true
-        );
-
+        setIsActivityUpdating(true);
 
         const result =
           await updateActivityStatus(
-            newStatus
+            newStatus,
           );
-
 
         console.log(
           "활동 상태 변경 성공:",
-          result
+          result,
         );
 
-
-        setIsActive(
-          checked
-        );
-
+        setIsActive(checked);
 
         localStorage.setItem(
           "activityStatus",
-          newStatus
+          newStatus,
         );
-
 
         window.dispatchEvent(
           new Event(
-            "userInfoUpdated"
-          )
+            "userInfoUpdated",
+          ),
         );
       } catch (error) {
         console.error(
           "활동 상태 변경 실패:",
-          error
+          error,
         );
 
-
-        if (
-          error.status ===
-          401
-        ) {
+        if (error.status === 401) {
           alert(
-            "로그인이 만료되었습니다. 다시 로그인해주세요."
+            "로그인이 만료되었습니다. 다시 로그인해주세요.",
           );
         } else {
           alert(
             error.message ||
-              "활동 상태 변경에 실패했습니다."
+              "활동 상태 변경에 실패했습니다.",
           );
         }
       } finally {
-        setIsActivityUpdating(
-          false
-        );
+        setIsActivityUpdating(false);
       }
     };
-
 
   /* ========================================
      로그아웃
   ======================================== */
 
-  const handleLogout =
-    async () => {
-      if (
-        isLoggingOut
-      ) {
+  const handleLogout = async () => {
+    if (isLoggingOut) {
+      return;
+    }
+
+    try {
+      setIsLoggingOut(true);
+
+      if (accessToken) {
+        const result = await logout();
+
+        console.log(
+          "로그아웃 성공:",
+          result,
+        );
+      }
+
+      setIsActive(false);
+    } catch (error) {
+      console.error(
+        "로그아웃 API 실패:",
+        error,
+      );
+
+      if (error.status !== 401) {
+        alert(
+          error.message ||
+            "로그아웃에 실패했습니다.",
+        );
+
         return;
       }
+    } finally {
+      localStorage.removeItem(
+        "isLoggedIn",
+      );
 
+      localStorage.removeItem(
+        "accessToken",
+      );
 
-      try {
-        setIsLoggingOut(
-          true
-        );
+      localStorage.removeItem(
+        "refreshToken",
+      );
 
+      localStorage.removeItem(
+        "activityStatus",
+      );
 
-        if (
-          accessToken
-        ) {
-          const result =
-            await logout();
+      localStorage.removeItem(
+        "workspaceId",
+      );
 
+      localStorage.removeItem(
+        "workspaceName",
+      );
 
-          console.log(
-            "로그아웃 성공:",
-            result
-          );
-        }
+      localStorage.removeItem(
+        "workspaceCompanyName",
+      );
 
+      localStorage.removeItem(
+        "selectedWorkspace",
+      );
 
-        setIsActive(
-          false
-        );
-      } catch (error) {
-        console.error(
-          "로그아웃 API 실패:",
-          error
-        );
+      localStorage.removeItem(
+        "projectId",
+      );
 
+      localStorage.removeItem(
+        "projectName",
+      );
 
-        /*
-          토큰이 이미 만료된 경우에는
-          로컬 로그인 정보는 정리
-        */
+      localStorage.removeItem(
+        "selectedProject",
+      );
 
-        if (
-          error.status !==
-          401
-        ) {
-          alert(
-            error.message ||
-              "로그아웃에 실패했습니다."
-          );
+      localStorage.removeItem(
+        "userRegion",
+      );
 
-          return;
-        }
-      } finally {
-        localStorage.removeItem(
-          "isLoggedIn"
-        );
+      localStorage.removeItem(
+        "userTimezone",
+      );
 
+      window.dispatchEvent(
+        new Event("authChanged"),
+      );
 
-        localStorage.removeItem(
-          "accessToken"
-        );
+      navigate("/");
 
-
-        localStorage.removeItem(
-          "refreshToken"
-        );
-
-
-        localStorage.removeItem(
-          "activityStatus"
-        );
-
-
-        localStorage.removeItem(
-          "workspaceId"
-        );
-
-
-        localStorage.removeItem(
-          "workspaceName"
-        );
-
-
-        localStorage.removeItem(
-          "workspaceCompanyName"
-        );
-
-
-        localStorage.removeItem(
-          "selectedWorkspace"
-        );
-
-
-        localStorage.removeItem(
-          "projectId"
-        );
-
-
-        localStorage.removeItem(
-          "projectName"
-        );
-
-
-        localStorage.removeItem(
-          "selectedProject"
-        );
-
-
-        localStorage.removeItem(
-          "userRegion"
-        );
-
-
-        localStorage.removeItem(
-          "userTimezone"
-        );
-
-
-        window.dispatchEvent(
-          new Event(
-            "authChanged"
-          )
-        );
-
-
-        navigate(
-          "/"
-        );
-
-
-        setIsLoggingOut(
-          false
-        );
-      }
-    };
-
+      setIsLoggingOut(false);
+    }
+  };
 
   /* ========================================
      Profile
   ======================================== */
 
-  const handleProfileClick =
-    () => {
-      setIsProfileOpen(
-        (prev) =>
-          !prev
-      );
-    };
-
+  const handleProfileClick = () => {
+    setIsProfileOpen(
+      (prev) => !prev,
+    );
+  };
 
   /* ========================================
      프로필 설정
   ======================================== */
 
-  const handleProfileSettingOpen =
-    () => {
-      setIsProfileOpen(
-        false
-      );
+  const handleProfileSettingOpen = () => {
+    setIsProfileOpen(false);
 
-
-      navigate(
-        ROUTES.PROFILE_SETTINGS
-      );
-    };
-
+    navigate(
+      ROUTES.PROFILE_SETTINGS,
+    );
+  };
 
   /* ========================================
      시스템 설정
   ======================================== */
 
-  const handleSystemSettingOpen =
-    () => {
-      setIsProfileOpen(
-        false
-      );
+  const handleSystemSettingOpen = () => {
+    setIsProfileOpen(false);
 
-
-      navigate(
-        ROUTES.SYSTEM_SETTINGS
-      );
-    };
-
+    navigate(
+      ROUTES.SYSTEM_SETTINGS,
+    );
+  };
 
   return (
-    <aside
-      className={
-        styles.sidebar
-      }
-    >
+    <aside className={styles.sidebar}>
       {/* =========================
           Logo
       ========================= */}
 
-      <div
-        className={
-          styles.logoArea
-        }
-      >
+      <div className={styles.logoArea}>
         <img
-          className={
-            styles.logo
-          }
-          src={
-            logoIcon
-          }
+          className={styles.logo}
+          src={logoIcon}
           alt="RelAi"
         />
       </div>
 
-
       <div
-        className={
-          styles.sidebarContent
-        }
+        className={styles.sidebarContent}
       >
         {/* ========================================
             로그인 사용자 정보
@@ -1165,19 +839,14 @@ function Sidebar() {
         {isLoggedIn ? (
           <>
             <div
-              className={
-                styles.userArea
-              }
+              className={styles.userArea}
             >
               <p
-                className={
-                  styles.greeting
-                }
+                className={styles.greeting}
               >
                 안녕하세요, {userName}님
               </p>
             </div>
-
 
             {/* Workspace */}
 
@@ -1194,13 +863,11 @@ function Sidebar() {
                 disabled={
                   !isAuthenticated ||
                   isWorkspaceLoading ||
-                  workspaces.length ===
-                    0
+                  workspaces.length === 0
                 }
                 onClick={() =>
                   setIsWorkspaceOpen(
-                    (prev) =>
-                      !prev
+                    (prev) => !prev,
                   )
                 }
               >
@@ -1214,13 +881,9 @@ function Sidebar() {
                         : "워크스페이스 없음"}
                 </span>
 
-
-                {workspaces.length >
-                  0 && (
+                {workspaces.length > 0 && (
                   <img
-                    src={
-                      dropdownIcon
-                    }
+                    src={dropdownIcon}
                     alt=""
                     className={`${styles.workspaceDropdownIcon} ${
                       isWorkspaceOpen
@@ -1231,23 +894,18 @@ function Sidebar() {
                 )}
               </button>
 
-
               {workspaceError && (
                 <p
                   className={
                     styles.workspaceError
                   }
                 >
-                  {
-                    workspaceError
-                  }
+                  {workspaceError}
                 </p>
               )}
 
-
               {isWorkspaceOpen &&
-                workspaces.length >
-                  1 && (
+                workspaces.length > 1 && (
                   <div
                     className={
                       styles.workspaceMenu
@@ -1255,17 +913,13 @@ function Sidebar() {
                   >
                     {workspaces
                       .filter(
-                        (
-                          workspace
-                        ) =>
+                        (workspace) =>
                           workspace.workspaceId !==
                           selectedWorkspace
-                            ?.workspaceId
+                            ?.workspaceId,
                       )
                       .map(
-                        (
-                          workspace
-                        ) => (
+                        (workspace) => (
                           <button
                             key={
                               workspace.workspaceId
@@ -1276,15 +930,13 @@ function Sidebar() {
                             }
                             onClick={() =>
                               handleWorkspaceSelect(
-                                workspace
+                                workspace,
                               )
                             }
                           >
-                            {
-                              workspace.name
-                            }
+                            {workspace.name}
                           </button>
-                        )
+                        ),
                       )}
                   </div>
                 )}
@@ -1292,249 +944,218 @@ function Sidebar() {
           </>
         ) : (
           <p
-            className={
-              styles.loginText
-            }
+            className={styles.loginText}
           >
             로그인이 필요합니다.
           </p>
         )}
 
-
         {/* ========================================
             메뉴
         ======================================== */}
 
-        <nav
-          className={
-            styles.menu
-          }
-        >
+        <nav className={styles.menu}>
           {/* 홈 */}
 
           <button
             type="button"
-            className={
-              styles.menuItem
-            }
+            className={`${styles.menuItem} ${
+              isDashboardActive
+                ? styles.activeMenuItem
+                : ""
+            }`}
             onClick={() =>
               navigate(
-                ROUTES.DASHBOARD
+                ROUTES.DASHBOARD,
               )
             }
           >
             <img
-              src={
-                homeIcon
-              }
+              src={homeIcon}
               alt=""
             />
 
-            <span>
-              홈
-            </span>
+            <span>Home</span>
           </button>
-
 
           {/* 사이클 */}
 
           <button
             type="button"
-            className={
-              styles.menuItem
-            }
+            className={`${styles.menuItem} ${
+              isCycleActive
+                ? styles.activeMenuItem
+                : ""
+            }`}
             onClick={() =>
               navigate(
-                ROUTES.CYCLE
+                ROUTES.CYCLE,
               )
             }
           >
             <img
-              src={
-                cycleIcon
-              }
+              src={cycleIcon}
               alt=""
             />
 
-            <span>
-              사이클
-            </span>
+            <span>Cycle</span>
           </button>
-
 
           {/* 이슈 */}
 
           <button
             type="button"
-            className={
-              styles.menuItem
-            }
+            className={`${styles.menuItem} ${
+              isIssueActive
+                ? styles.activeMenuItem
+                : ""
+            }`}
             onClick={() =>
               navigate(
-                ROUTES.ISSUE
+                ROUTES.ISSUE,
               )
             }
           >
             <img
-              src={
-                issueIcon
-              }
+              src={issueIcon}
               alt=""
             />
 
-            <span>
-              이슈
-            </span>
+            <span>Issue</span>
           </button>
 
+          {/* ========================================
+              프로젝트 + Member
+          ======================================== */}
 
-          {/* 프로젝트 */}
-
-          <button
-            type="button"
+          <div
             className={
-              styles.menuItem
-            }
-            onMouseEnter={() =>
-              setIsProjectOpen(
-                true
-              )
-            }
-            onMouseLeave={() =>
-              setIsProjectOpen(
-                false
-              )
-            }
-            onClick={() =>
-              navigate(
-                ROUTES.PROJECT_HOME
-              )
+              styles.projectMenu
             }
           >
-            <img
-              src={
-                projectIcon
-              }
-              alt=""
-            />
-
-            <span>
-              프로젝트
-            </span>
-          </button>
-
-
-          {isProjectOpen && (
             <button
               type="button"
-              className={
-                styles.bottomButton
-              }
-              onMouseEnter={() =>
-                setIsProjectOpen(
-                  true
-                )
-              }
-              onMouseLeave={() =>
-                setIsProjectOpen(
-                  false
-                )
-              }
+              className={`${styles.menuItem} ${
+                isProjectActive &&
+                !isMemberActive
+                  ? styles.activeMenuItem
+                  : ""
+              }`}
               onClick={() =>
                 navigate(
-                  ROUTES.PROJECT_HOME
+                  ROUTES.PROJECT_HOME,
                 )
               }
             >
               <img
-                src={
-                  projectIcon
-                }
+                src={projectIcon}
                 alt=""
               />
 
-              <span>
-                Member
-              </span>
+              <span>Project</span>
             </button>
-          )}
-        </nav>
 
+            <button
+              type="button"
+              className={`${styles.memberMenuItem} ${
+                isMemberActive
+                  ? styles.activeMemberMenuItem
+                  : ""
+              }`}
+              onClick={() =>
+                navigate(MEMBER_ROUTE)
+              }
+            >
+              <img
+                src={projectIcon}
+                alt=""
+              />
+
+              <span>Member</span>
+            </button>
+          </div>
+        </nav>
 
         {/* ========================================
             빠른 생성
         ======================================== */}
 
         <div
-          className={
-            styles.actionMenu
-          }
+          className={styles.actionMenu}
         >
           <button
             type="button"
             onClick={() =>
               navigate(
-                ROUTES.CREATE_ISSUE
+                ROUTES.CREATE_WORKSPACE,
               )
             }
           >
-            이슈 생성
+            Create Workspace
           </button>
-
 
           <button
             type="button"
             onClick={() =>
               navigate(
-                ROUTES.CREATE_PROJECT
+                ROUTES.JOIN_WORKSPACE,
               )
             }
           >
-            프로젝트 생성
+            Join Workspace
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              navigate("/workspace/create")
+            }
+          >
+            Create Project
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              navigate("/issue/create")
+            }
+          >
+            Create Issue
           </button>
         </div>
-
 
         {/* ========================================
             시간
 
-            위: 서울
+            위: 서울 고정
             아래: 시스템 설정 지역
+
+            사이드바에서는 영어 표시
         ======================================== */}
 
         <div
-          className={
-            styles.timeSection
-          }
+          className={styles.timeSection}
         >
           <div>
             <p>
-              [KR] 서울, 대한민국
+              [KR] Seoul, Korea
             </p>
 
             <strong>
-              {
-                seoulTime
-              }
+              {seoulTime}
             </strong>
           </div>
-
 
           <div>
             <p>
-              {
-                selectedRegionInfo.name
-              }
+              {selectedRegionInfo.name}
             </p>
 
             <strong>
-              {
-                selectedRegionTime
-              }
+              {selectedRegionTime}
             </strong>
           </div>
         </div>
-
 
         {/* ========================================
             하단 메뉴
@@ -1542,9 +1163,7 @@ function Sidebar() {
 
         {isLoggedIn && (
           <div
-            className={
-              styles.bottomMenu
-            }
+            className={styles.bottomMenu}
           >
             {/* 활동 상태 아이콘 */}
 
@@ -1565,22 +1184,15 @@ function Sidebar() {
               }
             >
               <img
-                src={
-                  isActive
-                    ? notifyIcon
-                    : notifyIcon2
-                }
+                src={notifyIcon2}
                 alt=""
               />
             </button>
 
-
             {/* 활동 상태 토글 */}
 
             <div
-              className={
-                styles.notifyRow
-              }
+              className={styles.notifyRow}
             >
               <button
                 type="button"
@@ -1590,24 +1202,17 @@ function Sidebar() {
                 aria-label="활동 상태"
               >
                 <img
-                  src={
-                    moonIcon
-                  }
+                  src={moonIcon}
                   alt=""
                 />
               </button>
 
-
               <label
-                className={
-                  styles.toggle
-                }
+                className={styles.toggle}
               >
                 <input
                   type="checkbox"
-                  checked={
-                    isActive
-                  }
+                  checked={isActive}
                   disabled={
                     isActivityUpdating ||
                     !isAuthenticated
@@ -1630,7 +1235,6 @@ function Sidebar() {
               </label>
             </div>
 
-
             {/* ========================================
                 프로필
             ======================================== */}
@@ -1651,13 +1255,10 @@ function Sidebar() {
                 }
               >
                 <img
-                  src={
-                    profileIcon
-                  }
+                  src={profileIcon}
                   alt=""
                 />
               </button>
-
 
               {isProfileOpen && (
                 <div
@@ -1676,13 +1277,10 @@ function Sidebar() {
                       }
                     >
                       <img
-                        src={
-                          profileIcon
-                        }
+                        src={profileIcon}
                         alt="프로필"
                       />
                     </div>
-
 
                     <div
                       className={
@@ -1690,31 +1288,22 @@ function Sidebar() {
                       }
                     >
                       <strong>
-                        {
-                          userName
-                        }
+                        {userName}
                       </strong>
-
 
                       {userEmail && (
                         <span>
-                          {
-                            userEmail
-                          }
+                          {userEmail}
                         </span>
                       )}
 
-
                       {userCompany && (
                         <span>
-                          {
-                            userCompany
-                          }
+                          {userCompany}
                         </span>
                       )}
                     </div>
                   </div>
-
 
                   <div
                     className={
@@ -1729,7 +1318,6 @@ function Sidebar() {
                       내 계정 설정
                     </p>
 
-
                     <button
                       type="button"
                       className={
@@ -1740,9 +1328,7 @@ function Sidebar() {
                       }
                     >
                       <img
-                        src={
-                          profileIcon
-                        }
+                        src={profileIcon}
                         alt=""
                       />
 
@@ -1750,7 +1336,6 @@ function Sidebar() {
                         프로필 설정
                       </span>
                     </button>
-
 
                     <button
                       type="button"
@@ -1762,9 +1347,7 @@ function Sidebar() {
                       }
                     >
                       <img
-                        src={
-                          settingIcon
-                        }
+                        src={settingIcon}
                         alt=""
                       />
 
@@ -1774,13 +1357,11 @@ function Sidebar() {
                     </button>
                   </div>
 
-
                   <div
                     className={
                       styles.profileDivider
                     }
                   />
-
 
                   <button
                     type="button"
@@ -1795,9 +1376,7 @@ function Sidebar() {
                     }
                   >
                     <img
-                      src={
-                        logoutIcon
-                      }
+                      src={logoutIcon}
                       alt=""
                     />
 
@@ -1816,6 +1395,5 @@ function Sidebar() {
     </aside>
   );
 }
-
 
 export default Sidebar;
