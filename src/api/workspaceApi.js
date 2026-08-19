@@ -207,3 +207,58 @@ export const createWorkspaceInvitation = async ({
 
   return parseResponse(response);
 };
+
+/* =========================================
+   내 워크스페이스 프로필 수정
+
+   PATCH
+   /api/v1/workspaces/{workspaceId}/members/me/profile
+========================================= */
+
+export const updateMyWorkspaceProfile = async ({
+  workspaceId,
+  name,
+  companyName,
+  teamName,
+  jobTitle,
+}) => {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    const error = new Error("로그인 정보가 없습니다.");
+
+    error.status = 401;
+
+    throw error;
+  }
+
+  if (!workspaceId) {
+    const error = new Error("워크스페이스 정보가 없습니다.");
+
+    error.status = 400;
+
+    throw error;
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/workspaces/${workspaceId}/members/me/profile`,
+    {
+      method: "PATCH",
+
+      headers: {
+        "Content-Type": "application/json",
+
+        Authorization: `Bearer ${accessToken}`,
+      },
+
+      body: JSON.stringify({
+        name,
+        companyName,
+        teamName,
+        jobTitle,
+      }),
+    },
+  );
+
+  return parseResponse(response);
+};
