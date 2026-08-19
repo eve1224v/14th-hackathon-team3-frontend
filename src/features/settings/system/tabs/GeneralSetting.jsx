@@ -84,6 +84,38 @@ function GeneralSetting({
           </div>
         </div>
       )}
+
+      {/* =========================
+          기본 설정
+      ========================= */}
+
+      <div className={styles.systemSection}>
+        <h4>기본 설정</h4>
+
+        <div className={styles.systemGroup}>
+          {/* 기본 언어 */}
+
+          <div className={styles.systemRow}>
+            <div>
+              <strong>기본 언어</strong>
+
+              <p>서비스의 기본 언어를 설정합니다.</p>
+            </div>
+
+            <select
+              name="language"
+              value={systemForm.language || "ko"}
+              onChange={onChange}
+            >
+              <option value="ko">한국어</option>
+
+              <option value="en">English</option>
+
+              <option value="ja">日本語</option>
+            </select>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
