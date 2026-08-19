@@ -18,6 +18,8 @@ import { getWorkspaceDetail } from "../../../api/workspaceApi";
 
 import { getMyRegion, updateMyRegion } from "../../../api/regionApi";
 
+import { getUserLanguage, updateUserLanguage } from "../../../api/userApi";
+
 function SystemSettingModal() {
   const navigate = useNavigate();
 
@@ -37,14 +39,19 @@ function SystemSettingModal() {
     partnerCompany: "",
 
     /*
+      사용자 기본 언어
+      UI 번역용이 아니라
+      메시지 AI 번역에서 사용할 사용자 언어
+    */
+    language: "ko",
+
+    /*
       업무 지역 API
     */
     region: "",
 
     /*
       서버에서 region에 따라 결정되는 timezone
-
-      사용자가 직접 수정하지 않음
     */
     timezone: "",
   });
@@ -56,6 +63,14 @@ function SystemSettingModal() {
   const [isWorkspaceLoading, setIsWorkspaceLoading] = useState(true);
 
   const [workspaceError, setWorkspaceError] = useState("");
+
+  /* =========================================
+     Language State
+  ========================================= */
+
+  const [isLanguageLoading, setIsLanguageLoading] = useState(true);
+
+  const [languageError, setLanguageError] = useState("");
 
   /* =========================================
      Region State
@@ -156,6 +171,54 @@ function SystemSettingModal() {
   }, []);
 
   /* =========================================
+     사용자 기본 언어 조회
+  ========================================= */
+
+  useEffect(() => {
+    const fetchLanguage = async () => {
+      try {
+        setIsLanguageLoading(true);
+
+        setLanguageError("");
+
+        const result = await getUserLanguage();
+
+        console.log("사용자 기본 언어 조회 성공:", result);
+
+        /*
+          기존 사용자처럼 language가 null일 수 있으므로
+          null이면 기본값 ko 사용
+        */
+
+        const language = result?.data?.language || "ko";
+
+        setSystemForm((prev) => ({
+          ...prev,
+          language,
+        }));
+      } catch (error) {
+        console.error("사용자 기본 언어 조회 실패:", error);
+
+        if (error.status === 401) {
+          setLanguageError(
+            "로그인이 만료되었거나 인증 정보가 올바르지 않습니다.",
+          );
+
+          return;
+        }
+
+        setLanguageError(
+          error.message || "기본 언어 정보를 불러오지 못했습니다.",
+        );
+      } finally {
+        setIsLanguageLoading(false);
+      }
+    };
+
+    fetchLanguage();
+  }, []);
+
+  /* =========================================
      업무 지역 조회
   ========================================= */
 
@@ -227,14 +290,16 @@ function SystemSettingModal() {
 
     setSystemForm((prev) => ({
       ...prev,
-
       [name]: value,
     }));
 
-    /*
-      지역을 다시 선택하면
-      기존 오류 메시지 제거
-    */
+    /* 언어 선택 시 기존 오류 제거 */
+
+    if (name === "language") {
+      setLanguageError("");
+    }
+
+    /* 지역 선택 시 기존 오류 제거 */
 
     if (name === "region" || name === "timezone") {
       setRegionError("");
@@ -248,7 +313,6 @@ function SystemSettingModal() {
   const handleNotificationChange = (name) => {
     setNotificationSettings((prev) => ({
       ...prev,
-
       [name]: !prev[name],
     }));
   };
@@ -262,10 +326,19 @@ function SystemSettingModal() {
       return;
     }
 
-    /*
-      국가 및 시간 탭에서
-      region을 선택하지 않은 경우
-    */
+    /* =====================================
+       일반 탭 검증
+    ===================================== */
+
+    if (activeTab === "general" && !systemForm.language) {
+      setLanguageError("기본 언어를 선택해주세요.");
+
+      return;
+    }
+
+    /* =====================================
+       시간 탭 검증
+    ===================================== */
 
     if (activeTab === "time" && !systemForm.region) {
       setRegionError("업무 지역을 선택해주세요.");
@@ -277,16 +350,24 @@ function SystemSettingModal() {
       setIsSaving(true);
 
       /* =====================================
-         일반 설정
+         일반 설정 저장
 
-         현재는 별도의 저장 API 없음.
-         조회된 정보만 보여주는 상태.
+         사용자 기본 언어 저장
       ===================================== */
 
       if (activeTab === "general") {
-        navigate(-1);
+        const result = await updateUserLanguage(systemForm.language);
 
-        return;
+        console.log("사용자 기본 언어 저장 성공:", result);
+
+        const changedLanguage = result?.data?.language;
+
+        if (changedLanguage) {
+          setSystemForm((prev) => ({
+            ...prev,
+            language: changedLanguage,
+          }));
+        }
       }
 
       /* =====================================
@@ -321,9 +402,6 @@ function SystemSettingModal() {
 
       /* =====================================
          알림 탭
-
-         현재 별도 저장 API 없으면
-         화면 상태만 유지
       ===================================== */
 
       if (activeTab === "notification") {
@@ -331,16 +409,42 @@ function SystemSettingModal() {
       }
 
       /* =====================================
-         저장 완료 → 모달 닫기
+         저장 완료
       ===================================== */
 
       navigate(-1);
     } catch (error) {
       console.error("시스템 설정 저장 실패:", error);
 
-      /*
-        업무 지역 오류
-      */
+      /* =====================================
+         기본 언어 오류
+      ===================================== */
+
+      if (activeTab === "general") {
+        if (error.status === 400) {
+          setLanguageError(
+            error.message || "선택한 기본 언어가 올바르지 않습니다.",
+          );
+
+          return;
+        }
+
+        if (error.status === 401) {
+          setLanguageError(
+            "로그인이 만료되었거나 인증 정보가 올바르지 않습니다.",
+          );
+
+          return;
+        }
+
+        setLanguageError(error.message || "기본 언어 저장에 실패했습니다.");
+
+        return;
+      }
+
+      /* =====================================
+         업무 지역 오류
+      ===================================== */
 
       if (activeTab === "time") {
         if (error.status === 400) {
@@ -473,13 +577,19 @@ function SystemSettingModal() {
           ================================= */}
 
           {activeTab === "general" && (
-            <GeneralSetting
-              systemForm={systemForm}
-              onChange={handleSystemFormChange}
-              isLoading={isWorkspaceLoading}
-              errorMessage={workspaceError}
-              styles={styles}
-            />
+            <>
+              <GeneralSetting
+                systemForm={systemForm}
+                onChange={handleSystemFormChange}
+                isLoading={isWorkspaceLoading || isLanguageLoading}
+                errorMessage={workspaceError}
+                styles={styles}
+              />
+
+              {languageError && (
+                <p className={styles.generalErrorText}>{languageError}</p>
+              )}
+            </>
           )}
 
           {/* =================================
@@ -522,8 +632,6 @@ function SystemSettingModal() {
 
           {/* =================================
               하단 버튼
-
-              계정 탭에서는 표시 X
           ================================= */}
 
           {activeTab !== "account" && (
@@ -543,7 +651,8 @@ function SystemSettingModal() {
                 onClick={handleSave}
                 disabled={
                   isSaving ||
-                  (activeTab === "general" && isWorkspaceLoading) ||
+                  (activeTab === "general" &&
+                    (isWorkspaceLoading || isLanguageLoading)) ||
                   (activeTab === "time" && isRegionLoading)
                 }
               >
