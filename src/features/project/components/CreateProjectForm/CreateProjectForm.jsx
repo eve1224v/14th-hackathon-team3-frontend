@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import { useNavigate } from "react-router-dom";
 
 import styles from "./CreateProjectForm.module.css";
@@ -11,7 +10,6 @@ import searchIcon from "../../../../assets/icons/searchIcon.svg";
 import backbuttonIcon from "../../../../assets/icons/backbuttonIcon.svg";
 
 import { getWorkspaceDetail } from "../../../../api/workspaceApi";
-
 import { createProject } from "../../../../api/projectApi";
 
 import ProjectCreateSuccessModal from "../ProjectCreateSuccessModal/ProjectCreateSuccessModal";
@@ -24,7 +22,6 @@ function CreateProjectForm() {
   ========================= */
 
   const [projectName, setProjectName] = useState("");
-
   const [projectGoal, setProjectGoal] = useState("");
 
   /* =========================
@@ -34,7 +31,6 @@ function CreateProjectForm() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const [startDate, setStartDate] = useState("");
-
   const [endDate, setEndDate] = useState("");
 
   const [selectingStart, setSelectingStart] = useState(true);
@@ -46,7 +42,6 @@ function CreateProjectForm() {
   ========================= */
 
   const [searchCompany, setSearchCompany] = useState("");
-
   const [companies, setCompanies] = useState([]);
 
   /* =========================
@@ -66,85 +61,58 @@ function CreateProjectForm() {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   /* =========================
-     회사 정보 불러오기
+     현재 워크스페이스 회사 정보 불러오기
+
+     중요:
+     workspaceCompany /
+     workspaceCollaboratingCompanies
+     localStorage 값을 사용하지 않음.
+
+     현재 workspaceId의 실제 상세 API 응답을
+     기준으로 참여 기업 목록을 구성함.
   ========================= */
 
   useEffect(() => {
+    let isCancelled = false;
+
     const loadCompanies = async () => {
       const workspaceId = localStorage.getItem("workspaceId");
 
       if (!workspaceId) {
-        setErrorMessage("워크스페이스 정보가 없습니다.");
-
-        setIsWorkspaceLoading(false);
+        if (!isCancelled) {
+          setCompanies([]);
+          setErrorMessage("워크스페이스 정보가 없습니다.");
+          setIsWorkspaceLoading(false);
+        }
 
         return;
       }
 
       try {
-        setIsWorkspaceLoading(true);
+        if (!isCancelled) {
+          setIsWorkspaceLoading(true);
+          setErrorMessage("");
+        }
 
-        setErrorMessage("");
+        console.log("현재 프로젝트 생성 workspaceId:", workspaceId);
 
-        /* =========================================
-             먼저 localStorage 확인
-          ========================================= */
+        /*
+         * localStorage의 예전 회사 정보를 사용하지 않고
+         * 현재 workspaceId로 상세 조회
+         */
+        const result = await getWorkspaceDetail(workspaceId);
 
-        const savedHostCompany = localStorage.getItem("workspaceCompany");
-
-        const savedPartners = localStorage.getItem(
-          "workspaceCollaboratingCompanies",
-        );
-
-        if (savedHostCompany) {
-          const host = JSON.parse(savedHostCompany);
-
-          const partners = savedPartners ? JSON.parse(savedPartners) : [];
-
-          const companyList = [
-            {
-              id: host.companyId,
-
-              name: host.name,
-
-              countryCode: host.countryCode,
-
-              role: "주관사",
-
-              apiRole: "HOST",
-
-              isMine: true,
-            },
-
-            ...partners.map((company) => ({
-              id: company.companyId,
-
-              name: company.name,
-
-              countryCode: company.countryCode,
-
-              role: "파트너사",
-
-              apiRole: "PARTNER",
-
-              isMine: false,
-            })),
-          ];
-
-          setCompanies(companyList);
-
+        if (isCancelled) {
           return;
         }
 
-        /* =========================================
-             localStorage에 없으면 상세 조회
-          ========================================= */
-
-        const result = await getWorkspaceDetail(workspaceId);
+        console.log("현재 워크스페이스 상세 조회 성공:", result);
 
         const data = result?.data;
 
         if (!data) {
+          setCompanies([]);
+
           setErrorMessage("워크스페이스 정보를 불러오지 못했습니다.");
 
           return;
@@ -152,51 +120,80 @@ function CreateProjectForm() {
 
         const companyList = [];
 
+        /* =========================
+           주관사
+        ========================= */
+
         if (data.company) {
           companyList.push({
             id: data.company.companyId,
-
             name: data.company.name,
-
             countryCode: data.company.countryCode,
-
             role: "주관사",
-
             apiRole: "HOST",
-
             isMine: true,
           });
         }
+
+        /* =========================
+           파트너사
+        ========================= */
 
         if (Array.isArray(data.collaboratingCompanies)) {
           data.collaboratingCompanies.forEach((company) => {
             companyList.push({
               id: company.companyId,
-
               name: company.name,
-
               countryCode: company.countryCode,
-
               role: "파트너사",
-
               apiRole: "PARTNER",
-
               isMine: false,
             });
           });
         }
 
+        console.log("프로젝트 참여 기업 목록:", companyList);
+
         setCompanies(companyList);
       } catch (error) {
+        if (isCancelled) {
+          return;
+        }
+
         console.error("워크스페이스 회사 정보 조회 실패:", error);
 
-        setErrorMessage(error.message || "회사 정보를 불러오지 못했습니다.");
+        setCompanies([]);
+
+        switch (error.code) {
+          case "403WORKSPACE_ACCESS_DENIED":
+            setErrorMessage("워크스페이스 접근 권한이 없습니다.");
+            break;
+
+          case "404WORKSPACE_NOT_FOUND":
+            setErrorMessage("워크스페이스를 찾을 수 없습니다.");
+            break;
+
+          default:
+            if (error.status === 401) {
+              setErrorMessage("로그인이 만료되었습니다. 다시 로그인해주세요.");
+            } else {
+              setErrorMessage(
+                error.message || "회사 정보를 불러오지 못했습니다.",
+              );
+            }
+        }
       } finally {
-        setIsWorkspaceLoading(false);
+        if (!isCancelled) {
+          setIsWorkspaceLoading(false);
+        }
       }
     };
 
     loadCompanies();
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   /* =========================
@@ -247,9 +244,7 @@ function CreateProjectForm() {
     }
 
     const year = Number(parts[0]);
-
     const month = Number(parts[1]);
-
     const day = Number(parts[2]);
 
     if (!year || !month || !day) {
@@ -272,7 +267,6 @@ function CreateProjectForm() {
   };
 
   const selectedStartDate = parseDate(startDate);
-
   const selectedEndDate = parseDate(endDate);
 
   const isBetweenDates = (date) => {
@@ -295,9 +289,7 @@ function CreateProjectForm() {
 
     if (selectingStart) {
       setStartDate(formattedDate);
-
       setEndDate("");
-
       setSelectingStart(false);
 
       return;
@@ -307,16 +299,13 @@ function CreateProjectForm() {
 
     if (start && date.getTime() < start.getTime()) {
       setStartDate(formattedDate);
-
       setEndDate("");
-
       setSelectingStart(false);
 
       return;
     }
 
     setEndDate(formattedDate);
-
     setSelectingStart(true);
   };
 
@@ -333,7 +322,6 @@ function CreateProjectForm() {
   };
 
   const year = currentDate.getFullYear();
-
   const month = currentDate.getMonth();
 
   const firstDay = new Date(year, month, 1).getDay();
@@ -349,9 +337,7 @@ function CreateProjectForm() {
 
     calendarDays.push({
       day,
-
       date: new Date(year, month - 1, day),
-
       currentMonth: false,
     });
   }
@@ -359,9 +345,7 @@ function CreateProjectForm() {
   for (let day = 1; day <= lastDate; day++) {
     calendarDays.push({
       day,
-
       date: new Date(year, month, day),
-
       currentMonth: true,
     });
   }
@@ -371,9 +355,7 @@ function CreateProjectForm() {
   while (calendarDays.length < 42) {
     calendarDays.push({
       day: nextMonthDay,
-
       date: new Date(year, month + 1, nextMonthDay),
-
       currentMonth: false,
     });
 
@@ -390,7 +372,6 @@ function CreateProjectForm() {
     const workspaceId = localStorage.getItem("workspaceId");
 
     const trimmedName = projectName.trim();
-
     const trimmedGoal = projectGoal.trim();
 
     if (!workspaceId) {
@@ -412,7 +393,6 @@ function CreateProjectForm() {
     }
 
     const parsedStart = parseDate(startDate);
-
     const parsedEnd = parseDate(endDate);
 
     if (!parsedStart) {
@@ -449,11 +429,20 @@ function CreateProjectForm() {
       return;
     }
 
+    /* =========================
+       현재 워크스페이스의
+       주관사 + 파트너사를 API 형식으로 변환
+    ========================= */
+
     const participatingCompanies = companies.map((company) => ({
       companyId: Number(company.id),
-
       role: company.apiRole,
     }));
+
+    console.log(
+      "프로젝트 생성 participatingCompanies:",
+      participatingCompanies,
+    );
 
     try {
       setIsCreating(true);
@@ -484,7 +473,7 @@ function CreateProjectForm() {
 
       /* =========================
            프로젝트 저장
-        ========================= */
+      ========================= */
 
       localStorage.setItem("projectId", String(projectId));
 
@@ -504,12 +493,14 @@ function CreateProjectForm() {
           endDate: formatApiDate(endDate),
 
           status: result?.data?.status || "DRAFT",
+
+          participatingCompanies,
         }),
       );
 
       /* =========================
            프로젝트 갱신 이벤트
-        ========================= */
+      ========================= */
 
       window.dispatchEvent(new Event("projectCreated"));
 
@@ -517,7 +508,7 @@ function CreateProjectForm() {
 
       /* =========================
            성공 Modal OPEN
-        ========================= */
+      ========================= */
 
       setIsSuccessModalOpen(true);
     } catch (error) {
@@ -566,7 +557,9 @@ function CreateProjectForm() {
   return (
     <>
       <section className={styles.container}>
-        {/* BACK */}
+        {/* =========================
+            BACK
+        ========================= */}
 
         <button
           type="button"
@@ -772,6 +765,12 @@ function CreateProjectForm() {
               <p className={styles.noCompany}>검색 결과가 없습니다.</p>
             )}
           </div>
+
+          {/*
+            아직 별도의 "새 회사 생성/검색 API"가 없으므로
+            버튼 디자인은 기존 그대로 유지.
+            현재는 별도 동작을 연결하지 않음.
+          */}
 
           <button type="button" className={styles.addCompanyButton}>
             기업 추가
