@@ -1,8 +1,35 @@
+import { useState } from "react";
+
 import styles from "./TransferInfoPanel.module.css";
 
 import calendarIcon2 from "../../../../assets/icons/calendarIcon2.svg";
 
 function TransferInfoPanel() {
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [teamName, setTeamName] = useState("Engineering Team");
+  const [managerName, setManagerName] = useState("Emily Chh");
+
+  const [editTeamName, setEditTeamName] = useState(teamName);
+  const [editManagerName, setEditManagerName] = useState(managerName);
+
+
+  const handleEdit = () => {
+    setEditTeamName(teamName);
+    setEditManagerName(managerName);
+
+    setIsEditing(true);
+  };
+
+
+  const handleSave = () => {
+    setTeamName(editTeamName);
+    setManagerName(editManagerName);
+
+    setIsEditing(false);
+  };
+
+
   return (
     <section className={styles.panel}>
       <div className={styles.header}>
@@ -11,10 +38,12 @@ function TransferInfoPanel() {
         <button
           type="button"
           className={styles.editButton}
+          onClick={isEditing ? handleSave : handleEdit}
         >
-          수정
+          {isEditing ? "저장" : "수정"}
         </button>
       </div>
+
 
       <div className={styles.targetSection}>
         <span className={styles.label}>
@@ -29,10 +58,23 @@ function TransferInfoPanel() {
           </span>
         </div>
 
-        <p className={styles.teamName}>
-          Engineering Team
-        </p>
+
+        {isEditing ? (
+          <input
+            type="text"
+            className={styles.teamEditInput}
+            value={editTeamName}
+            onChange={(event) =>
+              setEditTeamName(event.target.value)
+            }
+          />
+        ) : (
+          <p className={styles.teamName}>
+            {teamName}
+          </p>
+        )}
       </div>
+
 
       <div className={styles.managerSection}>
         <span className={styles.label}>
@@ -42,9 +84,21 @@ function TransferInfoPanel() {
         <div className={styles.managerRow}>
           <div className={styles.avatar} />
 
-          <span>Emily Chh</span>
+          {isEditing ? (
+            <input
+              type="text"
+              className={styles.managerEditInput}
+              value={editManagerName}
+              onChange={(event) =>
+                setEditManagerName(event.target.value)
+              }
+            />
+          ) : (
+            <span>{managerName}</span>
+          )}
         </div>
       </div>
+
 
       <div className={styles.timeSection}>
         <span className={styles.label}>
