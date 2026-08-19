@@ -19,7 +19,6 @@
   overflow: visible;
 }
 
-
 /* ======================================== */
 /* LOGO */
 /* ======================================== */
@@ -28,14 +27,12 @@
   padding: 24px 0 0 20px;
 }
 
-
 .logo {
   display: block;
 
   width: 26px;
   height: auto;
 }
-
 
 /* ======================================== */
 /* SIDEBAR CONTENT */
@@ -51,7 +48,6 @@
   padding-top: 58px;
 }
 
-
 /* ======================================== */
 /* LOGIN */
 /* ======================================== */
@@ -65,7 +61,6 @@
   font-weight: 500;
 }
 
-
 /* ======================================== */
 /* USER */
 /* ======================================== */
@@ -78,7 +73,6 @@
   padding: 0 32px;
 }
 
-
 .greeting {
   margin: 0;
 
@@ -90,11 +84,9 @@
   white-space: nowrap;
 }
 
-
 .greeting strong {
   font-weight: 700;
 }
-
 
 /* ======================================== */
 /* WORKSPACE */
@@ -103,15 +95,14 @@
 .workspaceDropdown {
   position: relative;
 
-  width: 110px;
+  width: 130px;
 
   margin: 15px 0 0 32px;
 }
 
-
 .workspaceButton {
-  width: 110px;
-  height: 20px;
+  width: 130px;
+  height: 25px;
 
   display: flex;
   align-items: center;
@@ -122,18 +113,17 @@
   padding: 0 10px;
 
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
 
   background: #ffffff;
 
   color: #171b38;
 
-  font-size: 7px;
+  font-size: 9px;
   font-weight: 600;
 
   cursor: pointer;
 }
-
 
 .workspaceButton span {
   min-width: 0;
@@ -145,17 +135,19 @@
   text-overflow: ellipsis;
 }
 
-
 .workspaceButton:disabled {
   cursor: default;
 
   opacity: 0.8;
 }
 
+/* ======================================== */
+/* Dropdown Icon */
+/* ======================================== */
 
 .workspaceDropdownIcon {
-  width: 7px;
-  height: 7px;
+  width: 17px;
+  height: 17px;
 
   flex-shrink: 0;
 
@@ -164,50 +156,63 @@
   transition: transform 0.2s ease;
 }
 
-
 .workspaceDropdownIconOpen {
   transform: rotate(180deg);
 }
 
+/* ======================================== */
+/* Workspace Dropdown Menu */
+/* ======================================== */
 
 .workspaceMenu {
   position: absolute;
 
-  top: 25px;
+  top: 32px;
   left: 0;
 
-  width: 110px;
+  width: 130px;
 
   box-sizing: border-box;
 
-  padding: 4px;
+  padding: 7px 0;
 
-  border-radius: 7px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
 
   background: #ffffff;
 
   z-index: 300;
 
   box-shadow:
-    0 4px 10px
-    rgba(0, 0, 0, 0.18);
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 5px 10px rgba(0, 0, 0, 0.06);
 }
 
+/* ======================================== */
+/* Workspace Option */
+/* ======================================== */
 
 .workspaceOption {
   width: 100%;
-  height: 24px;
+  height: 28px;
 
-  padding: 0 6px;
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+
+  padding: 0 16px;
 
   border: none;
-  border-radius: 5px;
+  border-radius: 0;
 
   background: transparent;
 
   color: #171b38;
 
-  font-size: 8px;
+  font-family: Pretendard, sans-serif;
+  font-size: 9px;
+  font-weight: 600;
 
   overflow: hidden;
 
@@ -218,18 +223,22 @@
   text-align: left;
 
   cursor: pointer;
-}
 
+  transition: background-color 0.15s ease;
+}
 
 .workspaceOption:hover {
-  background: #f0f1f5;
+  background: #f5f5f5;
 }
 
+/* ======================================== */
+/* Workspace Error */
+/* ======================================== */
 
 .workspaceError {
   position: absolute;
 
-  top: 25px;
+  top: 32px;
   left: 0;
 
   width: 150px;
@@ -244,7 +253,6 @@
   line-height: 1.4;
 }
 
-
 /* ======================================== */
 /* MAIN MENU */
 /* ======================================== */
@@ -257,7 +265,6 @@
 
   margin-top: 17px;
 }
-
 
 .menuItem {
   width: 100%;
@@ -284,26 +291,42 @@
   cursor: pointer;
 
   text-align: left;
-}
 
+  transition:
+    color 0.18s ease,
+    opacity 0.18s ease;
+}
 
 .menuItem img {
   width: 15px;
   height: 15px;
 
   object-fit: contain;
-}
 
+  transition: filter 0.18s ease;
+}
 
 .menuItem span {
   line-height: 16px;
 }
 
-
 .menuItem:hover {
   opacity: 0.75;
 }
 
+/* ======================================== */
+/* 선택된 메인 메뉴 */
+/* ======================================== */
+
+.activeMenuItem {
+  color: #a6b4ff;
+}
+
+.activeMenuItem img {
+  filter: brightness(0) saturate(100%) invert(78%) sepia(21%)
+    saturate(889%) hue-rotate(194deg) brightness(103%)
+    contrast(101%);
+}
 
 /* ======================================== */
 /* PROJECT → MEMBER */
@@ -318,6 +341,7 @@
   flex-direction: column;
 }
 
+/* Member는 항상 표시 */
 
 .memberMenuItem {
   width: fit-content;
@@ -348,8 +372,15 @@
   white-space: nowrap;
 
   cursor: pointer;
-}
 
+  transform: scale(1);
+  transform-origin: left center;
+
+  transition:
+    transform 0.18s ease,
+    opacity 0.18s ease,
+    color 0.18s ease;
+}
 
 .memberMenuItem img {
   display: block;
@@ -360,18 +391,47 @@
   flex-shrink: 0;
 
   object-fit: contain;
-}
 
+  transition: filter 0.18s ease;
+}
 
 .memberMenuItem span {
   line-height: 13.8px;
 }
 
+/* Member Hover */
 
 .memberMenuItem:hover {
-  opacity: 0.75;
+  transform: scale(1.08);
+
+  opacity: 0.9;
 }
 
+/* Member 클릭 */
+
+.memberMenuItem:active {
+  transform: scale(0.97);
+}
+
+/* ======================================== */
+/* 선택된 Member */
+/* ======================================== */
+
+.activeMemberMenuItem {
+  color: #a6b4ff;
+}
+
+.activeMemberMenuItem img {
+  filter: brightness(0) saturate(100%) invert(78%) sepia(21%)
+    saturate(889%) hue-rotate(194deg) brightness(103%)
+    contrast(101%);
+}
+
+.activeMemberMenuItem:hover {
+  color: #a6b4ff;
+
+  transform: scale(1.08);
+}
 
 /* ======================================== */
 /* CREATE MENU */
@@ -385,15 +445,14 @@
 
   margin: 60px 0 0 32px;
 
-  border-top:
-    1px solid
-    rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
-
 
 .actionMenu button {
   width: 100%;
   height: 40px;
+
+  flex-shrink: 0;
 
   box-sizing: border-box;
 
@@ -401,9 +460,7 @@
 
   border: none;
 
-  border-bottom:
-    1px solid
-    rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 
   background: transparent;
 
@@ -418,7 +475,6 @@
   cursor: pointer;
 }
 
-
 .actionMenu button:hover {
   opacity: 0.75;
 }
@@ -429,47 +485,44 @@
 /* ======================================== */
 
 .timeSection {
-  position: absolute;
-
-  left: 27px;
-  bottom: 285px;
+  /* 기존 absolute 제거 */
+  position: static;
 
   display: flex;
   flex-direction: column;
 
   gap: 24px;
-}
 
+  /* Join Workspace 아래 간격 */
+  margin: 40px 0 0 27px;
+}
 
 .timeSection > div {
   display: flex;
   flex-direction: column;
 }
 
-
 .timeSection p {
   margin: 0;
 
   color: #ffffff;
 
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 
   line-height: 1.2;
 }
-
 
 .timeSection strong {
   margin-top: 1px;
 
   color: #ffffff;
 
-  font-size: 21px;
-  font-weight: 500;
+  font-size: 24px;
+  font-weight: 600;
 
   line-height: 1;
 }
-
 
 /* ======================================== */
 /* BOTTOM */
@@ -486,7 +539,6 @@
 
   gap: 14px;
 }
-
 
 .bottomButton {
   width: 20px;
@@ -505,14 +557,12 @@
   cursor: pointer;
 }
 
-
 .bottomButton img {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
 
   object-fit: contain;
 }
-
 
 .notifyRow {
   display: flex;
@@ -520,7 +570,6 @@
 
   gap: 7px;
 }
-
 
 /* ======================================== */
 /* TOGGLE */
@@ -537,11 +586,9 @@
   flex-shrink: 0;
 }
 
-
 .toggle input {
   display: none;
 }
-
 
 .toggleSlider {
   position: absolute;
@@ -556,7 +603,6 @@
 
   transition: 0.2s;
 }
-
 
 .toggleSlider::before {
   content: "";
@@ -576,19 +622,13 @@
   transition: 0.2s;
 }
 
-
-.toggle input:checked
-  + .toggleSlider {
+.toggle input:checked + .toggleSlider {
   background: #536cff;
 }
 
-
-.toggle input:checked
-  + .toggleSlider::before {
-  transform:
-    translateX(16px);
+.toggle input:checked + .toggleSlider::before {
+  transform: translateX(16px);
 }
-
 
 /* ======================================== */
 /* PROFILE POPUP */
@@ -597,7 +637,6 @@
 .profileWrapper {
   position: relative;
 }
-
 
 .profilePopup {
   position: absolute;
@@ -609,9 +648,7 @@
 
   background: #171b38;
 
-  border:
-    1px solid
-    rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 
   border-radius: 10px;
 
@@ -619,11 +656,8 @@
 
   z-index: 1000;
 
-  box-shadow:
-    0 6px 18px
-    rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
 }
-
 
 .profileInfo {
   display: flex;
@@ -633,7 +667,6 @@
 
   padding: 16px 18px 12px;
 }
-
 
 .profileImage {
   width: 46px;
@@ -650,12 +683,10 @@
   background: #b5acb1;
 }
 
-
 .profileImage img {
   width: 25px;
   height: 25px;
 }
-
 
 .profileText {
   display: flex;
@@ -666,14 +697,12 @@
   min-width: 0;
 }
 
-
 .profileText strong {
   color: #ffffff;
 
   font-size: 13px;
   font-weight: 700;
 }
-
 
 .profileText span {
   color: #d4d5df;
@@ -687,11 +716,9 @@
   text-overflow: ellipsis;
 }
 
-
 .accountSection {
   padding: 0 18px 12px;
 }
-
 
 .accountTitle {
   margin: 4px 0 8px;
@@ -700,7 +727,6 @@
 
   font-size: 11px;
 }
-
 
 .profileMenuItem {
   width: 100%;
@@ -726,27 +752,22 @@
   text-align: left;
 }
 
-
 .profileMenuItem img {
   width: 21px;
   height: 21px;
 }
 
-
 .profileMenuItem:hover {
   opacity: 0.75;
 }
-
 
 .profileDivider {
   height: 1px;
 
   margin: 0 16px;
 
-  background:
-    rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.12);
 }
-
 
 .profileLogoutButton {
   width: 100%;
@@ -771,22 +792,14 @@
   cursor: pointer;
 }
 
-
 .profileLogoutButton img {
   width: 16px;
   height: 16px;
 
-  filter:
-    brightness(0)
-    saturate(100%)
-    invert(42%)
-    sepia(92%)
-    saturate(1788%)
-    hue-rotate(328deg)
-    brightness(94%)
+  filter: brightness(0) saturate(100%) invert(42%) sepia(92%)
+    saturate(1788%) hue-rotate(328deg) brightness(94%)
     contrast(92%);
 }
-
 
 .profileLogoutButton:hover {
   opacity: 0.8;
