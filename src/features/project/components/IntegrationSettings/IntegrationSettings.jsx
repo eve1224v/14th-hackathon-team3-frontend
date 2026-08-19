@@ -782,6 +782,17 @@ function IntegrationSettings() {
             서비스 해제 시 이후 콘텐츠 수집은 중단되며, 기존에 수집된 기록은
             프로젝트 데이터로 유지됩니다.
           </p>
+          <div className={styles.saveArea}>
+            <button
+              type="button"
+              className={styles.saveButton}
+              onClick={() => {
+                alert("외부 서비스 설정이 저장되었습니다.");
+              }}
+            >
+              저장
+            </button>
+          </div>
         </section>
       </section>
 
