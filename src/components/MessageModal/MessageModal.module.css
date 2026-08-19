@@ -24,7 +24,6 @@
 
   width: 500px;
 
-  /* 사용자 화면보다 커지지 않도록 */
   max-height: calc(100vh - 40px);
 
   box-sizing: border-box;
@@ -40,7 +39,6 @@
 
   font-family: Pretendard, sans-serif;
 
-  /* 모달 내부 전체 상하 스크롤 */
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -68,7 +66,14 @@
   height: min(760px, calc(100vh - 40px));
   max-height: calc(100vh - 40px);
 
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+
   padding: 42px 55px 26px;
+
+  overflow: hidden;
 }
 
 /* =========================
@@ -552,6 +557,10 @@
 ========================= */
 
 .chatArea {
+  flex: 1;
+
+  min-height: 0;
+
   margin-top: 24px;
 
   display: flex;
@@ -562,9 +571,26 @@
   box-sizing: border-box;
 
   padding-right: 4px;
-  padding-bottom: 10px;
+  padding-bottom: 14px;
 
-  overflow: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  overscroll-behavior: contain;
+}
+
+.chatArea::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chatArea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chatArea::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.18);
 }
 
 /* scrollbar */
