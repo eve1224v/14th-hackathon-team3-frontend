@@ -20,8 +20,9 @@
    공통 카드
 ========================= */
 
-.inviteCard,
 .memberCard {
+  position: relative;
+
   width: 690px;
 
   box-sizing: border-box;
@@ -29,15 +30,10 @@
   padding: 20px;
 
   border: 1px solid #252a44;
+
   border-radius: 8px;
 
   background: #13172b;
-}
-
-/* 드롭다운이 카드 밖으로 나와도 잘리지 않도록 */
-
-.memberCard {
-  position: relative;
 
   overflow: visible;
 }
