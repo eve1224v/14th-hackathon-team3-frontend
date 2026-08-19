@@ -467,6 +467,17 @@ function MemberSettings() {
           </div>
         )}
       </section>
+      <div className={styles.saveArea}>
+        <button
+          type="button"
+          className={styles.saveButton}
+          onClick={() => {
+            alert("멤버 권한 설정이 저장되었습니다.");
+          }}
+        >
+          저장
+        </button>
+      </div>
     </section>
   );
 }

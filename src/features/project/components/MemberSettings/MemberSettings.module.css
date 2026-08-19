@@ -617,3 +617,56 @@
 
   font-size: 12px;
 }
+
+/* =========================
+   저장 버튼 영역
+========================= */
+
+.saveArea {
+  width: 690px;
+
+  display: flex;
+  justify-content: flex-end;
+
+  box-sizing: border-box;
+
+  margin-top: 32px;
+}
+
+.saveButton {
+  min-width: 48px;
+  height: 35px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #4d67ff;
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.saveButton:hover {
+  background: #5d74ff;
+}
+
+.saveButton:active {
+  transform: scale(0.97);
+}
