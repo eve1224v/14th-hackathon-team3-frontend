@@ -1,0 +1,605 @@
+.overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    rgba(
+      0,
+      0,
+      0,
+      0.58
+    );
+}
+
+
+.modal {
+  position: relative;
+
+  width: 576px;
+  min-height: 718px;
+
+  box-sizing: border-box;
+
+  padding:
+    82px
+    80px
+    58px;
+
+  border-radius: 14px;
+
+  background: #1b2037;
+
+  color: #ffffff;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+}
+
+
+/* =========================
+   Close
+========================= */
+
+.closeButton {
+  position: absolute;
+
+  top: 36px;
+  right: 38px;
+
+  width: 26px;
+  height: 26px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+
+.closeButton img {
+  width: 22px;
+  height: 22px;
+
+  opacity: 0.35;
+}
+
+
+/* =========================
+   Title
+========================= */
+
+.title {
+  margin:
+    0
+    0
+    42px;
+
+  color: #ffffff;
+
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 110%;
+}
+
+
+/* =========================
+   Field
+========================= */
+
+.field {
+  width: 100%;
+
+  margin-top: 23px;
+}
+
+
+.field:first-of-type {
+  margin-top: 0;
+}
+
+
+.field label,
+.dateSection > label {
+  display: block;
+
+  margin:
+    0
+    0
+    8px
+    6px;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.78
+  );
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+
+.field input,
+.field textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius: 12px;
+
+  outline: none;
+
+  background: #2d3767;
+
+  color: #ffffff;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  font-size: 13px;
+}
+
+
+.field input {
+  height: 52px;
+
+  padding:
+    0
+    18px;
+}
+
+
+.field textarea {
+  height: 108px;
+
+  padding:
+    16px
+    18px;
+
+  resize: none;
+
+  line-height: 150%;
+}
+
+
+.field input:focus,
+.field textarea:focus {
+  border-color: #4d67ff;
+}
+
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: rgba(
+    255,
+    255,
+    255,
+    0.25
+  );
+}
+
+
+/* =========================
+   Date
+========================= */
+
+.dateSection {
+  position: relative;
+
+  width: 100%;
+
+  margin-top: 26px;
+}
+
+
+.dateButton {
+  width: 100%;
+  height: 52px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding:
+    0
+    16px
+    0
+    20px;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius: 12px;
+
+  background: #2d3767;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  cursor: pointer;
+}
+
+
+.dateButton:hover {
+  border-color:
+    rgba(
+      77,
+      103,
+      255,
+      0.7
+    );
+}
+
+
+.dateValue {
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+
+.datePlaceholder {
+  color: rgba(
+    255,
+    255,
+    255,
+    0.35
+  );
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
+
+.calendarIcon {
+  width: 23px;
+  height: 23px;
+
+  display: block;
+
+  object-fit: contain;
+}
+
+
+/* =========================
+   Calendar Popup
+========================= */
+
+.calendarPopup {
+  position: absolute;
+
+  top: 78px;
+  left: 0;
+
+  width: 330px;
+
+  box-sizing: border-box;
+
+  padding:
+    18px
+    22px
+    22px;
+
+  border:
+    1px solid
+    #e5e5e5;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0
+    10px
+    30px
+    rgba(
+      0,
+      0,
+      0,
+      0.2
+    );
+
+  z-index: 1100;
+}
+
+
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.calendarHeader strong {
+  color: #888888;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  font-size: 16px;
+  font-weight: 500;
+}
+
+
+.monthButton {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #111111;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+
+.calendarDivider {
+  width: 100%;
+  height: 1px;
+
+  margin:
+    14px
+    0
+    16px;
+
+  background: #dddddd;
+}
+
+
+.weekRow {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      7,
+      1fr
+    );
+
+  margin-bottom: 10px;
+
+  text-align: center;
+}
+
+
+.weekRow span {
+  color: #111111;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  font-size: 9px;
+  font-weight: 500;
+}
+
+
+.calendarGrid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      7,
+      1fr
+    );
+
+  row-gap: 5px;
+
+  justify-items: center;
+}
+
+
+.dayButton {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: #111111;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  font-size: 13px;
+  font-weight: 400;
+
+  cursor: pointer;
+}
+
+
+.dayButton:hover {
+  background:
+    rgba(
+      25,
+      152,
+      238,
+      0.08
+    );
+}
+
+
+.otherMonthDay {
+  color: #c9c9c9;
+}
+
+
+.rangeDay {
+  background:
+    rgba(
+      25,
+      152,
+      238,
+      0.1
+    );
+
+  color: #2f7fe8;
+}
+
+
+.selectedDay {
+  background: #1998ee;
+
+  color: #ffffff;
+
+  font-weight: 500;
+}
+
+
+.selectedDay:hover {
+  background: #1998ee;
+}
+
+
+/* =========================
+   Error
+========================= */
+
+.errorMessage {
+  margin:
+    14px
+    0
+    0;
+
+  color: #ff6464;
+
+  font-size: 11px;
+  font-weight: 500;
+}
+
+
+/* =========================
+   Actions
+========================= */
+
+.actions {
+  width: 100%;
+
+  margin-top: 62px;
+}
+
+
+.primaryButton,
+.deleteButton {
+  width: 100%;
+  height: 53px;
+
+  box-sizing: border-box;
+
+  border-radius: 11px;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  font-size: 18px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+.primaryButton {
+  border: none;
+
+  background: #3f5cff;
+
+  color: #ffffff;
+}
+
+
+.primaryButton:hover {
+  background: #4965ff;
+}
+
+
+.deleteButton {
+  margin-top: 13px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.35
+    );
+
+  background: transparent;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.4
+  );
+}
+
+
+.deleteButton:hover {
+  border-color:
+    rgba(
+      255,
+      255,
+      255,
+      0.55
+    );
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.7
+  );
+}

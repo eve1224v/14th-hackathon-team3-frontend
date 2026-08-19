@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useState,
 } from "react";
 
@@ -9,22 +8,14 @@ import {
 
 import styles from "./CycleTimeline.module.css";
 
-import {
-  getCycles,
-} from "../../../../api/cycleApi";
-
 
 function CycleTimeline({
+  cycles = [],
   activeCycleId,
+  loading = false,
 }) {
   const navigate =
     useNavigate();
-
-
-  const [
-    cycles,
-    setCycles,
-  ] = useState([]);
 
 
   const [
@@ -33,126 +24,8 @@ function CycleTimeline({
   ] = useState(false);
 
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
-
-
-  const [
-    errorMessage,
-    setErrorMessage,
-  ] = useState("");
-
-
   /* =========================
-     사이클 목록 조회
-  ========================= */
-
-  useEffect(() => {
-    const fetchCycles =
-      async () => {
-        const projectId =
-          localStorage.getItem(
-            "projectId"
-          );
-
-
-        if (!projectId) {
-          console.warn(
-            "projectId가 없습니다."
-          );
-
-          setErrorMessage(
-            "선택된 프로젝트가 없습니다."
-          );
-
-          setLoading(false);
-
-          return;
-        }
-
-
-        try {
-          setLoading(true);
-
-          setErrorMessage("");
-
-
-          const response =
-            await getCycles(
-              projectId
-            );
-
-
-          console.log(
-            "사이클 리스트 조회 성공:",
-            response
-          );
-
-
-          const cycleList =
-            Array.isArray(
-              response?.data
-            )
-              ? response.data
-              : [];
-
-
-          setCycles(
-            cycleList
-          );
-        } catch (error) {
-          console.error(
-            "사이클 리스트 조회 실패:",
-            error
-          );
-
-          console.error(
-            "서버 응답:",
-            error.response?.data
-          );
-
-
-          const responseData =
-            error.response?.data;
-
-
-          if (
-            responseData?.code ===
-            "404PROJECT"
-          ) {
-            setErrorMessage(
-              "존재하지 않는 프로젝트입니다."
-            );
-          } else if (
-            responseData?.code ===
-            "403PROJECT"
-          ) {
-            setErrorMessage(
-              "프로젝트에 대한 접근 권한이 없습니다."
-            );
-          } else {
-            setErrorMessage(
-              responseData?.message ||
-                "사이클 목록을 불러오지 못했습니다."
-            );
-          }
-
-
-          setCycles([]);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-
-    fetchCycles();
-  }, []);
-
-
-  /* =========================
-     타입 변환
+     타입
   ========================= */
 
   const getCycleType = (
@@ -187,7 +60,9 @@ function CycleTimeline({
   const getStatusText = (
     status
   ) => {
-    switch (status) {
+    switch (
+      status
+    ) {
       case "IN_PROGRESS":
         return "진행 중";
 
@@ -195,8 +70,6 @@ function CycleTimeline({
         return "완료";
 
       case "PLANNED":
-        return null;
-
       case "READY":
         return null;
 
@@ -207,7 +80,7 @@ function CycleTimeline({
 
 
   /* =========================
-     날짜 표시
+     날짜
   ========================= */
 
   const formatDate = (
@@ -222,7 +95,17 @@ function CycleTimeline({
       year,
       month,
       day,
-    ] = date.split("-");
+    ] =
+      date.split("-");
+
+
+    if (
+      !year ||
+      !month ||
+      !day
+    ) {
+      return date;
+    }
 
 
     return `${year.slice(
@@ -232,27 +115,28 @@ function CycleTimeline({
 
 
   /* =========================
-     사이클 클릭
+     클릭
   ========================= */
 
-  const handleCycleClick = (
-    cycle
-  ) => {
-    if (
-      !cycle?.cycleId
-    ) {
-      return;
-    }
+  const handleCycleClick =
+    (
+      cycle
+    ) => {
+      if (
+        !cycle?.cycleId
+      ) {
+        return;
+      }
 
 
-    navigate(
-      `/cycle/${cycle.cycleId}`
-    );
-  };
+      navigate(
+        `/cycle/${cycle.cycleId}`
+      );
+    };
 
 
   /* =========================
-     보여줄 사이클
+     표시 목록
   ========================= */
 
   const visibleCycles =
@@ -263,10 +147,6 @@ function CycleTimeline({
           5
         );
 
-
-  /* =========================
-     선 길이
-  ========================= */
 
   const isExpanded =
     showMore &&
@@ -304,16 +184,6 @@ function CycleTimeline({
             중입니다.
           </p>
         </div>
-      ) : errorMessage ? (
-        <div
-          className={
-            styles.timeline
-          }
-        >
-          <p>
-            {errorMessage}
-          </p>
-        </div>
       ) : cycles.length ===
         0 ? (
         <div
@@ -343,7 +213,10 @@ function CycleTimeline({
 
 
             {visibleCycles.map(
-              (cycle) => {
+              (
+                cycle,
+                index
+              ) => {
                 const type =
                   getCycleType(
                     cycle
@@ -363,6 +236,22 @@ function CycleTimeline({
                   Number(
                     cycle.cycleId
                   );
+
+
+                /*
+                  index는 날짜순 정렬된
+                  전체 cycles 기준이므로
+
+                  Cycle 1
+                  Cycle 2
+                  Cycle 3
+                  자동 생성
+                */
+
+                const cycleLabel =
+                  `Cycle ${
+                    index + 1
+                  }`;
 
 
                 return (
@@ -388,7 +277,9 @@ function CycleTimeline({
                   >
                     <span
                       className={`${styles.dot} ${
-                        styles[type]
+                        styles[
+                          type
+                        ]
                       }`}
                     />
 
@@ -405,8 +296,17 @@ function CycleTimeline({
                       >
                         <strong>
                           {
-                            cycle.name
+                            cycleLabel
                           }
+
+                          {cycle.name && (
+                            <>
+                              {" · "}
+                              {
+                                cycle.name
+                              }
+                            </>
+                          )}
                         </strong>
 
 
@@ -456,6 +356,7 @@ function CycleTimeline({
                       {type ===
                       "future"
                         ? "예정"
+
                         : `${cycle.progressRate ?? 0}%`}
                     </strong>
                   </div>
@@ -474,7 +375,9 @@ function CycleTimeline({
               }
               onClick={() =>
                 setShowMore(
-                  (prev) =>
+                  (
+                    prev
+                  ) =>
                     !prev
                 )
               }

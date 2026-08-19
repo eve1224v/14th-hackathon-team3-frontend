@@ -9,13 +9,15 @@ const PROGRESS_STROKE =
 
 
 /* =========================
-   상태 표시
+   상태
 ========================= */
 
 const getStatusText = (
   status
 ) => {
-  switch (status) {
+  switch (
+    status
+  ) {
     case "IN_PROGRESS":
       return "진행 중";
 
@@ -23,6 +25,7 @@ const getStatusText = (
       return "완료";
 
     case "PLANNED":
+    case "READY":
       return "예정";
 
     default:
@@ -32,26 +35,94 @@ const getStatusText = (
 
 
 /* =========================
-   날짜 표시
+   날짜
 ========================= */
 
-const formatNextDate = (
-  date
+const formatDisplayDate = (
+  value
 ) => {
-  if (!date) {
+  if (!value) {
     return "-";
   }
 
-  return date;
+
+  return value.replaceAll(
+    "-",
+    "."
+  );
+};
+
+
+const formatNextDate = (
+  value
+) => {
+  if (!value) {
+    return "-";
+  }
+
+
+  const [
+    year,
+    month,
+    day,
+  ] =
+    value.split("-");
+
+
+  if (
+    !year ||
+    !month ||
+    !day
+  ) {
+    return value;
+  }
+
+
+  const date =
+    new Date(
+      Number(
+        year
+      ),
+      Number(
+        month
+      ) - 1,
+      Number(
+        day
+      )
+    );
+
+
+  const week =
+    [
+      "일",
+      "월",
+      "화",
+      "수",
+      "목",
+      "금",
+      "토",
+    ];
+
+
+  return `${year}.${month}.${day} (${
+    week[
+      date.getDay()
+    ]
+  })`;
 };
 
 
 function CycleSummary({
   cycleData,
+  cycleLabel = "Cycle",
+  nextCycle = null,
+  nextCycleLabel = null,
+  onEdit,
 }) {
   const progress =
     cycleData.progress ??
     0;
+
 
   const radius =
     (
@@ -59,13 +130,16 @@ function CycleSummary({
       PROGRESS_STROKE
     ) / 2;
 
+
   const center =
     PROGRESS_SIZE / 2;
+
 
   const circumference =
     2 *
     Math.PI *
     radius;
+
 
   const offset =
     circumference -
@@ -83,14 +157,18 @@ function CycleSummary({
   const period =
     cycleData.startDate &&
     cycleData.endDate
-      ? `${cycleData.startDate} ~ ${cycleData.endDate}${
+      ? `${formatDisplayDate(
+          cycleData.startDate
+        )} ~ ${formatDisplayDate(
+          cycleData.endDate
+        )}${
           cycleData.status ===
           "IN_PROGRESS"
             ? " 예정"
             : ""
         }`
-      : cycleData.period ||
-        "-";
+
+      : "-";
 
 
   /* =========================
@@ -103,14 +181,24 @@ function CycleSummary({
     cycleData.dDay ===
       undefined
       ? null
+
       : typeof cycleData.dDay ===
           "number"
-        ? cycleData.dDay >= 0
+        ? cycleData.dDay >=
+          0
           ? `D-${cycleData.dDay}`
+
           : `D+${Math.abs(
               cycleData.dDay
             )}`
+
         : cycleData.dDay;
+
+
+  const statusText =
+    getStatusText(
+      cycleData.status
+    );
 
 
   return (
@@ -240,49 +328,100 @@ function CycleSummary({
       >
         <div
           className={
-            styles.cycleTitle
+            styles.currentTopRow
           }
         >
-          <span
+          <div
             className={
-              styles.blueDot
+              styles.cycleTitle
             }
-          />
-
-          <strong>
-            {
-              cycleData.name
-            }{" "}
-            {
-              getStatusText(
-                cycleData.status
-              )
-            }
-          </strong>
-        </div>
-
-
-        <div
-          className={
-            styles.periodRow
-          }
-        >
-          <span>
-            {period}
-          </span>
-
-
-          {dDayText && (
+          >
             <span
               className={
-                styles.dayBadge
+                styles.blueDot
               }
-            >
-              {dDayText}
+            />
+
+
+            <strong>
+              {
+                cycleLabel
+              }
+
+              {cycleData.name && (
+                <>
+                  {" · "}
+                  {
+                    cycleData.name
+                  }
+                </>
+              )}
+
+              {statusText && (
+                <>
+                  {" "}
+                  {
+                    statusText
+                  }
+                </>
+              )}
+            </strong>
+          </div>
+
+
+          <div
+            className={
+              styles.periodRow
+            }
+          >
+            <span>
+              {period}
             </span>
-          )}
+
+
+            {dDayText && (
+              <span
+                className={
+                  styles.dayBadge
+                }
+              >
+                {dDayText}
+              </span>
+            )}
+          </div>
+
+
+          <button
+            type="button"
+            className={
+              styles.editButton
+            }
+            onClick={
+              onEdit
+            }
+          >
+            수정
+          </button>
         </div>
 
+
+        {/* =========================
+            사이클 목표
+        ========================= */}
+
+        <p
+          className={
+            styles.goal
+          }
+        >
+          {cycleData.goal ||
+            "사이클 목표가 아직 설정되지 않았습니다."}
+        </p>
+
+
+        {/* =========================
+            통계
+        ========================= */}
 
         <div
           className={
@@ -309,6 +448,7 @@ function CycleSummary({
                     item.label
                   }
                 </span>
+
 
                 <strong>
                   {
@@ -341,27 +481,14 @@ function CycleSummary({
           </span>
 
 
-          {cycleData.nextCycle ? (
-            <span
-              className={
-                styles.nextBadge
-              }
-            >
-              {
-                cycleData
-                  .nextCycle
-                  .name
-              }
-            </span>
-          ) : (
-            <span
-              className={
-                styles.nextBadge
-              }
-            >
-              없음
-            </span>
-          )}
+          <span
+            className={
+              styles.nextBadge
+            }
+          >
+            {nextCycleLabel ||
+              "없음"}
+          </span>
         </div>
 
 
@@ -379,12 +506,11 @@ function CycleSummary({
             styles.nextDate
           }
         >
-          {cycleData.nextCycle
+          {nextCycle
             ? formatNextDate(
-                cycleData
-                  .nextCycle
-                  .startDate
+                nextCycle.startDate
               )
+
             : "-"}
         </strong>
       </div>
