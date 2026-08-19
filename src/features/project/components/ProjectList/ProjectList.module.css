@@ -373,6 +373,11 @@
   transform: scale(0.97);
 }
 
+.joinButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* ========================================
    SETTING BUTTON
 ======================================== */

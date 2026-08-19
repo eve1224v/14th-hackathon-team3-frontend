@@ -54,9 +54,7 @@ function ProjectList() {
       try {
         const result = await getProjects({
           workspaceId,
-
           status: selectedStatus,
-
           keyword: "",
         });
 
@@ -68,7 +66,9 @@ function ProjectList() {
 
         console.log("프로젝트 목록 data:", result?.data);
 
-        setProjects(Array.isArray(result?.data) ? result.data : []);
+        const projectList = Array.isArray(result?.data) ? result.data : [];
+
+        setProjects(projectList);
 
         setErrorMessage("");
       } catch (error) {
@@ -129,7 +129,7 @@ function ProjectList() {
   };
 
   /* =========================
-     새로 고침
+     새로고침
   ========================= */
 
   const handleRefresh = () => {
@@ -147,20 +147,11 @@ function ProjectList() {
 
     localStorage.setItem("selectedProject", JSON.stringify(project));
 
+    if (project.cycleId) {
+      localStorage.setItem("cycleId", String(project.cycleId));
+    }
+
     window.dispatchEvent(new Event("projectChanged"));
-  };
-
-  /* =========================
-     Cycle ID
-  ========================= */
-
-  const getCycleId = (project) => {
-    return (
-      project.cycleId ??
-      project.currentCycleId ??
-      project.cycle?.cycleId ??
-      null
-    );
   };
 
   /* =========================
@@ -211,13 +202,12 @@ function ProjectList() {
 
   /* =========================
      카드 클릭
-     → 보기 전용
+     joined false → 보기 전용
+     joined true → 수정 가능
   ========================= */
 
   const handleProjectClick = (project) => {
-    const cycleId = getCycleId(project);
-
-    if (!cycleId) {
+    if (!project.cycleId) {
       alert("프로젝트 사이클 정보를 확인할 수 없습니다.");
 
       console.warn("cycleId가 없습니다:", project);
@@ -227,17 +217,15 @@ function ProjectList() {
 
     saveSelectedProject(project);
 
-    localStorage.setItem("cycleId", String(cycleId));
-
-    navigate(`/cycle/${cycleId}`, {
+    navigate(`/cycle/${project.cycleId}`, {
       state: {
-        viewOnly: true,
+        viewOnly: !project.joined,
 
-        joined: false,
+        joined: Boolean(project.joined),
 
         projectId: project.projectId,
 
-        cycleId,
+        cycleId: project.cycleId,
       },
     });
   };
@@ -257,6 +245,16 @@ function ProjectList() {
       return;
     }
 
+    if (!project.cycleId) {
+      alert("프로젝트 사이클 정보를 확인할 수 없습니다.");
+
+      return;
+    }
+
+    if (project.joined) {
+      return;
+    }
+
     if (joiningProjectId === projectId) {
       return;
     }
@@ -271,14 +269,20 @@ function ProjectList() {
       const data = result?.data;
 
       /* =========================
-         프로젝트 정보 저장
-      ========================= */
+           참가 완료된 프로젝트
+           로컬 상태 업데이트
+        ========================= */
 
-      saveSelectedProject(project);
+      const joinedProject = {
+        ...project,
+        joined: true,
+      };
+
+      saveSelectedProject(joinedProject);
 
       /* =========================
-         참가 멤버 정보 저장
-      ========================= */
+           참가 멤버 정보 저장
+        ========================= */
 
       if (data?.memberId) {
         localStorage.setItem("projectMemberId", String(data.memberId));
@@ -293,55 +297,44 @@ function ProjectList() {
       }
 
       /* =========================
-         Cycle ID
-      ========================= */
+           현재 리스트도 즉시
+           joined true 처리
+        ========================= */
 
-      const cycleId = getCycleId(project);
+      setProjects((prev) =>
+        prev.map((item) =>
+          item.projectId === projectId
+            ? {
+                ...item,
+                joined: true,
+              }
+            : item,
+        ),
+      );
 
       alert(result?.message || "프로젝트에 참가했습니다.");
 
       /* =========================
-         Cycle ID가 있는 경우
-         수정 가능 상태로 이동
-      ========================= */
+           수정 가능한 Cycle 화면
+        ========================= */
 
-      if (cycleId) {
-        localStorage.setItem("cycleId", String(cycleId));
+      navigate(`/cycle/${project.cycleId}`, {
+        state: {
+          viewOnly: false,
 
-        navigate(`/cycle/${cycleId}`, {
-          state: {
-            viewOnly: false,
+          joined: true,
 
-            joined: true,
+          projectId: data?.projectId || projectId,
 
-            projectId: data?.projectId || projectId,
+          cycleId: project.cycleId,
 
-            cycleId,
+          memberId: data?.memberId,
 
-            memberId: data?.memberId,
+          role: data?.role,
 
-            role: data?.role,
-
-            accessScope: data?.accessScope,
-          },
-        });
-
-        return;
-      }
-
-      /* =========================
-         cycleId가 아직
-         목록 API에 없는 경우
-      ========================= */
-
-      console.warn("프로젝트 참가에는 성공했지만 cycleId가 없습니다.", project);
-
-      /*
-        참가 상태는 서버에 이미 저장되었으므로
-        프로젝트 목록 다시 조회
-      */
-
-      setRefreshKey((prev) => prev + 1);
+          accessScope: data?.accessScope,
+        },
+      });
     } catch (error) {
       console.error("프로젝트 참가 실패:", error);
 
@@ -375,6 +368,22 @@ function ProjectList() {
 
         case "409ALREADY_PROJECT_MEMBER":
           alert("이미 참가한 프로젝트입니다.");
+
+          /*
+              서버에서는 이미 참가 상태이므로
+              프론트 상태도 true로 맞춰줌
+            */
+
+          setProjects((prev) =>
+            prev.map((item) =>
+              item.projectId === projectId
+                ? {
+                    ...item,
+                    joined: true,
+                  }
+                : item,
+            ),
+          );
 
           break;
 
@@ -502,7 +511,9 @@ function ProjectList() {
               project.currentCycleName ||
               (project.cycleNumber
                 ? `Cycle ${project.cycleNumber}`
-                : "Cycle 3");
+                : project.cycleId
+                  ? `Cycle ${project.cycleId}`
+                  : "Cycle");
 
             /* =========================
                    진행률
@@ -517,7 +528,7 @@ function ProjectList() {
             const partnerCompanyName = getPartnerCompanyName(project);
 
             /* =========================
-                   이슈 개수
+                   이슈
                 ========================= */
 
             const issueCount =
@@ -526,19 +537,11 @@ function ProjectList() {
               project.totalIssues ??
               12;
 
-            /* =========================
-                   완료 이슈 개수
-                ========================= */
-
             const completedIssueCount =
               project.completedIssueCount ??
               project.completeIssueCount ??
               project.completedIssues ??
               8;
-
-            /* =========================
-                   참가 중 여부
-                ========================= */
 
             const isJoining = joiningProjectId === project.projectId;
 
@@ -566,14 +569,20 @@ function ProjectList() {
                       ========================= */}
 
                   <div className={styles.cardActions}>
-                    <button
-                      type="button"
-                      className={styles.joinButton}
-                      disabled={isJoining}
-                      onClick={(event) => handleJoinProject(event, project)}
-                    >
-                      {isJoining ? "참가 중..." : "참가하기"}
-                    </button>
+                    {/* =========================
+                            미참가 프로젝트에만 표시
+                        ========================= */}
+
+                    {!project.joined && (
+                      <button
+                        type="button"
+                        className={styles.joinButton}
+                        disabled={isJoining}
+                        onClick={(event) => handleJoinProject(event, project)}
+                      >
+                        {isJoining ? "참가 중..." : "참가하기"}
+                      </button>
+                    )}
 
                     <button
                       type="button"
