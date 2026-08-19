@@ -4,6 +4,7 @@ import {
 } from "react";
 
 import {
+  useLocation,
   useNavigate,
   useParams,
 } from "react-router-dom";
@@ -21,6 +22,7 @@ import {
   createIssue,
   getIssue,
   updateIssue,
+  updateIssueStatus,
 } from "../../../../api/issueApi";
 
 import {
@@ -28,8 +30,8 @@ import {
 } from "../../../../api/cycleApi";
 
 import {
-  getWorkspaceMembers,
-} from "../../../../api/memberApi";
+  getProjectMembers,
+} from "../../../../api/projectApi";
 
 
 const DEFAULT_CONDITIONS = [
@@ -56,42 +58,6 @@ const DEFAULT_CONDITIONS = [
     content:
       "결제 API 요구사항 확정",
     isDone: false,
-  },
-];
-
-
-const DEFAULT_FILES = [
-  {
-    name:
-      "Global_Launch_Copy_x4.xlsx",
-    size:
-      "23.4 KB",
-    url: null,
-    isMock: true,
-  },
-  {
-    name:
-      "Global_Launch_Copy_x4.xlsx",
-    size:
-      "23.4 KB",
-    url: null,
-    isMock: true,
-  },
-  {
-    name:
-      "Global_Launch_Copy_x4.xlsx",
-    size:
-      "23.4 KB",
-    url: null,
-    isMock: true,
-  },
-  {
-    name:
-      "Global_Launch_Copy_x4.xlsx",
-    size:
-      "23.4 KB",
-    url: null,
-    isMock: true,
   },
 ];
 
@@ -126,37 +92,45 @@ const PRIORITY_REVERSE_MAP = {
 };
 
 
-const formatFileSize = (
-  size
-) => {
-  if (
-    size === null ||
-    size === undefined
-  ) {
-    return "-";
-  }
+const formatFileSize =
+  (
+    size
+  ) => {
+    if (
+      size === null ||
+      size === undefined
+    ) {
+      return "-";
+    }
 
 
-  if (size < 1024) {
-    return `${size} B`;
-  }
+    if (
+      size <
+      1024
+    ) {
+      return `${size} B`;
+    }
 
 
-  if (
-    size <
-    1024 * 1024
-  ) {
+    if (
+      size <
+      1024 * 1024
+    ) {
+      return `${(
+        size / 1024
+      ).toFixed(
+        1
+      )} KB`;
+    }
+
+
     return `${(
-      size / 1024
-    ).toFixed(1)} KB`;
-  }
-
-
-  return `${(
-    size /
-    (1024 * 1024)
-  ).toFixed(1)} MB`;
-};
+      size /
+      (1024 * 1024)
+    ).toFixed(
+      1
+    )} MB`;
+  };
 
 
 function IssueForm({
@@ -166,13 +140,31 @@ function IssueForm({
     useNavigate();
 
 
+  const location =
+    useLocation();
+
+
   const {
     issueId,
   } = useParams();
 
 
   const isEdit =
-    mode === "edit";
+    mode ===
+    "edit";
+
+
+  /* =========================
+      생성 시작 상태
+
+      생성 페이지를
+      직접 들어온 경우에는 TODO
+  ========================= */
+
+  const initialStatus =
+    location.state
+      ?.initialStatus ||
+    "TODO";
 
 
   /* =========================
@@ -307,35 +299,34 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
   /* =========================
       파일
+
+      더미 데이터 없음
   ========================= */
 
   const [
     files,
     setFiles,
-  ] = useState(
-    DEFAULT_FILES
-  );
+  ] = useState([]);
 
 
   /* ==================================================
-     실제 워크스페이스 멤버 조회
-
-     GET
-     /api/v1/workspaces/{workspaceId}/members?status=ACTIVE
+     프로젝트 멤버 조회
   ================================================== */
 
   useEffect(() => {
     const fetchMembers =
       async () => {
-        const workspaceId =
+        const projectId =
           localStorage.getItem(
-            "workspaceId"
+            "projectId"
           );
 
 
-        if (!workspaceId) {
+        if (
+          !projectId
+        ) {
           console.warn(
-            "workspaceId가 없습니다."
+            "projectId가 없습니다."
           );
 
           return;
@@ -349,17 +340,13 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
 
           const response =
-            await getWorkspaceMembers(
-              workspaceId,
-              {
-                status:
-                  "ACTIVE",
-              }
+            await getProjectMembers(
+              projectId
             );
 
 
           console.log(
-            "워크스페이스 멤버 조회 성공:",
+            "프로젝트 멤버 조회 성공:",
             response
           );
 
@@ -369,27 +356,34 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
               response?.data
                 ?.members
             )
-              ? response.data.members
+              ? response.data
+                  .members
               : [];
 
 
           setMembers(
             memberList
           );
-        } catch (error) {
+        } catch (
+          error
+        ) {
           console.error(
-            "워크스페이스 멤버 조회 실패:",
+            "프로젝트 멤버 조회 실패:",
             error
           );
 
 
           console.error(
             "서버 응답:",
-            error.response?.data
+            error.response
+              ?.data ||
+              error.data
           );
 
 
-          setMembers([]);
+          setMembers(
+            []
+          );
         } finally {
           setMemberLoading(
             false
@@ -403,10 +397,7 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
 
   /* ==================================================
-     실제 Cycle 조회
-
-     GET
-     /api/v1/projects/{projectId}/cycles
+     Cycle 조회
   ================================================== */
 
   useEffect(() => {
@@ -418,7 +409,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
           );
 
 
-        if (!projectId) {
+        if (
+          !projectId
+        ) {
           console.warn(
             "projectId가 없습니다."
           );
@@ -456,7 +449,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
           setCycles(
             cycleList
           );
-        } catch (error) {
+        } catch (
+          error
+        ) {
           console.error(
             "이슈 생성용 사이클 조회 실패:",
             error
@@ -465,11 +460,14 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
           console.error(
             "서버 응답:",
-            error.response?.data
+            error.response
+              ?.data
           );
 
 
-          setCycles([]);
+          setCycles(
+            []
+          );
         } finally {
           setCycleLoading(
             false
@@ -483,7 +481,7 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
 
   /* ==================================================
-     수정 화면 기존 이슈 조회
+     수정용 이슈 조회
   ================================================== */
 
   useEffect(() => {
@@ -552,16 +550,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
           );
 
 
-          /*
-            현재 상세 조회 응답 구조가
-            assigneeMemberId를 제공하면 우선 사용.
-
-            기존 응답 구조에서 memberId가 있다면
-            그것도 대응.
-          */
-
           setAssigneeId(
-            issueData.assigneeMemberId ??
+            issueData
+              .assigneeMemberId ??
               issueData.assignee
                 ?.memberId ??
               null
@@ -579,7 +570,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
               issueData.checklist ||
               []
             ).map(
-              (item) => ({
+              (
+                item
+              ) => ({
                 itemId:
                   item.itemId,
 
@@ -598,7 +591,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
               issueData.attachments ||
               []
             ).map(
-              (file) => ({
+              (
+                file
+              ) => ({
                 id:
                   file.attachmentId,
 
@@ -618,7 +613,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
               })
             )
           );
-        } catch (error) {
+        } catch (
+          error
+        ) {
           console.error(
             "수정용 이슈 조회 실패:",
             error
@@ -627,7 +624,8 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
           console.error(
             "서버 응답:",
-            error.response?.data
+            error.response
+              ?.data
           );
         }
       };
@@ -648,11 +646,6 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
     (
       member
     ) => {
-      /*
-        워크스페이스 멤버 조회 API에서
-        내려오는 실제 식별자 memberId 사용
-      */
-
       setAssigneeName(
         member.name ||
           ""
@@ -670,10 +663,10 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
 
       console.log(
-        "선택한 담당자:",
+        "선택한 프로젝트 담당자:",
         member
       );
-  };
+    };
 
 
   const handleAssigneeInputChange =
@@ -684,12 +677,6 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
         value
       );
 
-
-      /*
-        사용자가 선택 후 이름을 직접 수정하면
-        기존 ID와 이름이 불일치할 수 있으므로
-        실제 assigneeId 초기화.
-      */
 
       setAssigneeId(
         null
@@ -703,19 +690,23 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
 
   /* ==================================================
-     입력된 이름 기준 담당자 검색
+     담당자 검색
   ================================================== */
 
   const filteredMembers =
     members.filter(
-      (member) => {
+      (
+        member
+      ) => {
         const keyword =
           assigneeName
             .trim()
             .toLowerCase();
 
 
-        if (!keyword) {
+        if (
+          !keyword
+        ) {
           return true;
         }
 
@@ -763,7 +754,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
   const handleAddCondition =
     () => {
       setConditions(
-        (prev) => [
+        (
+          prev
+        ) => [
           ...prev,
 
           {
@@ -787,7 +780,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
       value
     ) => {
       setConditions(
-        (prev) =>
+        (
+          prev
+        ) =>
           prev.map(
             (
               condition,
@@ -812,7 +807,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
       removeIndex
     ) => {
       setConditions(
-        (prev) =>
+        (
+          prev
+        ) =>
           prev.filter(
             (
               _,
@@ -826,17 +823,28 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
 
   /* ==================================================
-     실제 Cycle 선택
+     Cycle 선택
   ================================================== */
 
   const handleCycleSelect =
     (
       selectedCycle
     ) => {
-      if (!selectedCycle) {
-        setCycle("");
-        setCycleId(null);
-        setCycleOpen(false);
+      if (
+        !selectedCycle
+      ) {
+        setCycle(
+          ""
+        );
+
+        setCycleId(
+          null
+        );
+
+        setCycleOpen(
+          false
+        );
+
 
         return;
       }
@@ -887,7 +895,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
       }
 
 
-      if (!priority) {
+      if (
+        !priority
+      ) {
         console.warn(
           "우선순위를 선택해주세요."
         );
@@ -907,7 +917,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
       }
 
 
-      if (!cycleId) {
+      if (
+        !cycleId
+      ) {
         console.warn(
           "사이클을 선택해주세요."
         );
@@ -916,19 +928,54 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
       }
 
 
-      if (!assigneeId) {
+      /* =========================
+          담당자 ID 결정
+      ========================= */
+
+      const matchedMember =
+        members.find(
+          (
+            member
+          ) =>
+            member.name ===
+            assigneeName
+        );
+
+
+      const resolvedAssigneeId =
+        assigneeId ??
+        matchedMember
+          ?.memberId ??
+        null;
+
+
+      if (
+        !resolvedAssigneeId
+      ) {
         console.warn(
-          "담당자를 목록에서 선택해주세요."
+          "담당자를 프로젝트 멤버 목록에서 확인할 수 없습니다."
         );
 
         return;
       }
 
 
+      console.log(
+        "최종 담당자 ID:",
+        resolvedAssigneeId
+      );
+
+
+      /* =========================
+          첨부파일
+      ========================= */
+
       const attachments =
         files
           .map(
-            (file) =>
+            (
+              file
+            ) =>
               file.url
           )
           .filter(
@@ -940,7 +987,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
           수정
       ========================= */
 
-      if (isEdit) {
+      if (
+        isEdit
+      ) {
         const requestData = {
           cycleId,
 
@@ -961,7 +1010,8 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
                 (
                   condition
                 ) =>
-                  condition.content.trim()
+                  condition.content
+                    .trim()
               )
               .map(
                 (
@@ -971,14 +1021,16 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
                     condition.itemId,
 
                   content:
-                    condition.content.trim(),
+                    condition.content
+                      .trim(),
 
                   isDone:
                     condition.isDone,
                 })
               ),
 
-          assigneeId,
+          assigneeId:
+            resolvedAssigneeId,
 
           dueDate,
 
@@ -1009,7 +1061,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
           navigate(
             `/issue/${issueId}`
           );
-        } catch (error) {
+        } catch (
+          error
+        ) {
           console.error(
             "이슈 수정 실패:",
             error
@@ -1018,7 +1072,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
           console.error(
             "서버 응답:",
-            error.response?.data
+            error.response
+              ?.data ||
+              error.data
           );
         }
 
@@ -1051,18 +1107,15 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
               (
                 condition
               ) =>
-                condition.content.trim()
+                condition.content
+                  .trim()
             )
             .filter(
               Boolean
             ),
 
-        /*
-          실제 멤버 조회 응답의
-          memberId가 들어감
-        */
-
-        assigneeId,
+        assigneeId:
+          resolvedAssigneeId,
 
         dueDate,
 
@@ -1076,7 +1129,20 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
       );
 
 
+      console.log(
+        "생성 후 적용할 상태:",
+        initialStatus
+      );
+
+
       try {
+        /* =========================
+            1. 이슈 생성
+
+            생성 직후 기본 상태는
+            TODO
+        ========================= */
+
         const response =
           await createIssue(
             requestData
@@ -1095,13 +1161,83 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
 
         if (
-          createdIssueId
+          !createdIssueId
         ) {
-          navigate(
-            `/issue/${createdIssueId}`
+          console.warn(
+            "생성된 issueId가 없습니다."
           );
+
+          return;
         }
-      } catch (error) {
+
+
+        /* =========================
+            2. TODO가 아닌 컬럼에서
+               생성한 경우 상태 변경
+        ========================= */
+
+        if (
+          initialStatus !==
+          "TODO"
+        ) {
+          try {
+            const statusResponse =
+              await updateIssueStatus(
+                createdIssueId,
+                {
+                  status:
+                    initialStatus,
+                }
+              );
+
+
+            console.log(
+              "생성 이슈 상태 변경 성공:",
+              statusResponse
+            );
+
+
+            console.log(
+              "변경 상태:",
+              initialStatus
+            );
+          } catch (
+            statusError
+          ) {
+            console.error(
+              "생성 이슈 상태 변경 실패:",
+              statusError
+            );
+
+
+            console.error(
+              "상태 변경 서버 응답:",
+              statusError.response
+                ?.data
+            );
+
+
+            /*
+              이슈 생성 자체는 이미 성공했으므로
+              상세 페이지로 이동
+
+              상태 전환이 허용되지 않는 경우
+              서버 응답을 콘솔에서 확인
+            */
+          }
+        }
+
+
+        /* =========================
+            3. 생성된 이슈 상세 이동
+        ========================= */
+
+        navigate(
+          `/issue/${createdIssueId}`
+        );
+      } catch (
+        error
+      ) {
         console.error(
           "이슈 생성 실패:",
           error
@@ -1110,7 +1246,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
         console.error(
           "서버 응답:",
-          error.response?.data
+          error.response
+            ?.data ||
+            error.data
         );
       }
     };
@@ -1196,10 +1334,18 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
 
       <IssueBasicInfo
-        title={title}
-        setTitle={setTitle}
-        priority={priority}
-        setPriority={setPriority}
+        title={
+          title
+        }
+        setTitle={
+          setTitle
+        }
+        priority={
+          priority
+        }
+        setPriority={
+          setPriority
+        }
       />
 
 
@@ -1288,7 +1434,7 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
 
 
       {/* =========================
-          하단 버튼
+          하단
       ========================= */}
 
       <div
@@ -1302,7 +1448,9 @@ CTA 버튼 클릭 시 앱 설치 페이지로 연결되는 딥링크도 일부 �
             styles.cancelButton
           }
           onClick={() =>
-            navigate(-1)
+            navigate(
+              -1
+            )
           }
         >
           취소
