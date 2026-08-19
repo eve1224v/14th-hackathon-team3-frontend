@@ -16,7 +16,15 @@
 
   display: flex;
   flex-direction: column;
+
+  transition: height 0.2s ease;
 }
+
+
+.expandedCard {
+  height: 667px;
+}
+
 
 .card h2 {
   margin: 0;
@@ -28,6 +36,7 @@
   line-height: 110%;
 }
 
+
 .divider {
   width: 100%;
   height: 1px;
@@ -37,27 +46,33 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+
 .timeline {
   position: relative;
 
   margin-top: 18px;
 }
 
+
 .line {
   position: absolute;
 
   left: 25px;
-
-  /* Cycle 1 원의 중앙에서 시작 */
   top: 34.5px;
 
   width: 3px;
-
-  /* Cycle 1 중심 ~ Cycle 5 중심 */
   height: 276px;
 
   background: #353c61;
+
+  transition: height 0.2s ease;
 }
+
+
+.expandedLine {
+  height: 414px;
+}
+
 
 .cycleItem {
   position: relative;
@@ -76,9 +91,16 @@
   border-radius: 8px;
 }
 
+
+.clickableItem {
+  cursor: pointer;
+}
+
+
 .activeItem {
   border-color: #4d67ff;
 }
+
 
 .dot {
   position: absolute;
@@ -96,22 +118,27 @@
   z-index: 2;
 }
 
+
 .complete {
   background: #ffffff;
 }
+
 
 .active {
   background: #3957ff;
 }
 
+
 .future {
   background: #354064;
 }
+
 
 .cycleInfo {
   display: flex;
   flex-direction: column;
 }
+
 
 .nameRow {
   display: flex;
@@ -119,6 +146,7 @@
 
   gap: 5px;
 }
+
 
 .nameRow strong {
   color: #ffffff;
@@ -130,6 +158,7 @@
   white-space: nowrap;
 }
 
+
 .status {
   color: rgba(255, 255, 255, 0.5);
 
@@ -139,6 +168,7 @@
   white-space: nowrap;
 }
 
+
 .activeStatus {
   color: #3957ff;
 
@@ -147,6 +177,7 @@
 
   white-space: nowrap;
 }
+
 
 .period {
   margin-top: 5px;
@@ -159,6 +190,7 @@
   white-space: nowrap;
 }
 
+
 .result {
   margin-left: auto;
 
@@ -170,19 +202,21 @@
   white-space: nowrap;
 }
 
+
 .activeResult {
   color: #4d67ff;
 }
 
-.cycleItem:nth-of-type(5) .cycleInfo,
-.cycleItem:nth-of-type(6) .cycleInfo {
+
+.futureItem .cycleInfo {
   opacity: 0.55;
 }
 
-.cycleItem:nth-of-type(5) .result,
-.cycleItem:nth-of-type(6) .result {
+
+.futureItem .result {
   color: rgba(255, 255, 255, 0.3);
 }
+
 
 .moreButton {
   width: 316px;
