@@ -1,0 +1,848 @@
+.page {
+  width: 690px;
+  box-sizing: border-box;
+
+  margin-left: 57px;
+
+  padding-top: 93px;
+  padding-bottom: 100px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+}
+
+
+/* ==================================================
+   제목
+================================================== */
+
+.title {
+  width: 201px;
+  height: 31px;
+
+  margin: 0;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================================
+   탭
+================================================== */
+
+.tabs {
+  position: relative;
+
+  width: 690px;
+  height: 44px;
+
+  display: flex;
+  align-items: flex-end;
+
+  margin-top: 22px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.12);
+}
+
+
+.tabButton {
+  position: relative;
+
+  width: 125px;
+  height: 44px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 110%;
+
+  cursor: pointer;
+}
+
+
+.activeTab {
+  color: #4d67ff;
+}
+
+
+.activeTab::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  bottom: -1px;
+
+  width: 125px;
+  height: 2px;
+
+  background: #4d67ff;
+}
+
+
+/* ==================================================
+   멤버 목록
+================================================== */
+
+.memberList {
+  width: 690px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-top: 29px;
+}
+
+
+.stateText {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+/* ==================================================
+   멤버 카드
+================================================== */
+
+.memberCard {
+  position: relative;
+
+  width: 690px;
+  height: 82px;
+
+  box-sizing: border-box;
+
+  border-radius: 8px;
+
+  background: #15192f;
+
+  overflow: visible;
+}
+
+
+.memberCardEditing {
+  height: 188px;
+}
+
+
+/* ==================================================
+   기존 카드 영역
+================================================== */
+
+.memberMain {
+  position: relative;
+
+  width: 690px;
+  height: 82px;
+}
+
+
+/* ==================================================
+   프로필
+================================================== */
+
+.avatar {
+  position: absolute;
+
+  left: 24px;
+  top: 13px;
+
+  width: 41px;
+  height: 41px;
+
+  border-radius: 50%;
+
+  background: rgba(217, 217, 217, 0.75);
+}
+
+
+/* ==================================================
+   멤버 정보
+================================================== */
+
+.memberInfo {
+  position: absolute;
+
+  left: 76px;
+  top: 13px;
+}
+
+
+/* ==================================================
+   이름 행
+================================================== */
+
+.nameRow {
+  height: 13px;
+
+  display: flex;
+  align-items: center;
+}
+
+
+/* ==================================================
+   이름
+================================================== */
+
+.memberName {
+  height: 13px;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================================
+   (나)
+================================================== */
+
+.meText {
+  height: 13px;
+
+  margin-left: 7px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================================
+   활동 중
+================================================== */
+
+.activeArea {
+  height: 13px;
+
+  display: flex;
+  align-items: center;
+
+  margin-left: 13px;
+}
+
+
+.activeText {
+  height: 13px;
+
+  color: #4d67ff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.activeDot {
+  width: 5px;
+  height: 5px;
+
+  margin-left: 6px;
+
+  border-radius: 50%;
+
+  background: #4d67ff;
+}
+
+
+/* ==================================================
+   회사 / 팀 / 직책
+================================================== */
+
+.jobText {
+  width: fit-content;
+  height: 13px;
+
+  margin: 6px 0 0;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================================
+   이메일 + 기존 역할 + 정보 수정
+================================================== */
+
+.bottomRow {
+  height: 17px;
+
+  display: flex;
+  align-items: center;
+
+  margin-top: 6px;
+}
+
+
+.email {
+  display: block;
+
+  height: 13px;
+
+  color: rgba(255, 255, 255, 0.76);
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  letter-spacing: 0;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================================
+   기존 역할 드롭다운
+
+   담당자 / 검토자 / 승인자 / 참조자
+================================================== */
+
+.roleDropdown {
+  position: relative;
+
+  margin-left: 20px;
+
+  z-index: 40;
+}
+
+
+.roleButton {
+  min-width: 48px;
+  height: 15px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.dropdownIcon {
+  display: block;
+
+  width: 14px;
+  height: 14px;
+
+  flex-shrink: 0;
+
+  object-fit: contain;
+
+  opacity: 0.7;
+
+  transition: transform 0.15s ease;
+}
+
+
+.dropdownIconOpen {
+  transform: rotate(180deg);
+}
+
+
+/* ==================================================
+   기존 역할 메뉴
+================================================== */
+
+.roleMenu {
+  position: absolute;
+
+  left: -3px;
+  top: 19px;
+
+  width: 67px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 4px 0;
+
+  border-radius: 4px;
+
+  background: #242b57;
+
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.25);
+
+  overflow: hidden;
+
+  z-index: 200;
+}
+
+
+.roleOption {
+  width: 67px;
+  height: 27px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 10px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 110%;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+
+.roleOption:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+
+/* ==================================================
+   정보 수정 버튼
+================================================== */
+
+.editButton {
+  height: 20px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-left: 13px;
+
+  padding: 0 8px;
+
+  border: 1px solid
+    rgba(77, 103, 255, 0.55);
+
+  border-radius: 5px;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.editButton:hover {
+  background:
+    rgba(77, 103, 255, 0.12);
+
+  color: #ffffff;
+}
+
+
+/* ==================================================
+   메시지 아이콘
+================================================== */
+
+.chatButton {
+  position: absolute;
+
+  right: 36px;
+  top: 26px;
+
+  width: 24px;
+  height: 29px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+
+.chatButton img {
+  display: block;
+
+  width: 24px;
+  height: 29px;
+
+  object-fit: contain;
+}
+
+
+/* ==================================================
+   멤버 수정 영역
+================================================== */
+
+.editArea {
+  position: absolute;
+
+  left: 76px;
+  top: 82px;
+
+  width: 578px;
+  height: 91px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: flex-end;
+
+  gap: 10px;
+
+  padding-top: 14px;
+  padding-bottom: 12px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+/* ==================================================
+   수정 필드
+================================================== */
+
+.editField {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+
+.editField label {
+  height: 11px;
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 110%;
+
+  white-space: nowrap;
+}
+
+
+.editField input {
+  width: 135px;
+  height: 32px;
+
+  box-sizing: border-box;
+
+  padding: 0 10px;
+
+  border:
+    1px solid rgba(166, 180, 255, 0.1);
+
+  border-radius: 7px;
+
+  outline: none;
+
+  background: #1b2038;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 110%;
+}
+
+
+.editField input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+
+.editField input:focus {
+  border-color:
+    rgba(77, 103, 255, 0.65);
+}
+
+
+/* ==================================================
+   실제 워크스페이스 권한 드롭다운
+================================================== */
+
+.workspaceRoleDropdown {
+  position: relative;
+
+  width: 128px;
+
+  z-index: 100;
+}
+
+
+.workspaceRoleButton {
+  width: 128px;
+  height: 32px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 9px 0 11px;
+
+  border:
+    1px solid rgba(166, 180, 255, 0.1);
+
+  border-radius: 7px;
+
+  background: #1b2038;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 110%;
+
+  cursor: pointer;
+}
+
+
+.workspaceRoleButton:disabled {
+  color: rgba(255, 255, 255, 0.45);
+
+  cursor: default;
+}
+
+
+/* ==================================================
+   실제 권한 메뉴
+================================================== */
+
+.workspaceRoleMenu {
+  position: absolute;
+
+  left: 0;
+  top: 37px;
+
+  width: 128px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 4px 0;
+
+  border-radius: 7px;
+
+  background: #242b57;
+
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.25);
+
+  overflow: hidden;
+
+  z-index: 300;
+}
+
+
+.workspaceRoleOption {
+  width: 128px;
+  height: 29px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 11px;
+
+  border: none;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.75);
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 110%;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+
+.workspaceRoleOption:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+
+.workspaceRoleOptionSelected {
+  color: #7184ff;
+
+  background: rgba(77, 103, 255, 0.12);
+}
+
+
+/* ==================================================
+   취소 / 저장
+================================================== */
+
+.editActions {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  margin-left: auto;
+}
+
+
+.cancelButton,
+.saveButton {
+  height: 32px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 10px;
+
+  border-radius: 7px;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 110%;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.cancelButton {
+  border: 1px solid #4d67ff;
+
+  background: transparent;
+
+  color: #ffffff;
+}
+
+
+.saveButton {
+  border: none;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+}
+
+
+.cancelButton:disabled,
+.saveButton:disabled {
+  opacity: 0.5;
+
+  cursor: default;
+}
