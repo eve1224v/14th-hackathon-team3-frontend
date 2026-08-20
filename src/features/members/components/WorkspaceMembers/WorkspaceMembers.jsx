@@ -13,7 +13,6 @@ import MessageModal from "../../../../components/MessageModal/MessageModal";
 import {
   getOrganizationChart,
   getWorkspaceMembers,
-  updateWorkspaceMembers,
 } from "../../../../api/memberApi";
 
 
@@ -28,18 +27,6 @@ const ROLE_OPTIONS = [
   "검토자",
   "승인자",
   "참조자",
-];
-
-
-/* ==================================================
-   실제 워크스페이스 권한
-
-   OWNER는 직접 지정 불가
-================================================== */
-
-const WORKSPACE_ROLE_OPTIONS = [
-  "MEMBER",
-  "ADMIN",
 ];
 
 
@@ -71,16 +58,6 @@ function WorkspaceMembers() {
 
 
   /* ==================================================
-     현재 로그인 사용자 권한
-  ================================================== */
-
-  const [
-    currentUserRole,
-    setCurrentUserRole,
-  ] = useState(null);
-
-
-  /* ==================================================
      기존 역할 드롭다운
   ================================================== */
 
@@ -88,46 +65,6 @@ function WorkspaceMembers() {
     openRoleId,
     setOpenRoleId,
   ] = useState(null);
-
-
-  /* ==================================================
-     정보 수정
-  ================================================== */
-
-  const [
-    editingMemberId,
-    setEditingMemberId,
-  ] = useState(null);
-
-
-  const [
-    editTeamName,
-    setEditTeamName,
-  ] = useState("");
-
-
-  const [
-    editJobTitle,
-    setEditJobTitle,
-  ] = useState("");
-
-
-  const [
-    editWorkspaceRole,
-    setEditWorkspaceRole,
-  ] = useState("MEMBER");
-
-
-  const [
-    isWorkspaceRoleOpen,
-    setIsWorkspaceRoleOpen,
-  ] = useState(false);
-
-
-  const [
-    isSaving,
-    setIsSaving,
-  ] = useState(false);
 
 
   /* ==================================================
@@ -154,16 +91,6 @@ function WorkspaceMembers() {
     errorMessage,
     setErrorMessage,
   ] = useState("");
-
-
-  /*
-    저장 성공 후 서버 데이터를 다시 조회하기 위한 값
-  */
-
-  const [
-    reloadKey,
-    setReloadKey,
-  ] = useState(0);
 
 
   /* ==================================================
@@ -278,7 +205,7 @@ function WorkspaceMembers() {
 
 
           /* ==================================================
-             2. 워크스페이스 멤버 조회 데이터
+             2. 워크스페이스 멤버 데이터
           ================================================== */
 
           const workspaceMembers =
@@ -321,10 +248,15 @@ function WorkspaceMembers() {
 
 
           /* ==================================================
-             조직도 데이터를 화면용으로 변환
+             화면용 멤버 데이터
 
-             이메일은 화면에는 표시하지 않지만
-             현재 사용자 판별을 위해 내부 데이터에는 유지
+             - 이름
+             - 기업
+             - 팀
+             - 직책
+             - 활동 상태
+
+             정보 수정 / 권한 관리 기능은 사용하지 않음
           ================================================== */
 
           const formattedMembers =
@@ -359,6 +291,10 @@ function WorkspaceMembers() {
                           ?.name ??
                         "-",
 
+                      /*
+                        이메일은 화면에는 표시하지 않지만
+                        현재 사용자 판별에만 사용
+                      */
                       email:
                         member.email ??
                         workspaceMember
@@ -387,19 +323,11 @@ function WorkspaceMembers() {
                           ?.status ===
                           "ACTIVE",
 
+                      /*
+                        기존 카드의 역할 UI 유지
+                      */
                       displayRole:
                         "담당자",
-
-                      workspaceRole:
-                        workspaceMember
-                          ?.role ??
-                        "MEMBER",
-
-                      status:
-                        workspaceMember
-                          ?.status ??
-                        member.activityStatus ??
-                        null,
 
                       isMe:
                         false,
@@ -445,33 +373,6 @@ function WorkspaceMembers() {
           console.log(
             "현재 사용자로 판별된 조직도 멤버:",
             currentMember
-          );
-
-
-          const currentWorkspaceMember =
-            currentMember
-              ? workspaceMemberMap.get(
-                  currentMember.id
-                )
-              : null;
-
-
-          const detectedRole =
-            currentWorkspaceMember
-              ?.role ??
-            currentMember
-              ?.workspaceRole ??
-            null;
-
-
-          console.log(
-            "현재 사용자 워크스페이스 권한:",
-            detectedRole
-          );
-
-
-          setCurrentUserRole(
-            detectedRole
           );
 
 
@@ -597,7 +498,7 @@ function WorkspaceMembers() {
     return () => {
       cancelled = true;
     };
-  }, [reloadKey]);
+  }, []);
 
 
   /* ==================================================
@@ -612,18 +513,9 @@ function WorkspaceMembers() {
 
 
   /* ==================================================
-     멤버 수정 가능 여부
-  ================================================== */
-
-  const canManageMembers =
-    currentUserRole ===
-      "OWNER" ||
-    currentUserRole ===
-      "ADMIN";
-
-
-  /* ==================================================
      기존 역할 선택
+
+     담당자 / 검토자 / 승인자 / 참조자
   ================================================== */
 
   const handleRoleSelect = (
@@ -665,262 +557,7 @@ function WorkspaceMembers() {
 
 
   /* ==================================================
-     정보 수정 열기
-  ================================================== */
-
-  const handleEditOpen =
-    (member) => {
-      setEditingMemberId(
-        member.id
-      );
-
-
-      setEditTeamName(
-        member.team ===
-          "팀 미지정"
-          ? ""
-          : member.team
-      );
-
-
-      setEditJobTitle(
-        member.position ===
-          "-"
-          ? ""
-          : member.position
-      );
-
-
-      if (
-        member.workspaceRole ===
-          "ADMIN" ||
-        member.workspaceRole ===
-          "MEMBER"
-      ) {
-        setEditWorkspaceRole(
-          member.workspaceRole
-        );
-      } else {
-        setEditWorkspaceRole(
-          "MEMBER"
-        );
-      }
-
-
-      setOpenRoleId(null);
-
-      setIsWorkspaceRoleOpen(
-        false
-      );
-    };
-
-
-  /* ==================================================
-     정보 수정 닫기
-  ================================================== */
-
-  const handleEditCancel =
-    () => {
-      setEditingMemberId(
-        null
-      );
-
-
-      setEditTeamName("");
-
-      setEditJobTitle("");
-
-      setEditWorkspaceRole(
-        "MEMBER"
-      );
-
-
-      setIsWorkspaceRoleOpen(
-        false
-      );
-    };
-
-
-  /* ==================================================
-     실제 멤버 수정 저장
-  ================================================== */
-
-  const handleEditSave =
-    async (
-      member
-    ) => {
-      const workspaceId =
-        localStorage.getItem(
-          "workspaceId"
-        );
-
-
-      if (!workspaceId) {
-        console.warn(
-          "workspaceId가 없습니다."
-        );
-
-        return;
-      }
-
-
-      const updateAction = {
-        action:
-          "UPDATE",
-
-        memberId:
-          member.id,
-      };
-
-
-      const newTeamName =
-        editTeamName.trim();
-
-
-      const oldTeamName =
-        member.team ===
-          "팀 미지정"
-          ? ""
-          : member.team;
-
-
-      if (
-        newTeamName &&
-        newTeamName !==
-          oldTeamName
-      ) {
-        updateAction.teamName =
-          newTeamName;
-      }
-
-
-      const newJobTitle =
-        editJobTitle.trim();
-
-
-      const oldJobTitle =
-        member.position === "-"
-          ? ""
-          : member.position;
-
-
-      if (
-        newJobTitle &&
-        newJobTitle !==
-          oldJobTitle
-      ) {
-        updateAction.jobTitle =
-          newJobTitle;
-      }
-
-
-      if (
-        member.workspaceRole !==
-          "OWNER" &&
-        editWorkspaceRole !==
-          member.workspaceRole
-      ) {
-        updateAction.role =
-          editWorkspaceRole;
-      }
-
-
-      const hasChanges =
-        Object.keys(
-          updateAction
-        ).length > 2;
-
-
-      if (!hasChanges) {
-        console.log(
-          "변경된 멤버 정보가 없습니다."
-        );
-
-        handleEditCancel();
-
-        return;
-      }
-
-
-      console.log(
-        "워크스페이스 멤버 수정 요청:",
-        {
-          actions: [
-            updateAction,
-          ],
-        }
-      );
-
-
-      try {
-        setIsSaving(
-          true
-        );
-
-
-        const response =
-          await updateWorkspaceMembers(
-            workspaceId,
-            [
-              updateAction,
-            ]
-          );
-
-
-        console.log(
-          "워크스페이스 멤버 수정 성공:",
-          response
-        );
-
-
-        handleEditCancel();
-
-
-        setLoading(true);
-
-
-        setReloadKey(
-          (prev) =>
-            prev + 1
-        );
-      } catch (error) {
-        console.error(
-          "워크스페이스 멤버 수정 실패:",
-          error
-        );
-
-
-        console.error(
-          "서버 응답:",
-          error.response?.data
-        );
-      } finally {
-        setIsSaving(
-          false
-        );
-      }
-    };
-
-
-  /* ==================================================
-     워크스페이스 권한 선택
-  ================================================== */
-
-  const handleWorkspaceRoleSelect =
-    (role) => {
-      setEditWorkspaceRole(
-        role
-      );
-
-
-      setIsWorkspaceRoleOpen(
-        false
-      );
-    };
-
-
-  /* ==================================================
-     탭
+     탭 변경
   ================================================== */
 
   const handleTabChange =
@@ -930,10 +567,9 @@ function WorkspaceMembers() {
       );
 
 
-      setOpenRoleId(null);
-
-
-      handleEditCancel();
+      setOpenRoleId(
+        null
+      );
     };
 
 
@@ -1072,476 +708,239 @@ function WorkspaceMembers() {
           {!loading &&
             !errorMessage &&
             members.map(
-              (member) => {
-                const isEditing =
-                  editingMemberId ===
-                  member.id;
-
-
-                return (
-                  <article
-                    key={
-                      member.id
+              (member) => (
+                <article
+                  key={
+                    member.id
+                  }
+                  className={
+                    styles.memberCard
+                  }
+                >
+                  <div
+                    className={
+                      styles.memberMain
                     }
-                    className={`${styles.memberCard} ${
-                      isEditing
-                        ? styles.memberCardEditing
-                        : ""
-                    }`}
                   >
+                    {/* 프로필 */}
+
                     <div
                       className={
-                        styles.memberMain
+                        styles.avatar
+                      }
+                    />
+
+
+                    <div
+                      className={
+                        styles.memberInfo
                       }
                     >
-                      <div
-                        className={
-                          styles.avatar
-                        }
-                      />
-
+                      {/* 이름 */}
 
                       <div
                         className={
-                          styles.memberInfo
+                          styles.nameRow
                         }
                       >
-                        {/* 이름 */}
-
-                        <div
+                        <strong
                           className={
-                            styles.nameRow
+                            styles.memberName
                           }
                         >
-                          <strong
+                          {
+                            member.name
+                          }
+                        </strong>
+
+
+                        {member.isMe && (
+                          <span
                             className={
-                              styles.memberName
+                              styles.meText
                             }
                           >
-                            {
-                              member.name
+                            (나)
+                          </span>
+                        )}
+
+
+                        {member.active && (
+                          <div
+                            className={
+                              styles.activeArea
                             }
-                          </strong>
-
-
-                          {member.isMe && (
+                          >
                             <span
                               className={
-                                styles.meText
+                                styles.activeText
                               }
                             >
-                              (나)
+                              활동 중
                             </span>
-                          )}
 
 
-                          {member.active && (
+                            <span
+                              className={
+                                styles.activeDot
+                              }
+                            />
+                          </div>
+                        )}
+                      </div>
+
+
+                      {/* 기업 · 팀 · 직책 */}
+
+                      <p
+                        className={
+                          styles.jobText
+                        }
+                      >
+                        {
+                          member.company
+                        }
+                        {" · "}
+                        {
+                          member.team
+                        }
+                        {" · "}
+                        {
+                          member.position
+                        }
+                      </p>
+
+
+                      {/* 역할 */}
+
+                      <div
+                        className={
+                          styles.bottomRow
+                        }
+                      >
+                        <div
+                          className={
+                            styles.roleDropdown
+                          }
+                        >
+                          <button
+                            type="button"
+                            className={
+                              styles.roleButton
+                            }
+                            onClick={() =>
+                              setOpenRoleId(
+                                (
+                                  prev
+                                ) =>
+                                  prev ===
+                                  member.id
+                                    ? null
+                                    : member.id
+                              )
+                            }
+                          >
+                            <span>
+                              {
+                                member.displayRole
+                              }
+                            </span>
+
+
+                            <img
+                              src={
+                                dropdownIcon
+                              }
+                              alt=""
+                              className={`${
+                                styles.dropdownIcon
+                              } ${
+                                openRoleId ===
+                                member.id
+                                  ? styles.dropdownIconOpen
+                                  : ""
+                              }`}
+                            />
+                          </button>
+
+
+                          {openRoleId ===
+                            member.id && (
                             <div
                               className={
-                                styles.activeArea
+                                styles.roleMenu
                               }
                             >
-                              <span
-                                className={
-                                  styles.activeText
-                                }
-                              >
-                                활동 중
-                              </span>
-
-
-                              <span
-                                className={
-                                  styles.activeDot
-                                }
-                              />
+                              {ROLE_OPTIONS
+                                .filter(
+                                  (
+                                    role
+                                  ) =>
+                                    role !==
+                                    member.displayRole
+                                )
+                                .map(
+                                  (
+                                    role
+                                  ) => (
+                                    <button
+                                      key={
+                                        role
+                                      }
+                                      type="button"
+                                      className={
+                                        styles.roleOption
+                                      }
+                                      onClick={() =>
+                                        handleRoleSelect(
+                                          member.id,
+                                          role
+                                        )
+                                      }
+                                    >
+                                      {
+                                        role
+                                      }
+                                    </button>
+                                  )
+                                )}
                             </div>
                           )}
                         </div>
-
-
-                        {/* 기업 · 팀 · 직책 */}
-
-                        <p
-                          className={
-                            styles.jobText
-                          }
-                        >
-                          {
-                            member.company
-                          }
-                          {" · "}
-                          {
-                            member.team
-                          }
-                          {" · "}
-                          {
-                            member.position
-                          }
-                        </p>
-
-
-                        {/* 기존 역할 */}
-
-                        <div
-                          className={
-                            styles.bottomRow
-                          }
-                        >
-                          <div
-                            className={
-                              styles.roleDropdown
-                            }
-                          >
-                            <button
-                              type="button"
-                              className={
-                                styles.roleButton
-                              }
-                              onClick={() =>
-                                setOpenRoleId(
-                                  (
-                                    prev
-                                  ) =>
-                                    prev ===
-                                    member.id
-                                      ? null
-                                      : member.id
-                                )
-                              }
-                            >
-                              <span>
-                                {
-                                  member.displayRole
-                                }
-                              </span>
-
-
-                              <img
-                                src={
-                                  dropdownIcon
-                                }
-                                alt=""
-                                className={`${
-                                  styles.dropdownIcon
-                                } ${
-                                  openRoleId ===
-                                  member.id
-                                    ? styles.dropdownIconOpen
-                                    : ""
-                                }`}
-                              />
-                            </button>
-
-
-                            {openRoleId ===
-                              member.id && (
-                              <div
-                                className={
-                                  styles.roleMenu
-                                }
-                              >
-                                {ROLE_OPTIONS
-                                  .filter(
-                                    (
-                                      role
-                                    ) =>
-                                      role !==
-                                      member.displayRole
-                                  )
-                                  .map(
-                                    (
-                                      role
-                                    ) => (
-                                      <button
-                                        key={
-                                          role
-                                        }
-                                        type="button"
-                                        className={
-                                          styles.roleOption
-                                        }
-                                        onClick={() =>
-                                          handleRoleSelect(
-                                            member.id,
-                                            role
-                                          )
-                                        }
-                                      >
-                                        {
-                                          role
-                                        }
-                                      </button>
-                                    )
-                                  )}
-                              </div>
-                            )}
-                          </div>
-
-
-                          {canManageMembers && (
-                            <button
-                              type="button"
-                              className={
-                                styles.editButton
-                              }
-                              onClick={() =>
-                                isEditing
-                                  ? handleEditCancel()
-                                  : handleEditOpen(
-                                      member
-                                    )
-                              }
-                            >
-                              {isEditing
-                                ? "닫기"
-                                : "정보 수정"}
-                            </button>
-                          )}
-                        </div>
                       </div>
-
-
-                      {/* 채팅 */}
-
-                      <button
-                        type="button"
-                        className={
-                          styles.chatButton
-                        }
-                        aria-label={`${member.name}에게 메시지 보내기`}
-                        onClick={
-                          handleChatOpen
-                        }
-                      >
-                        <img
-                          src={
-                            chatIcon3
-                          }
-                          alt=""
-                        />
-                      </button>
                     </div>
 
 
-                    {/* ==================================================
-                        정보 수정 영역
-                    ================================================== */}
+                    {/* 채팅 */}
 
-                    {isEditing && (
-                      <div
-                        className={
-                          styles.editArea
+                    <button
+                      type="button"
+                      className={
+                        styles.chatButton
+                      }
+                      aria-label={`${member.name}에게 메시지 보내기`}
+                      onClick={
+                        handleChatOpen
+                      }
+                    >
+                      <img
+                        src={
+                          chatIcon3
                         }
-                      >
-                        <div
-                          className={
-                            styles.editField
-                          }
-                        >
-                          <label>
-                            소속 팀
-                          </label>
-
-
-                          <input
-                            type="text"
-                            value={
-                              editTeamName
-                            }
-                            placeholder="팀 이름 입력"
-                            onChange={(
-                              event
-                            ) =>
-                              setEditTeamName(
-                                event
-                                  .target
-                                  .value
-                              )
-                            }
-                          />
-                        </div>
-
-
-                        <div
-                          className={
-                            styles.editField
-                          }
-                        >
-                          <label>
-                            직책
-                          </label>
-
-
-                          <input
-                            type="text"
-                            value={
-                              editJobTitle
-                            }
-                            placeholder="직책 입력"
-                            onChange={(
-                              event
-                            ) =>
-                              setEditJobTitle(
-                                event
-                                  .target
-                                  .value
-                              )
-                            }
-                          />
-                        </div>
-
-
-                        <div
-                          className={
-                            styles.editField
-                          }
-                        >
-                          <label>
-                            워크스페이스 권한
-                          </label>
-
-
-                          <div
-                            className={
-                              styles.workspaceRoleDropdown
-                            }
-                          >
-                            <button
-                              type="button"
-                              className={
-                                styles.workspaceRoleButton
-                              }
-                              disabled={
-                                member.workspaceRole ===
-                                "OWNER"
-                              }
-                              onClick={() =>
-                                setIsWorkspaceRoleOpen(
-                                  (
-                                    prev
-                                  ) =>
-                                    !prev
-                                )
-                              }
-                            >
-                              <span>
-                                {member.workspaceRole ===
-                                "OWNER"
-                                  ? "OWNER"
-                                  : editWorkspaceRole}
-                              </span>
-
-
-                              {member.workspaceRole !==
-                                "OWNER" && (
-                                <img
-                                  src={
-                                    dropdownIcon
-                                  }
-                                  alt=""
-                                  className={`${
-                                    styles.dropdownIcon
-                                  } ${
-                                    isWorkspaceRoleOpen
-                                      ? styles.dropdownIconOpen
-                                      : ""
-                                  }`}
-                                />
-                              )}
-                            </button>
-
-
-                            {isWorkspaceRoleOpen &&
-                              member.workspaceRole !==
-                                "OWNER" && (
-                                <div
-                                  className={
-                                    styles.workspaceRoleMenu
-                                  }
-                                >
-                                  {WORKSPACE_ROLE_OPTIONS.map(
-                                    (
-                                      role
-                                    ) => (
-                                      <button
-                                        key={
-                                          role
-                                        }
-                                        type="button"
-                                        className={`${styles.workspaceRoleOption} ${
-                                          editWorkspaceRole ===
-                                          role
-                                            ? styles.workspaceRoleOptionSelected
-                                            : ""
-                                        }`}
-                                        onClick={() =>
-                                          handleWorkspaceRoleSelect(
-                                            role
-                                          )
-                                        }
-                                      >
-                                        {
-                                          role
-                                        }
-                                      </button>
-                                    )
-                                  )}
-                                </div>
-                              )}
-                          </div>
-                        </div>
-
-
-                        <div
-                          className={
-                            styles.editActions
-                          }
-                        >
-                          <button
-                            type="button"
-                            className={
-                              styles.cancelButton
-                            }
-                            onClick={
-                              handleEditCancel
-                            }
-                            disabled={
-                              isSaving
-                            }
-                          >
-                            취소
-                          </button>
-
-
-                          <button
-                            type="button"
-                            className={
-                              styles.saveButton
-                            }
-                            onClick={() =>
-                              handleEditSave(
-                                member
-                              )
-                            }
-                            disabled={
-                              isSaving
-                            }
-                          >
-                            {isSaving
-                              ? "저장 중"
-                              : "저장"}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </article>
-                );
-              }
+                        alt=""
+                      />
+                    </button>
+                  </div>
+                </article>
+              )
             )}
         </div>
       </main>
 
+
+      {/* ==================================================
+          기존 채팅 모달
+      ================================================== */}
 
       {isMessageOpen && (
         <MessageModal

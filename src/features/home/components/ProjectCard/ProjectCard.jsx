@@ -1,42 +1,22 @@
 import styles from "./ProjectCard.module.css";
 
 
-/* ========================================
-   상태 한글 변환
-======================================== */
-
-const getStatusText = (status) => {
-  switch (status) {
-    case "DRAFT":
-      return "초안";
-
-    case "ACTIVE":
-      return "진행 중";
-
-    case "ENDED":
-      return "종료";
-
-    default:
-      return status || "-";
-  }
-};
-
-
 function ProjectCard({
-  name,
-  status,
-  startDate,
-  endDate,
-  memberCount,
+  title,
+  company,
+  cycle,
+  progress,
+  issueCount,
+  completeCount,
 }) {
-  /*
-    현재 프로젝트 목록 API에는
-    진행률 값이 없기 때문에
-    기존 프로젝트 페이지와 동일하게
-    디자인 유지용 78% 사용
-  */
-
-  const progress = 78;
+  const safeProgress =
+    Math.min(
+      Math.max(
+        Number(progress) || 0,
+        0,
+      ),
+      100,
+    );
 
 
   return (
@@ -48,45 +28,29 @@ function ProjectCard({
       {/* 프로젝트명 */}
 
       <h3>
-        {name || "프로젝트"}
+        {title || "-"}
       </h3>
 
 
-      {/* 상태 */}
+      {/* 파트너사 */}
 
       <p
         className={
-          styles.projectStatus
+          styles.projectCompany
         }
       >
-        {getStatusText(
-          status,
-        )}
+        {company || "파트너사 · -"}
       </p>
 
 
-      {/* 프로젝트 기간 */}
+      {/* 현재 사이클 */}
 
       <p
         className={
-          styles.projectPeriod
+          styles.projectCycle
         }
       >
-        {startDate || "-"}
-        {" ~ "}
-        {endDate || "-"}
-      </p>
-
-
-      {/* 멤버 */}
-
-      <p
-        className={
-          styles.projectMember
-        }
-      >
-        멤버{" "}
-        {memberCount ?? 0}명
+        {cycle || "Cycle"}
       </p>
 
 
@@ -107,21 +71,32 @@ function ProjectCard({
               styles.progressFill
             }
             style={{
-              width:
-                `${progress}%`,
+              width: `${safeProgress}%`,
             }}
           />
         </div>
-
 
         <span
           className={
             styles.progressText
           }
         >
-          {progress}%
+          {safeProgress}%
         </span>
       </div>
+
+
+      {/* 이슈 정보 */}
+
+      <p
+        className={
+          styles.projectMeta
+        }
+      >
+        이슈 {issueCount ?? 0}
+        {" · "}
+        완료 {completeCount ?? 0}
+      </p>
     </article>
   );
 }

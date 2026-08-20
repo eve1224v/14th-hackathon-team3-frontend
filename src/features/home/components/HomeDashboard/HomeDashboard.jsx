@@ -1,11 +1,5 @@
-import {
-  useEffect,
-  useState,
-} from "react";
-
-import {
-  useNavigate,
-} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import styles from "./HomeDashboard.module.css";
 
@@ -16,258 +10,165 @@ import TodoCard from "../TodoCard/TodoCard";
 import ProjectCard from "../ProjectCard/ProjectCard";
 import HandoverCard from "../HandoverCard/HandoverCard";
 
-import {
-  ROUTES,
-} from "../../../../router/routes.constant";
+import { ROUTES } from "../../../../router/routes.constant";
 
 import {
   getProjects,
+  getProjectDetail,
 } from "../../../../api/projectApi";
-
-import {
-  getCycles,
-} from "../../../../api/cycleApi";
-
-import {
-  getIssues,
-} from "../../../../api/issueApi";
-
-import {
-  getHandover,
-} from "../../../../api/handoverApi";
 
 
 /* ========================================
-   업무 요약 기본값
+   나의 업무 요약
 ======================================== */
 
-const DEFAULT_SUMMARY_ITEMS = [
+const summaryItems = [
   {
     label: "진행 중",
-    count: 0,
+    count: 4,
     color: "#4D67FF",
   },
   {
     label: "확인 필요",
-    count: 0,
+    count: 3,
     color: "#FEBC2E",
   },
   {
     label: "지연 중",
-    count: 0,
+    count: 2,
     color: "#FE6057",
   },
   {
     label: "완료",
-    count: 0,
+    count: 12,
     color: "#28C840",
   },
 ];
 
 
 /* ========================================
-   최근 인수인계 기본값
+   이어서 할 일
 ======================================== */
 
-const DEFAULT_HANDOVER = {
-  fromCountry: "",
-  fromTeam: "",
+const todoItems = [
+  {
+    title: "API 요구사항 검토",
+    project: "Global Payment Integration",
+    manager: "김예티",
+    startDate: "2026.08.03",
+    endDate: "2026.08.07",
+  },
+  {
+    title: "API 요구사항 검토",
+    project: "Global Payment Integration",
+    manager: "김예티",
+    startDate: "2026.08.03",
+    endDate: "2026.08.07",
+  },
+  {
+    title: "API 요구사항 검토",
+    project: "Global Payment Integration",
+    manager: "김예티",
+    startDate: "2026.08.03",
+    endDate: "2026.08.07",
+  },
+];
 
-  toCountry: "",
-  toTeam: "",
 
-  project: "프로젝트",
-  cycle: "Cycle -",
+/* ========================================
+   최근 인수인계
+======================================== */
 
-  completed: 0,
-  next: 0,
-  questions: 0,
-  needsReview: 0,
+const handover = {
+  fromCountry: "GB",
+  fromTeam: "Product Team",
 
-  notice:
-    "아직 생성된 인수인계가 없습니다.",
+  toCountry: "KR",
+  toTeam: "Engineering Team",
+
+  project: "Global Payment Integration",
+  cycle: "Cycle 3",
+
+  completed: 5,
+  next: 3,
+  questions: 2,
+  approvals: 1,
 };
 
 
 /* ========================================
-   Cycle 정렬
+   파트너사 이름
+
+   ProjectList와 동일한 방식
 ======================================== */
 
-const sortCyclesByPeriod = (
-  cycles,
-) => {
-  return [...cycles].sort(
-    (a, b) => {
-      const startCompare =
-        String(
-          a.startDate || "",
-        ).localeCompare(
-          String(
-            b.startDate || "",
-          ),
-        );
-
-      if (
-        startCompare !== 0
-      ) {
-        return startCompare;
-      }
-
-      return (
-        Number(
-          a.cycleId || 0,
-        ) -
-        Number(
-          b.cycleId || 0,
-        )
-      );
-    },
-  );
-};
-
-
-/* ========================================
-   지연 이슈 판단
-======================================== */
-
-const isDelayedIssue = (
-  issue,
-) => {
-  if (!issue?.dueDate) {
-    return false;
+const getPartnerCompanyName = (project) => {
+  if (!Array.isArray(project?.participatingCompanies)) {
+    return "-";
   }
 
-  if (
-    issue.status === "DONE" ||
-    issue.status === "CANCELED"
-  ) {
-    return false;
-  }
-
-  const today =
-    new Date();
-
-  today.setHours(
-    0,
-    0,
-    0,
-    0,
+  const partners = project.participatingCompanies.filter(
+    (company) => company.role === "PARTNER",
   );
 
-  const dueDate =
-    new Date(
-      `${issue.dueDate}T00:00:00`,
-    );
-
-  if (
-    Number.isNaN(
-      dueDate.getTime(),
-    )
-  ) {
-    return false;
+  if (partners.length === 0) {
+    return "-";
   }
 
-  return dueDate < today;
+  const names = partners
+    .map((company) => company.name || company.companyName)
+    .filter(Boolean);
+
+  if (names.length === 0) {
+    return "-";
+  }
+
+  return names.join(", ");
 };
 
 
 /* ========================================
-   AI 업데이트 시간
+   Cycle 표시
+
+   ProjectList와 동일한 데이터 기준
 ======================================== */
 
-const getUpdateNotice = (
-  lastSyncedAt,
-) => {
-  if (!lastSyncedAt) {
-    return "AI 인수인계 업데이트 정보가 없습니다.";
+const getCycleText = (project) => {
+  if (project?.cycleName) {
+    return project.cycleName;
   }
 
-  const syncedDate =
-    new Date(
-      lastSyncedAt,
-    );
-
-  if (
-    Number.isNaN(
-      syncedDate.getTime(),
-    )
-  ) {
-    return "AI 인수인계가 업데이트되었습니다.";
+  if (project?.currentCycleName) {
+    return project.currentCycleName;
   }
 
-  const now =
-    new Date();
-
-  const diffMinutes =
-    Math.max(
-      0,
-      Math.floor(
-        (
-          now.getTime() -
-          syncedDate.getTime()
-        ) /
-          60000,
-      ),
-    );
-
-  if (
-    diffMinutes < 1
-  ) {
-    return "AI가 방금 인수인계를 업데이트했습니다.";
+  if (project?.cycleNumber) {
+    return `Cycle ${project.cycleNumber}`;
   }
 
-  if (
-    diffMinutes < 60
-  ) {
-    return `AI가 ${diffMinutes}분 전에 인수인계를 업데이트했습니다.`;
+  if (project?.cycleId) {
+    return `Cycle ${project.cycleId}`;
   }
 
-  const diffHours =
-    Math.floor(
-      diffMinutes / 60,
-    );
-
-  if (
-    diffHours < 24
-  ) {
-    return `AI가 ${diffHours}시간 전에 인수인계를 업데이트했습니다.`;
-  }
-
-  const diffDays =
-    Math.floor(
-      diffHours / 24,
-    );
-
-  return `AI가 ${diffDays}일 전에 인수인계를 업데이트했습니다.`;
+  return "Cycle";
 };
 
 
 /* ========================================
-   ArrowButton
+   Arrow Button
 ======================================== */
 
-function ArrowButton({
-  children,
-  onClick,
-}) {
+function ArrowButton({ children, onClick }) {
   return (
     <button
       type="button"
-      className={
-        styles.arrowButton
-      }
-      onClick={
-        onClick
-      }
+      className={styles.arrowButton}
+      onClick={onClick}
     >
-      <span>
-        {children}
-      </span>
+      <span>{children}</span>
 
       <img
-        src={
-          rightArrowIcon
-        }
+        src={rightArrowIcon}
         alt=""
       />
     </button>
@@ -275,870 +176,467 @@ function ArrowButton({
 }
 
 
-/* ========================================
-   HomeDashboard
-======================================== */
-
 function HomeDashboard() {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
+  /* ========================================
+     프로젝트
+  ========================================= */
 
-  const [
-    summaryItems,
-    setSummaryItems,
-  ] = useState(
-    DEFAULT_SUMMARY_ITEMS,
-  );
+  const [projects, setProjects] = useState([]);
 
+  const [isProjectLoading, setIsProjectLoading] =
+    useState(true);
 
-  /*
-    ★ 이제 이슈가 아니라
-      인수인계 NEXT_ACTION
-  */
-
-  const [
-    todoItems,
-    setTodoItems,
-  ] = useState([]);
-
-
-  const [
-    projects,
-    setProjects,
-  ] = useState([]);
-
-
-  const [
-    handover,
-    setHandover,
-  ] = useState(
-    DEFAULT_HANDOVER,
-  );
-
-
-  const [
-    refreshKey,
-    setRefreshKey,
-  ] = useState(0);
+  const [projectError, setProjectError] =
+    useState("");
 
 
   /* ========================================
-     홈 데이터 조회
-  ======================================== */
+     프로젝트 조회
+
+     ProjectList와 동일하게
+     목록 조회 → 상세 병합
+  ========================================= */
 
   useEffect(() => {
-    let cancelled =
-      false;
+    let isCancelled = false;
 
 
-    const fetchHomeData =
-      async () => {
-        const workspaceId =
-          localStorage.getItem(
-            "workspaceId",
+    const fetchProjects = async () => {
+      const workspaceId =
+        localStorage.getItem("workspaceId");
+
+
+      if (!workspaceId) {
+        if (!isCancelled) {
+          setProjects([]);
+
+          setProjectError(
+            "워크스페이스 정보가 없습니다.",
           );
 
+          setIsProjectLoading(false);
+        }
 
-        if (
-          !workspaceId
-        ) {
-          console.warn(
-            "홈: workspaceId가 없습니다.",
-          );
+        return;
+      }
 
+
+      try {
+        setIsProjectLoading(true);
+
+        setProjectError("");
+
+
+        /* =========================
+           1. 프로젝트 목록 조회
+
+           ProjectList 기본 필터와 동일
+        ========================= */
+
+        const result = await getProjects({
+          workspaceId,
+
+          status: "",
+
+          keyword: "",
+        });
+
+
+        if (isCancelled) {
           return;
         }
 
 
-        try {
-          /* ========================================
-             1. 프로젝트 조회
-          ======================================== */
-
-          const projectResponse =
-            await getProjects({
-              workspaceId,
-              status: "",
-              keyword: "",
-            });
+        console.log(
+          "홈 프로젝트 목록 조회 성공:",
+          result,
+        );
 
 
-          if (
-            cancelled
-          ) {
-            return;
-          }
+        const projectList =
+          Array.isArray(result?.data)
+            ? result.data
+            : [];
 
 
-          const projectList =
-            Array.isArray(
-              projectResponse
-                ?.data,
-            )
-              ? projectResponse.data
-              : [];
+        /* =========================
+           2. 각 프로젝트 상세 조회
 
+           ProjectList와 동일하게 병합
+        ========================= */
 
-          console.log(
-            "홈 프로젝트 목록:",
-            projectList,
-          );
-
-
-          setProjects(
-            projectList,
-          );
-
-
-          /* ========================================
-             2. 프로젝트별 Cycle 조회
-          ======================================== */
-
-          const cycleResults =
-            await Promise.allSettled(
-              projectList.map(
-                async (
-                  project,
-                ) => {
-                  const response =
-                    await getCycles(
+        const projectsWithDetail =
+          await Promise.all(
+            projectList.map(
+              async (project) => {
+                try {
+                  const detailResult =
+                    await getProjectDetail(
                       project.projectId,
                     );
 
 
-                  const cycles =
-                    Array.isArray(
-                      response?.data,
-                    )
-                      ? sortCyclesByPeriod(
-                          response.data,
-                        )
-                      : [];
+                  const detail =
+                    detailResult?.data || {};
 
 
                   return {
-                    project,
-                    cycles,
+                    ...project,
+
+                    participatingCompanies:
+                      detail.participatingCompanies ||
+                      [],
+
+                    teamSchedules:
+                      detail.teamSchedules ||
+                      [],
+
+                    members:
+                      detail.members ||
+                      [],
+
+                    objective:
+                      detail.objective ||
+                      "",
+
+                    version:
+                      detail.version,
+
+                    issueCount:
+                      detail.issueCount ??
+                      detail.totalIssueCount ??
+                      project.issueCount ??
+                      project.totalIssueCount ??
+                      0,
+
+                    completedIssueCount:
+                      detail.completedIssueCount ??
+                      detail.completeIssueCount ??
+                      project.completedIssueCount ??
+                      project.completeIssueCount ??
+                      0,
+
+                    progressRate:
+                      detail.progressRate ??
+                      detail.progress ??
+                      project.progressRate ??
+                      project.progress ??
+                      0,
                   };
-                },
-              ),
-            );
-
-
-          if (
-            cancelled
-          ) {
-            return;
-          }
-
-
-          const cyclesByProject =
-            new Map();
-
-
-          const allCycles =
-            [];
-
-
-          cycleResults.forEach(
-            (
-              result,
-            ) => {
-              if (
-                result.status !==
-                "fulfilled"
-              ) {
-                console.error(
-                  "홈 Cycle 조회 실패:",
-                  result.reason,
-                );
-
-                return;
-              }
-
-
-              const {
-                project,
-                cycles,
-              } =
-                result.value;
-
-
-              cyclesByProject.set(
-                String(
-                  project.projectId,
-                ),
-                cycles,
-              );
-
-
-              allCycles.push(
-                ...cycles,
-              );
-            },
-          );
-
-
-          /* ========================================
-             3. 모든 이슈 조회
-
-             ★ 나의 업무 요약에서만 사용
-          ======================================== */
-
-          const issueResults =
-            await Promise.allSettled(
-              allCycles.map(
-                (
-                  cycle,
-                ) =>
-                  getIssues(
-                    cycle.cycleId,
-                    {
-                      page: 0,
-                      size: 100,
-                      sort:
-                        "createdAt,desc",
-                    },
-                  ),
-              ),
-            );
-
-
-          if (
-            cancelled
-          ) {
-            return;
-          }
-
-
-          const issueMap =
-            new Map();
-
-
-          issueResults.forEach(
-            (
-              result,
-            ) => {
-              if (
-                result.status !==
-                "fulfilled"
-              ) {
-                console.error(
-                  "홈 이슈 조회 실패:",
-                  result.reason,
-                );
-
-                return;
-              }
-
-
-              const issues =
-                Array.isArray(
-                  result.value
-                    ?.data,
-                )
-                  ? result.value.data
-                  : [];
-
-
-              issues.forEach(
-                (
-                  issue,
-                ) => {
-                  if (
-                    issue.issueId ===
-                      undefined ||
-                    issue.issueId ===
-                      null
-                  ) {
-                    return;
-                  }
-
-
-                  issueMap.set(
-                    String(
-                      issue.issueId,
-                    ),
-                    issue,
+                } catch (error) {
+                  console.error(
+                    `홈 프로젝트 ${project.projectId} 상세 조회 실패:`,
+                    error,
                   );
-                },
-              );
-            },
+
+
+                  /*
+                    상세 하나가 실패해도
+                    프로젝트 목록 자체는 유지
+                  */
+
+                  return project;
+                }
+              },
+            ),
           );
 
 
-          const allIssues =
-            Array.from(
-              issueMap.values(),
-            );
+        if (isCancelled) {
+          return;
+        }
 
 
-          /* ========================================
-             4. 업무 요약
-
-             여기는 계속 이슈 데이터 사용
-          ======================================== */
-
-          const inProgressCount =
-            allIssues.filter(
-              (
-                issue,
-              ) =>
-                issue.status ===
-                "IN_PROGRESS",
-            ).length;
+        console.log(
+          "홈 상세 정보 병합 프로젝트:",
+          projectsWithDetail,
+        );
 
 
-          const needsReviewCount =
-            allIssues.filter(
-              (
-                issue,
-              ) =>
-                issue.status ===
-                "NEEDS_REVIEW",
-            ).length;
+        /* =========================
+           3. Home ProjectCard 형태 변환
+
+           홈에는 최대 3개 표시
+        ========================= */
+
+        const homeProjects =
+          projectsWithDetail
+            .slice(0, 3)
+            .map((project) => {
+              const progress =
+                Number(
+                  project.progressRate ??
+                    project.progress ??
+                    0,
+                ) || 0;
 
 
-          const delayedCount =
-            allIssues.filter(
-              isDelayedIssue,
-            ).length;
+              const issueCount =
+                project.issueCount ??
+                project.totalIssueCount ??
+                project.totalIssues ??
+                0;
 
 
-          const doneCount =
-            allIssues.filter(
-              (
-                issue,
-              ) =>
-                issue.status ===
-                "DONE",
-            ).length;
+              const completeCount =
+                project.completedIssueCount ??
+                project.completeIssueCount ??
+                project.completedIssues ??
+                0;
 
 
-          setSummaryItems([
-            {
-              label:
-                "진행 중",
-
-              count:
-                inProgressCount,
-
-              color:
-                "#4D67FF",
-            },
-
-            {
-              label:
-                "확인 필요",
-
-              count:
-                needsReviewCount,
-
-              color:
-                "#FEBC2E",
-            },
-
-            {
-              label:
-                "지연 중",
-
-              count:
-                delayedCount,
-
-              color:
-                "#FE6057",
-            },
-
-            {
-              label:
-                "완료",
-
-              count:
-                doneCount,
-
-              color:
-                "#28C840",
-            },
-          ]);
-
-
-          /* ========================================
-             5. 인수인계 조회
-
-             ★ 이어서 할 일
-             ★ 최근 인수인계
-
-             둘 다 여기 데이터 사용
-          ======================================== */
-
-          const handoverId =
-            localStorage.getItem(
-              "handoverId",
-            );
-
-
-          const handoverProjectId =
-            localStorage.getItem(
-              "handoverProjectId",
-            );
-
-
-          const handoverCycleId =
-            localStorage.getItem(
-              "handoverCycleId",
-            );
-
-
-          /*
-            아직 생성된 인수인계 없음
-          */
-
-          if (
-            !handoverId
-          ) {
-            setTodoItems([]);
-
-            setHandover(
-              DEFAULT_HANDOVER,
-            );
-
-            return;
-          }
-
-
-          try {
-            const handoverResponse =
-              await getHandover(
-                handoverId,
-              );
-
-
-            if (
-              cancelled
-            ) {
-              return;
-            }
-
-
-            const handoverData =
-              handoverResponse
-                ?.data ||
-              {};
-
-
-            console.log(
-              "홈 인수인계 전체 조회:",
-              handoverData,
-            );
-
-
-            const items =
-              Array.isArray(
-                handoverData.items,
-              )
-                ? handoverData.items
-                : [];
-
-
-            /* ========================================
-               프로젝트 이름
-            ======================================== */
-
-            const handoverProject =
-              projectList.find(
-                (
+              const partnerCompanyName =
+                getPartnerCompanyName(
                   project,
-                ) =>
-                  Number(
-                    project.projectId,
-                  ) ===
-                  Number(
-                    handoverProjectId,
-                  ),
-              );
-
-
-            const projectName =
-              handoverProject
-                ?.name ||
-              localStorage.getItem(
-                "projectName",
-              ) ||
-              "프로젝트";
-
-
-            /* ========================================
-               Cycle N
-            ======================================== */
-
-            const handoverCycles =
-              cyclesByProject.get(
-                String(
-                  handoverProjectId,
-                ),
-              ) || [];
-
-
-            const cycleIndex =
-              handoverCycles.findIndex(
-                (
-                  cycle,
-                ) =>
-                  Number(
-                    cycle.cycleId,
-                  ) ===
-                  Number(
-                    handoverCycleId,
-                  ),
-              );
-
-
-            const cycleLabel =
-              cycleIndex >= 0
-                ? `Cycle ${
-                    cycleIndex +
-                    1
-                  }`
-                : "Cycle -";
-
-
-            /* ========================================
-               6. 이어서 할 일
-
-               ★ NEXT_ACTION만 사용
-
-               items가 []이면
-               todoItems도 []
-            ======================================== */
-
-            const nextActions =
-              items
-                .filter(
-                  (
-                    item,
-                  ) =>
-                    item.category ===
-                    "NEXT_ACTION",
-                )
-                .slice(
-                  0,
-                  3,
-                )
-                .map(
-                  (
-                    item,
-                  ) => ({
-                    id:
-                      item.itemId,
-
-                    title:
-                      item.title ||
-                      "제목 없음",
-
-                    project:
-                      projectName,
-
-                    manager:
-                      item.assigneeMemberId
-                        ? `멤버 #${item.assigneeMemberId}`
-                        : "미지정",
-
-                    startDate:
-                      "-",
-
-                    endDate:
-                      "-",
-
-                    dueLabel:
-                      "다음 업무",
-                  }),
                 );
 
 
-            console.log(
-              "홈 이어서 할 일:",
-              nextActions,
-            );
+              return {
+                id:
+                  project.projectId,
 
+                projectId:
+                  project.projectId,
 
-            setTodoItems(
-              nextActions,
-            );
+                title:
+                  project.name || "-",
 
+                company:
+                  `파트너사 · ${partnerCompanyName}`,
 
-            /* ========================================
-               7. 최근 인수인계 카드
-            ======================================== */
+                cycle:
+                  getCycleText(
+                    project,
+                  ),
 
-            const completedCount =
-              items.filter(
-                (
-                  item,
-                ) =>
-                  item.category ===
-                  "COMPLETED",
-              ).length;
+                progress:
+                  Math.min(
+                    Math.max(
+                      progress,
+                      0,
+                    ),
+                    100,
+                  ),
 
+                issueCount,
 
-            const nextCount =
-              items.filter(
-                (
-                  item,
-                ) =>
-                  item.category ===
-                  "NEXT_ACTION",
-              ).length;
+                completeCount,
 
+                cycleId:
+                  project.cycleId ??
+                  null,
 
-            /*
-              질문 개수는
-              reviewSummary의 unansweredCount 우선
-            */
-
-            const questionCount =
-              handoverData
-                ?.reviewSummary
-                ?.unansweredCount ??
-              items.filter(
-                (
-                  item,
-                ) =>
-                  item.category ===
-                  "QUESTION",
-              ).length;
-
-
-            const reviewCount =
-              handoverData
-                ?.reviewSummary
-                ?.needsReviewCount ??
-              0;
-
-
-            setHandover({
-              fromCountry: "",
-              fromTeam: "",
-
-              toCountry: "",
-              toTeam: "",
-
-              project:
-                projectName,
-
-              cycle:
-                cycleLabel,
-
-              completed:
-                completedCount,
-
-              next:
-                nextCount,
-
-              questions:
-                questionCount,
-
-              needsReview:
-                reviewCount,
-
-              notice:
-                getUpdateNotice(
-                  handoverData.lastSyncedAt,
-                ),
+                rawProject:
+                  project,
+              };
             });
-          } catch (
-            error
-          ) {
-            console.error(
-              "홈 인수인계 조회 실패:",
-              error,
-            );
 
 
-            if (
-              cancelled
-            ) {
-              return;
-            }
-
-
-            setTodoItems([]);
-
-            setHandover({
-              ...DEFAULT_HANDOVER,
-
-              notice:
-                "인수인계 내용을 불러오지 못했습니다.",
-            });
-          }
-        } catch (
-          error
-        ) {
-          if (
-            cancelled
-          ) {
-            return;
-          }
-
-
-          console.error(
-            "홈 데이터 조회 실패:",
-            error,
-          );
-
-
-          setProjects([]);
-
-          setTodoItems([]);
-
-          setSummaryItems(
-            DEFAULT_SUMMARY_ITEMS,
-          );
-
-          setHandover(
-            DEFAULT_HANDOVER,
-          );
-        }
-      };
-
-
-    void fetchHomeData();
-
-
-    return () => {
-      cancelled =
-        true;
-    };
-  }, [
-    refreshKey,
-  ]);
-
-
-  /* ========================================
-     워크스페이스 변경
-  ======================================== */
-
-  useEffect(() => {
-    const handleWorkspaceChanged =
-      () => {
-        setRefreshKey(
-          (
-            prev,
-          ) =>
-            prev + 1,
+        console.log(
+          "홈 프로젝트 카드 데이터:",
+          homeProjects,
         );
-      };
 
 
-    window.addEventListener(
-      "workspaceChanged",
-      handleWorkspaceChanged,
-    );
+        setProjects(homeProjects);
+
+        setProjectError("");
+      } catch (error) {
+        if (isCancelled) {
+          return;
+        }
+
+
+        console.error(
+          "홈 프로젝트 목록 조회 실패:",
+          error,
+        );
+
+
+        setProjects([]);
+
+
+        switch (error.code) {
+          case "403WORKSPACE_ACCESS_DENIED":
+            setProjectError(
+              "워크스페이스 접근 권한이 없습니다.",
+            );
+
+            break;
+
+
+          case "404WORKSPACE_NOT_FOUND":
+            setProjectError(
+              "워크스페이스를 찾을 수 없습니다.",
+            );
+
+            break;
+
+
+          default:
+            if (error.status === 401) {
+              setProjectError(
+                "로그인이 만료되었습니다. 다시 로그인해주세요.",
+              );
+            } else {
+              setProjectError(
+                error.message ||
+                  "프로젝트 목록을 불러오지 못했습니다.",
+              );
+            }
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsProjectLoading(false);
+        }
+      }
+    };
+
+
+    fetchProjects();
 
 
     return () => {
-      window.removeEventListener(
-        "workspaceChanged",
-        handleWorkspaceChanged,
-      );
+      isCancelled = true;
     };
   }, []);
 
 
   /* ========================================
-     새로 고침
-  ======================================== */
+     상단 새로 고침
+  ========================================= */
 
-  const handleRefresh =
-    () => {
-      setRefreshKey(
-        (
-          prev,
-        ) =>
-          prev + 1,
-      );
-    };
+  const handleRefresh = () => {
+    window.location.reload();
+  };
 
 
   /* ========================================
-     모든 프로젝트
-  ======================================== */
+     프로젝트 선택 정보 저장
+  ========================================= */
 
-  const handleViewAllProjects =
-    () => {
-      navigate(
-        ROUTES.PROJECT_HOME,
+  const saveSelectedProject = (
+    project,
+  ) => {
+    const rawProject =
+      project.rawProject ||
+      project;
+
+
+    localStorage.setItem(
+      "projectId",
+      String(project.projectId),
+    );
+
+
+    localStorage.setItem(
+      "projectName",
+      project.title || "",
+    );
+
+
+    localStorage.setItem(
+      "selectedProject",
+      JSON.stringify(rawProject),
+    );
+
+
+    if (project.cycleId) {
+      localStorage.setItem(
+        "cycleId",
+        String(project.cycleId),
       );
-    };
+    } else {
+      localStorage.removeItem(
+        "cycleId",
+      );
+    }
+
+
+    /*
+      이전 프로젝트에서 사용하던
+      handover 정보 제거
+    */
+
+    localStorage.removeItem(
+      "handoverId",
+    );
+
+    localStorage.removeItem(
+      "handoverProjectId",
+    );
+
+    localStorage.removeItem(
+      "handoverCycleId",
+    );
+
+
+    window.dispatchEvent(
+      new Event("projectChanged"),
+    );
+  };
 
 
   /* ========================================
      프로젝트 카드 클릭
-  ======================================== */
 
-  const handleProjectClick =
-    (
+     ProjectList와 동일하게
+     해당 프로젝트 Cycle로 이동
+  ========================================= */
+
+  const handleProjectClick = (
+    project,
+  ) => {
+    console.log(
+      "홈에서 선택한 프로젝트:",
       project,
-    ) => {
-      if (
-        !project
-          ?.projectId
-      ) {
-        return;
-      }
+    );
 
 
-      localStorage.setItem(
-        "projectId",
-        String(
-          project.projectId,
-        ),
+    if (!project.cycleId) {
+      alert(
+        "프로젝트 사이클 정보를 확인할 수 없습니다.",
       );
 
-
-      localStorage.setItem(
-        "projectName",
-        project.name ||
-          "",
-      );
+      return;
+    }
 
 
-      localStorage.setItem(
-        "selectedProject",
-        JSON.stringify(
-          project,
-        ),
-      );
+    saveSelectedProject(
+      project,
+    );
 
 
-      localStorage.removeItem(
-        "cycleId",
-      );
+    navigate(
+      `/cycle/${project.cycleId}`,
+      {
+        state: {
+          projectId:
+            project.projectId,
 
-      localStorage.removeItem(
-        "cycleName",
-      );
+          cycleId:
+            project.cycleId,
 
+          joined:
+            Boolean(
+              project.rawProject
+                ?.joined,
+            ),
 
-      window.dispatchEvent(
-        new Event(
-          "projectChanged",
-        ),
-      );
-
-
-      navigate(
-        ROUTES.CYCLE,
-      );
-    };
+          viewOnly:
+            !project.rawProject
+              ?.joined,
+        },
+      },
+    );
+  };
 
 
   /* ========================================
-     인수인계 이동
-
-     1. 이어서 할 일 → 전체 보기
-     2. 최근 인수인계 → 내용 확인
-  ======================================== */
+     최근 인수인계
+  ========================================= */
 
   const handleViewHandover =
     () => {
@@ -1148,22 +646,15 @@ function HomeDashboard() {
     };
 
 
-  const visibleProjects =
-    projects.slice(
-      0,
-      3,
-    );
-
-
   return (
     <div
       className={
         styles.dashboard
       }
     >
-      {/* =========================
-          상단
-      ========================= */}
+      {/* ========================================
+          상단 인사
+      ======================================== */}
 
       <header
         className={
@@ -1183,19 +674,22 @@ function HomeDashboard() {
             대한민국 · 서울 · 09:14
           </p>
 
-
           <h1>
             좋은 아침이에요, 예티님 👋
           </h1>
-
 
           <p
             className={
               styles.heroDescription
             }
           >
-            이어서 진행해야 할 업무가{" "}
-            {todoItems.length}개 있습니다.
+            <strong>
+              London
+            </strong>{" "}
+            팀이 업무를 마쳤어요.
+            <br />
+            이어서 진행해야 할 업무가
+            3개 있습니다.
           </p>
         </div>
 
@@ -1217,7 +711,6 @@ function HomeDashboard() {
             새로 고침
           </button>
 
-
           <button
             type="button"
             className={
@@ -1235,9 +728,9 @@ function HomeDashboard() {
       </header>
 
 
-      {/* =========================
+      {/* ========================================
           본문
-      ========================= */}
+      ======================================== */}
 
       <div
         className={
@@ -1249,9 +742,9 @@ function HomeDashboard() {
             styles.leftColumn
           }
         >
-          {/* =========================
+          {/* ========================================
               나의 업무 요약
-          ========================= */}
+          ======================================== */}
 
           <section>
             <h2
@@ -1262,16 +755,13 @@ function HomeDashboard() {
               나의 업무 요약
             </h2>
 
-
             <div
               className={
                 styles.summaryList
               }
             >
               {summaryItems.map(
-                (
-                  item,
-                ) => (
+                (item) => (
                   <SummaryCard
                     key={
                       item.label
@@ -1284,11 +774,9 @@ function HomeDashboard() {
           </section>
 
 
-          {/* =========================
+          {/* ========================================
               이어서 할 일
-
-              ★ handover NEXT_ACTION
-          ========================= */}
+          ======================================== */}
 
           <section
             className={
@@ -1308,16 +796,16 @@ function HomeDashboard() {
                 이어서 할 일
               </h2>
 
-
               <ArrowButton
-                onClick={
-                  handleViewHandover
+                onClick={() =>
+                  navigate(
+                    ROUTES.HANDOVER,
+                  )
                 }
               >
                 전체 보기
               </ArrowButton>
             </div>
-
 
             <div
               className={
@@ -1327,10 +815,11 @@ function HomeDashboard() {
               {todoItems.map(
                 (
                   item,
+                  index,
                 ) => (
                   <TodoCard
                     key={
-                      item.id
+                      index
                     }
                     {...item}
                   />
@@ -1340,9 +829,9 @@ function HomeDashboard() {
           </section>
 
 
-          {/* =========================
-              프로젝트
-          ========================= */}
+          {/* ========================================
+              진행 중인 프로젝트
+          ======================================== */}
 
           <section
             className={
@@ -1362,10 +851,13 @@ function HomeDashboard() {
                 진행 중인 프로젝트
               </h2>
 
+              {/* 프로젝트 페이지로 이동 */}
 
               <ArrowButton
-                onClick={
-                  handleViewAllProjects
+                onClick={() =>
+                  navigate(
+                    ROUTES.PROJECT_HOME,
+                  )
                 }
               >
                 모든 프로젝트
@@ -1373,67 +865,129 @@ function HomeDashboard() {
             </div>
 
 
-            <div
-              className={
-                styles.projectList
-              }
-            >
-              {visibleProjects.map(
-                (
-                  project,
-                ) => (
-                  <div
-                    key={
-                      project.projectId
-                    }
-                    className={
-                      styles.projectCardWrapper
-                    }
-                    role="button"
-                    tabIndex={0}
-                    onClick={() =>
-                      handleProjectClick(
-                        project,
-                      )
-                    }
-                    onKeyDown={(
-                      event,
-                    ) => {
-                      if (
-                        event.key ===
-                          "Enter" ||
-                        event.key ===
-                          " "
-                      ) {
-                        event.preventDefault();
+            {/* Loading */}
+
+            {isProjectLoading && (
+              <p>
+                프로젝트를 불러오는
+                중입니다.
+              </p>
+            )}
 
 
-                        handleProjectClick(
-                          project,
-                        );
-                      }
-                    }}
-                  >
-                    <ProjectCard
-                      {...project}
-                    />
-                  </div>
-                ),
+            {/* Error */}
+
+            {!isProjectLoading &&
+              projectError && (
+                <p>
+                  {
+                    projectError
+                  }
+                </p>
               )}
-            </div>
+
+
+            {/* Empty */}
+
+            {!isProjectLoading &&
+              !projectError &&
+              projects.length ===
+                0 && (
+                <p>
+                  등록된 프로젝트가
+                  없습니다.
+                </p>
+              )}
+
+
+            {/* 프로젝트 카드 */}
+
+            {!isProjectLoading &&
+              !projectError &&
+              projects.length >
+                0 && (
+                <div
+                  className={
+                    styles.projectList
+                  }
+                >
+                  {projects.map(
+                    (
+                      project,
+                    ) => (
+                      <div
+                        key={
+                          project.projectId
+                        }
+                        className={
+                          styles.projectCardWrapper
+                        }
+                        role="button"
+                        tabIndex={0}
+                        onClick={() =>
+                          handleProjectClick(
+                            project,
+                          )
+                        }
+                        onKeyDown={(
+                          event,
+                        ) => {
+                          if (
+                            event.key ===
+                              "Enter" ||
+                            event.key ===
+                              " "
+                          ) {
+                            event.preventDefault();
+
+                            handleProjectClick(
+                              project,
+                            );
+                          }
+                        }}
+                      >
+                        <ProjectCard
+                          title={
+                            project.title
+                          }
+                          company={
+                            project.company
+                          }
+                          cycle={
+                            project.cycle
+                          }
+                          progress={
+                            project.progress
+                          }
+                          issueCount={
+                            project.issueCount
+                          }
+                          completeCount={
+                            project.completeCount
+                          }
+                        />
+                      </div>
+                    ),
+                  )}
+                </div>
+              )}
           </section>
         </main>
 
 
-        {/* =========================
-            최근 인수인계
-        ========================= */}
+        {/* ========================================
+            오른쪽
+        ======================================== */}
 
         <aside
           className={
             styles.rightColumn
           }
         >
+          {/* ========================================
+              최근 인수인계
+          ======================================== */}
+
           <section>
             <h2
               className={
@@ -1442,7 +996,6 @@ function HomeDashboard() {
             >
               최근 인수인계
             </h2>
-
 
             <HandoverCard
               {...handover}
