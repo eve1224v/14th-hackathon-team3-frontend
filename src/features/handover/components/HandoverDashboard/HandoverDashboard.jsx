@@ -1,6 +1,8 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -17,7 +19,6 @@ import closeIcon from "../../../../assets/icons/closeIcon.svg";
 
 import ReviewSummaryCard from "../ReviewSummaryCard/ReviewSummaryCard";
 import HandoverSection from "../HandoverSection/HandoverSection";
-import SourcePanel from "../SourcePanel/SourcePanel";
 import AiCheckPanel from "../AiCheckPanel/AiCheckPanel";
 import TransferInfoPanel from "../TransferInfoPanel/TransferInfoPanel";
 
@@ -26,14 +27,25 @@ import {
 } from "../../../../router/routes.constant";
 
 import {
+  createHandoverDraft,
   getHandover,
   refreshHandover,
+  saveHandoverDraft,
   deliverHandover,
 } from "../../../../api/handoverApi";
 
+import {
+  getCycle,
+  getCycles,
+} from "../../../../api/cycleApi";
+
+import {
+  getProjectDetail,
+} from "../../../../api/projectApi";
+
 
 /* ==================================================
-   인수인계 Category
+   Category
 ================================================== */
 
 const CATEGORY_INFO = {
@@ -73,13 +85,9 @@ const CATEGORY_ORDER = [
 ];
 
 
-/* ==================================================
-   기본 AI 검토 결과
-================================================== */
-
 const defaultReviewSummary = [
   {
-    label: "근거 확인 완료",
+    label: "확인 완료",
     count: 0,
   },
 
@@ -101,11 +109,67 @@ const defaultReviewSummary = [
 
 
 /* ==================================================
-   상대 시간 계산
+   Cycle 정렬
+================================================== */
+
+const sortCyclesByPeriod = (
+  cycles,
+) => {
+  return [...cycles].sort(
+    (a, b) => {
+      const startCompare =
+        String(
+          a.startDate || "",
+        ).localeCompare(
+          String(
+            b.startDate || "",
+          ),
+        );
+
+
+      if (
+        startCompare !== 0
+      ) {
+        return startCompare;
+      }
+
+
+      const endCompare =
+        String(
+          a.endDate || "",
+        ).localeCompare(
+          String(
+            b.endDate || "",
+          ),
+        );
+
+
+      if (
+        endCompare !== 0
+      ) {
+        return endCompare;
+      }
+
+
+      return (
+        Number(
+          a.cycleId || 0,
+        ) -
+        Number(
+          b.cycleId || 0,
+        )
+      );
+    },
+  );
+};
+
+
+/* ==================================================
+   상대 시간
 ================================================== */
 
 const getRelativeTimeText = (
-  dateString
+  dateString,
 ) => {
   if (!dateString) {
     return "";
@@ -113,71 +177,393 @@ const getRelativeTimeText = (
 
 
   const syncedDate =
-    new Date(dateString);
+    new Date(
+      dateString,
+    );
 
 
   const now =
     new Date();
 
 
-  const diffMilliseconds =
-    now.getTime() -
-    syncedDate.getTime();
-
-
   const diffMinutes =
     Math.max(
       0,
       Math.floor(
-        diffMilliseconds /
-          (1000 * 60)
-      )
+        (
+          now.getTime() -
+          syncedDate.getTime()
+        ) /
+          (1000 * 60),
+      ),
     );
 
 
-  if (diffMinutes < 1) {
+  if (
+    diffMinutes < 1
+  ) {
     return "방금 전";
   }
 
 
-  if (diffMinutes < 60) {
+  if (
+    diffMinutes < 60
+  ) {
     return `${diffMinutes}분 전`;
   }
 
 
   const diffHours =
     Math.floor(
-      diffMinutes / 60
+      diffMinutes / 60,
     );
 
 
-  if (diffHours < 24) {
+  if (
+    diffHours < 24
+  ) {
     return `${diffHours}시간 전`;
   }
 
 
-  const diffDays =
-    Math.floor(
-      diffHours / 24
-    );
-
-
-  return `${diffDays}일 전`;
+  return `${Math.floor(
+    diffHours / 24,
+  )}일 전`;
 };
 
 
 /* ==================================================
-   HandoverDashboard
+   Polling
 ================================================== */
+
+const wait = (
+  milliseconds,
+) =>
+  new Promise(
+    (resolve) => {
+      setTimeout(
+        resolve,
+        milliseconds,
+      );
+    },
+  );
+
+
+/* ==================================================
+   Timezone 날짜 계산
+================================================== */
+
+const getDatePartsInTimezone = (
+  date,
+  timezone,
+) => {
+  const formatter =
+    new Intl.DateTimeFormat(
+      "en-US",
+      {
+        timeZone:
+          timezone,
+
+        year:
+          "numeric",
+
+        month:
+          "2-digit",
+
+        day:
+          "2-digit",
+
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit",
+
+        second:
+          "2-digit",
+
+        hourCycle:
+          "h23",
+      },
+    );
+
+
+  const values = {};
+
+
+  formatter
+    .formatToParts(
+      date,
+    )
+    .forEach(
+      (part) => {
+        if (
+          part.type !==
+          "literal"
+        ) {
+          values[
+            part.type
+          ] =
+            Number(
+              part.value,
+            );
+        }
+      },
+    );
+
+
+  return values;
+};
+
+
+const buildDateTimeWithOffset = (
+  dateString,
+  timezone,
+  isEnd = false,
+) => {
+  const [
+    year,
+    month,
+    day,
+  ] =
+    String(
+      dateString,
+    )
+      .split("-")
+      .map(Number);
+
+
+  if (
+    !year ||
+    !month ||
+    !day
+  ) {
+    throw new Error(
+      "Cycle 날짜 정보가 올바르지 않습니다.",
+    );
+  }
+
+
+  const hour =
+    isEnd ? 23 : 0;
+
+  const minute =
+    isEnd ? 59 : 0;
+
+  const second =
+    isEnd ? 59 : 0;
+
+
+  const targetAsUtc =
+    Date.UTC(
+      year,
+      month - 1,
+      day,
+      hour,
+      minute,
+      second,
+    );
+
+
+  let instant =
+    targetAsUtc;
+
+
+  for (
+    let index = 0;
+    index < 3;
+    index += 1
+  ) {
+    const parts =
+      getDatePartsInTimezone(
+        new Date(
+          instant,
+        ),
+        timezone,
+      );
+
+
+    const timezoneAsUtc =
+      Date.UTC(
+        parts.year,
+        parts.month - 1,
+        parts.day,
+        parts.hour,
+        parts.minute,
+        parts.second,
+      );
+
+
+    const difference =
+      targetAsUtc -
+      timezoneAsUtc;
+
+
+    instant +=
+      difference;
+
+
+    if (
+      difference === 0
+    ) {
+      break;
+    }
+  }
+
+
+  const offsetMinutes =
+    Math.round(
+      (
+        targetAsUtc -
+        instant
+      ) /
+        (1000 * 60),
+    );
+
+
+  const sign =
+    offsetMinutes >= 0
+      ? "+"
+      : "-";
+
+
+  const absoluteOffset =
+    Math.abs(
+      offsetMinutes,
+    );
+
+
+  const offsetHour =
+    String(
+      Math.floor(
+        absoluteOffset / 60,
+      ),
+    ).padStart(
+      2,
+      "0",
+    );
+
+
+  const offsetMinute =
+    String(
+      absoluteOffset % 60,
+    ).padStart(
+      2,
+      "0",
+    );
+
+
+  const time =
+    isEnd
+      ? "23:59:59"
+      : "00:00:00";
+
+
+  return `${dateString}T${time}${sign}${offsetHour}:${offsetMinute}`;
+};
+
+
+/* ==================================================
+   Error
+================================================== */
+
+const getErrorMessage = (
+  error,
+) =>
+  error.response?.data?.message ||
+  error.data?.message ||
+  error.message ||
+  "AI 인수인계 요청에 실패했습니다.";
+
+
+/* ==================================================
+   GET item → PUT draft item
+================================================== */
+
+const buildDraftItems = (
+  items,
+) => {
+  return (
+    Array.isArray(
+      items,
+    )
+      ? items
+      : []
+  ).map(
+    (item) => {
+      let evidenceIds =
+        [];
+
+
+      if (
+        Array.isArray(
+          item.evidenceIds,
+        )
+      ) {
+        evidenceIds =
+          item.evidenceIds;
+      } else if (
+        Array.isArray(
+          item.evidences,
+        )
+      ) {
+        evidenceIds =
+          item.evidences
+            .map(
+              (evidence) =>
+                evidence
+                  ?.evidenceId,
+            )
+            .filter(
+              (id) =>
+                id !== null &&
+                id !== undefined,
+            );
+      }
+
+
+      return {
+        itemId:
+          item.itemId ??
+          null,
+
+        category:
+          item.category,
+
+        title:
+          item.title || "",
+
+        description:
+          item.description ||
+          "",
+
+        assigneeMemberId:
+          item.assigneeMemberId ??
+          null,
+
+        evidenceIds,
+
+        reviewStatus:
+          item.reviewStatus ||
+          "NEEDS_REVIEW",
+      };
+    },
+  );
+};
+
 
 function HandoverDashboard() {
   const navigate =
     useNavigate();
 
 
-  /* =========================
-      실제 API 데이터
-  ========================= */
+  const isUnmountedRef =
+    useRef(false);
+
+
+  const initializeStartedRef =
+    useRef(false);
+
 
   const [
     handoverData,
@@ -189,8 +575,33 @@ function HandoverDashboard() {
     reviewSummary,
     setReviewSummary,
   ] = useState(
-    defaultReviewSummary
+    defaultReviewSummary,
   );
+
+
+  const [
+    projectName,
+    setProjectName,
+  ] = useState(
+    localStorage.getItem(
+      "projectName",
+    ) ||
+      "프로젝트",
+  );
+
+
+  const [
+    cycleLabel,
+    setCycleLabel,
+  ] = useState(
+    "Cycle",
+  );
+
+
+  const [
+    deliveryDraft,
+    setDeliveryDraft,
+  ] = useState(null);
 
 
   const [
@@ -206,9 +617,21 @@ function HandoverDashboard() {
 
 
   const [
+    isSavingDraft,
+    setIsSavingDraft,
+  ] = useState(false);
+
+
+  const [
     isDelivering,
     setIsDelivering,
   ] = useState(false);
+
+
+  const [
+    errorMessage,
+    setErrorMessage,
+  ] = useState("");
 
 
   const [
@@ -217,71 +640,303 @@ function HandoverDashboard() {
   ] = useState(false);
 
 
-  /* =========================
-      프로젝트 / Cycle 표시
-  ========================= */
+  /* ==================================================
+     Handover 데이터 적용
+  ================================================== */
 
-  const projectName =
-    localStorage.getItem(
-      "projectName"
-    ) ||
-    "프로젝트";
-
-
-  const cycleName =
-    localStorage.getItem(
-      "cycleName"
-    ) ||
-    "Cycle";
+  const applyHandoverData =
+    useCallback(
+      (data) => {
+        if (!data) {
+          return;
+        }
 
 
-  /* =========================
-      인수인계 ID
-  ========================= */
+        if (
+          data.handoverId
+        ) {
+          localStorage.setItem(
+            "handoverId",
+            String(
+              data.handoverId,
+            ),
+          );
+        }
+
+
+        setHandoverData(
+          data,
+        );
+
+
+        if (
+          data.delivery
+        ) {
+          setDeliveryDraft(
+            data.delivery,
+          );
+        }
+
+
+        const summary =
+          data.reviewSummary;
+
+
+        if (summary) {
+          setReviewSummary([
+            {
+              label:
+                "확인 완료",
+
+              count:
+                summary.verifiedCount ??
+                0,
+            },
+
+            {
+              label:
+                "확인 필요",
+
+              count:
+                summary.needsReviewCount ??
+                0,
+            },
+
+            {
+              label:
+                "미답변 질문",
+
+              count:
+                summary.unansweredCount ??
+                0,
+            },
+
+            {
+              label:
+                "전체 항목",
+
+              count:
+                summary.totalCount ??
+                0,
+            },
+          ]);
+        }
+      },
+      [],
+    );
+
 
   const getCurrentHandoverId =
-    () => {
-      if (
-        handoverData?.handoverId
-      ) {
-        return String(
-          handoverData.handoverId
-        );
-      }
+    useCallback(
+      () =>
+        handoverData
+          ?.handoverId ||
+        localStorage.getItem(
+          "handoverId",
+        ),
+      [
+        handoverData,
+      ],
+    );
 
 
-      return localStorage.getItem(
-        "handoverId"
-      );
-    };
+  /* ==================================================
+     GET polling
+  ================================================== */
+
+  const fetchHandoverUntilReady =
+    useCallback(
+      async (
+        handoverId,
+      ) => {
+        const MAX_ATTEMPTS =
+          30;
+
+        const INTERVAL =
+          2000;
 
 
-  /* =========================
-      AI 인수인계 전체 조회
+        let lastData =
+          null;
 
-      GET
-      /api/v1/handovers/{handoverId}
-  ========================= */
+
+        for (
+          let attempt = 0;
+          attempt <
+          MAX_ATTEMPTS;
+          attempt += 1
+        ) {
+          if (
+            isUnmountedRef.current
+          ) {
+            return null;
+          }
+
+
+          try {
+            const response =
+              await getHandover(
+                handoverId,
+              );
+
+
+            console.log(
+              "AI 인수인계 전체 조회:",
+              response,
+            );
+
+
+            const data =
+              response?.data;
+
+
+            if (data) {
+              lastData =
+                data;
+
+
+              applyHandoverData(
+                data,
+              );
+
+
+              const generationStatus =
+                data.generation
+                  ?.status;
+
+
+              if (
+                generationStatus ===
+                "COMPLETED"
+              ) {
+                return data;
+              }
+
+
+              if (
+                generationStatus ===
+                "FAILED"
+              ) {
+                throw new Error(
+                  "AI 인수인계 생성에 실패했습니다.",
+                );
+              }
+
+
+              /*
+                PENDING
+                RUNNING
+                AI_GENERATING
+
+                → 계속 polling
+              */
+
+              const isRunning =
+                [
+                  "PENDING",
+                  "RUNNING",
+                  "AI_GENERATING",
+                ].includes(
+                  generationStatus,
+                );
+
+
+              if (
+                !isRunning &&
+                data.status &&
+                data.status !==
+                  "AI_GENERATING"
+              ) {
+                return data;
+              }
+            }
+          } catch (error) {
+            const status =
+              error.response
+                ?.status ||
+              error.status;
+
+
+            if (
+              status !== 404 ||
+              attempt ===
+                MAX_ATTEMPTS -
+                  1
+            ) {
+              throw error;
+            }
+          }
+
+
+          await wait(
+            INTERVAL,
+          );
+        }
+
+
+        return lastData;
+      },
+      [
+        applyHandoverData,
+      ],
+    );
+
+
+  /* ==================================================
+     최초 진입
+
+     handoverId가 없으면 자동 생성
+  ================================================== */
 
   useEffect(() => {
-    const fetchHandover =
+    /*
+      React StrictMode 대응
+    */
+
+    isUnmountedRef.current =
+      false;
+
+
+    if (
+      initializeStartedRef.current
+    ) {
+      return () => {
+        isUnmountedRef.current =
+          true;
+      };
+    }
+
+
+    initializeStartedRef.current =
+      true;
+
+
+    const initializeHandover =
       async () => {
-        const handoverId =
+        const projectId =
           localStorage.getItem(
-            "handoverId"
+            "projectId",
           );
 
 
-        /*
-          초안 생성 전에는
-          실제 handoverId가 없을 수 있음.
+        const cycleId =
+          localStorage.getItem(
+            "cycleId",
+          );
 
-          임시 ID를 사용하지 않음.
-        */
 
-        if (!handoverId) {
-          console.warn(
-            "handoverId가 없습니다."
+        if (!projectId) {
+          setErrorMessage(
+            "선택된 프로젝트가 없습니다.",
+          );
+
+          return;
+        }
+
+
+        if (!cycleId) {
+          setErrorMessage(
+            "선택된 Cycle이 없습니다. 사이클 페이지에서 Cycle을 먼저 선택해주세요.",
           );
 
           return;
@@ -290,125 +945,354 @@ function HandoverDashboard() {
 
         try {
           setIsLoading(
-            true
+            true,
           );
 
-
-          const response =
-            await getHandover(
-              handoverId
-            );
-
-
-          console.log(
-            "AI 인수인계 전체 조회 성공:",
-            response
-          );
-
-
-          const data =
-            response?.data;
-
-
-          if (!data) {
-            return;
-          }
-
-
-          /*
-            조회 응답의 실제 handoverId를
-            다시 저장해 ID를 일치시킴.
-          */
-
-          if (data.handoverId) {
-            localStorage.setItem(
-              "handoverId",
-              String(
-                data.handoverId
-              )
-            );
-          }
-
-
-          setHandoverData(
-            data
+          setErrorMessage(
+            "",
           );
 
 
           /* =========================
-              AI 검토 결과
+             프로젝트 Cycle 목록
           ========================= */
 
-          const summary =
-            data.reviewSummary;
+          const cycleListResponse =
+            await getCycles(
+              projectId,
+            );
 
 
-          if (summary) {
-            setReviewSummary([
-              {
-                label:
-                  "근거 확인 완료",
+          const cycleList =
+            Array.isArray(
+              cycleListResponse
+                ?.data,
+            )
+              ? cycleListResponse
+                  .data
+              : [];
 
-                count:
-                  summary.verifiedCount ??
-                  0,
-              },
 
-              {
-                label:
-                  "확인 필요",
+          const sortedCycles =
+            sortCyclesByPeriod(
+              cycleList,
+            );
 
-                count:
-                  summary.needsReviewCount ??
-                  0,
-              },
 
-              {
-                label:
-                  "미답변 질문",
+          const selectedCycleIndex =
+            sortedCycles.findIndex(
+              (cycle) =>
+                Number(
+                  cycle.cycleId,
+                ) ===
+                Number(
+                  cycleId,
+                ),
+            );
 
-                count:
-                  summary.unansweredCount ??
-                  0,
-              },
 
-              {
-                label:
-                  "전체 항목",
-
-                count:
-                  summary.totalCount ??
-                  0,
-              },
-            ]);
+          if (
+            selectedCycleIndex <
+            0
+          ) {
+            throw new Error(
+              "선택한 Cycle이 현재 프로젝트에 속하지 않습니다.",
+            );
           }
+
+
+          setCycleLabel(
+            `Cycle ${
+              selectedCycleIndex +
+              1
+            }`,
+          );
+
+
+          const [
+            cycleResponse,
+            projectResponse,
+          ] =
+            await Promise.all([
+              getCycle(
+                cycleId,
+              ),
+
+              getProjectDetail(
+                projectId,
+              ),
+            ]);
+
+
+          const cycleData =
+            cycleResponse
+              ?.data;
+
+
+          const projectData =
+            projectResponse
+              ?.data;
+
+
+          if (
+            !cycleData ||
+            !projectData
+          ) {
+            throw new Error(
+              "프로젝트 또는 Cycle 정보를 불러오지 못했습니다.",
+            );
+          }
+
+
+          if (
+            projectData.name
+          ) {
+            setProjectName(
+              projectData.name,
+            );
+
+            localStorage.setItem(
+              "projectName",
+              projectData.name,
+            );
+          }
+
+
+          /* =========================
+             기존 handoverId
+          ========================= */
+
+          const existingHandoverId =
+            localStorage.getItem(
+              "handoverId",
+            );
+
+
+          const handoverProjectId =
+            localStorage.getItem(
+              "handoverProjectId",
+            );
+
+
+          const handoverCycleId =
+            localStorage.getItem(
+              "handoverCycleId",
+            );
+
+
+          const isSameHandover =
+            existingHandoverId &&
+            handoverProjectId ===
+              String(
+                projectId,
+              ) &&
+            handoverCycleId ===
+              String(
+                cycleId,
+              );
+
+
+          if (
+            isSameHandover
+          ) {
+            console.log(
+              "기존 인수인계 조회:",
+              existingHandoverId,
+            );
+
+
+            await fetchHandoverUntilReady(
+              existingHandoverId,
+            );
+
+
+            return;
+          }
+
+
+          /* =========================
+             현재 프로젝트/Cycle에
+             handoverId가 없으므로 생성
+          ========================= */
+
+          localStorage.removeItem(
+            "handoverId",
+          );
+
+          localStorage.removeItem(
+            "handoverProjectId",
+          );
+
+          localStorage.removeItem(
+            "handoverCycleId",
+          );
+
+
+          if (
+            !cycleData.startDate ||
+            !cycleData.endDate
+          ) {
+            throw new Error(
+              "Cycle 기간 정보가 없습니다.",
+            );
+          }
+
+
+          const projectTimezone =
+            projectData
+              ?.teamSchedules
+              ?.find(
+                (team) =>
+                  team.timezone,
+              )
+              ?.timezone;
+
+
+          const timezone =
+            projectTimezone ||
+            Intl.DateTimeFormat()
+              .resolvedOptions()
+              .timeZone ||
+            "Asia/Seoul";
+
+
+          const sourceRange = {
+            from:
+              buildDateTimeWithOffset(
+                cycleData.startDate,
+                timezone,
+                false,
+              ),
+
+            to:
+              buildDateTimeWithOffset(
+                cycleData.endDate,
+                timezone,
+                true,
+              ),
+          };
+
+
+          console.log(
+            "AI 인수인계 초안 생성 Payload:",
+            {
+              projectId:
+                Number(
+                  projectId,
+                ),
+
+              cycleId:
+                Number(
+                  cycleId,
+                ),
+
+              sourceRange,
+
+              sourceTypes: [],
+            },
+          );
+
+
+          const draftResponse =
+            await createHandoverDraft(
+              projectId,
+              cycleId,
+              {
+                sourceRange,
+              },
+            );
+
+
+          console.log(
+            "AI 인수인계 초안 생성 성공:",
+            draftResponse,
+          );
+
+
+          const handoverId =
+            draftResponse
+              ?.data
+              ?.handoverId;
+
+
+          if (!handoverId) {
+            throw new Error(
+              "handoverId를 받지 못했습니다.",
+            );
+          }
+
+
+          localStorage.setItem(
+            "handoverId",
+            String(
+              handoverId,
+            ),
+          );
+
+          localStorage.setItem(
+            "handoverProjectId",
+            String(
+              projectId,
+            ),
+          );
+
+          localStorage.setItem(
+            "handoverCycleId",
+            String(
+              cycleId,
+            ),
+          );
+
+
+          await fetchHandoverUntilReady(
+            handoverId,
+          );
         } catch (error) {
           console.error(
-            "AI 인수인계 전체 조회 실패:",
-            error
+            "AI 인수인계 초기화 실패:",
+            error,
           );
 
 
           console.error(
             "서버 응답:",
-            error.response?.data
+            error.response?.data ||
+              error.data,
+          );
+
+
+          setErrorMessage(
+            getErrorMessage(
+              error,
+            ),
           );
         } finally {
-          setIsLoading(
-            false
-          );
+          if (
+            !isUnmountedRef.current
+          ) {
+            setIsLoading(
+              false,
+            );
+          }
         }
       };
 
 
-    fetchHandover();
-  }, []);
+    initializeHandover();
 
 
-  /* =========================
-      API items
-      → 화면 5개 섹션
-  ========================= */
+    return () => {
+      isUnmountedRef.current =
+        true;
+    };
+  }, [
+    fetchHandoverUntilReady,
+  ]);
+
+
+  /* ==================================================
+     화면 Section
+  ================================================== */
 
   const handoverSections =
     useMemo(() => {
@@ -430,78 +1314,48 @@ function HandoverDashboard() {
               .filter(
                 (item) =>
                   item.category ===
-                  category
+                  category,
               )
               .map(
                 (item) => ({
-                  /*
-                    명세상 handover item ID
-                  */
-
                   itemId:
                     item.itemId,
 
-
-                  /*
-                    HandoverItem 컴포넌트가
-                    현재 issueId prop을 사용하고 있으므로
-                    렌더링용 식별자로 itemId 전달.
-
-                    실제 Issue ID라는 의미는 아님.
-                  */
-
                   issueId:
                     item.itemId,
-
 
                   title:
                     item.title ||
                     "",
 
-
                   description:
                     item.description ||
                     "",
-
-
-                  /*
-                    전체 조회 명세에는
-                    담당자 이름이 없음.
-
-                    assigneeMemberId만 내려옴.
-                  */
 
                   manager:
                     item.assigneeMemberId
                       ? `멤버 ${item.assigneeMemberId}`
                       : "-",
 
-
-                  /*
-                    실제 evidences 배열 길이
-                  */
-
                   evidenceCount:
                     Array.isArray(
-                      item.evidences
+                      item.evidences,
                     )
-                      ? item.evidences.length
+                      ? item
+                          .evidences
+                          .length
                       : 0,
-
-
-                  /*
-                    VERIFIED가 아닌 항목은
-                    현재 UI의 확인 필요 표시 사용
-                  */
 
                   warning:
                     item.reviewStatus !==
                     "VERIFIED",
-                })
+                }),
               );
 
 
           return {
+            category,
+
             number:
               categoryInfo.number,
 
@@ -514,29 +1368,461 @@ function HandoverDashboard() {
             items:
               categoryItems,
           };
-        }
+        },
       );
     }, [
       handoverData,
     ]);
 
 
-  /* =========================
-      마지막 AI 반영 시간
-  ========================= */
+  /* ==================================================
+     PUT /draft 공통 저장
+  ================================================== */
 
-  const lastSyncedText =
-    getRelativeTimeText(
-      handoverData?.lastSyncedAt
+  const saveCurrentDraft =
+    useCallback(
+      async ({
+        items =
+          handoverData?.items ??
+          [],
+
+        delivery =
+          deliveryDraft,
+      } = {}) => {
+        const handoverId =
+          handoverData
+            ?.handoverId ||
+          localStorage.getItem(
+            "handoverId",
+          );
+
+
+        const version =
+          handoverData
+            ?.version;
+
+
+        if (!handoverId) {
+          throw new Error(
+            "handoverId가 없습니다.",
+          );
+        }
+
+
+        if (
+          version === null ||
+          version === undefined
+        ) {
+          throw new Error(
+            "인수인계 version이 없습니다.",
+          );
+        }
+
+
+        if (
+          !delivery
+            ?.targetTeamId ||
+          !delivery
+            ?.recipientMemberId ||
+          !delivery
+            ?.timingType ||
+          !delivery
+            ?.timezone
+        ) {
+          throw new Error(
+            "전달 정보를 먼저 설정해주세요.",
+          );
+        }
+
+
+        const request = {
+          items:
+            buildDraftItems(
+              items,
+            ),
+
+          removedItemIds:
+            [],
+
+          delivery: {
+            targetTeamId:
+              Number(
+                delivery.targetTeamId,
+              ),
+
+            recipientMemberId:
+              Number(
+                delivery.recipientMemberId,
+              ),
+
+            timingType:
+              delivery.timingType,
+
+            scheduledAt:
+              delivery.scheduledAt ??
+              null,
+
+            timezone:
+              delivery.timezone,
+          },
+
+          version:
+            Number(
+              version,
+            ),
+        };
+
+
+        console.log(
+          "인수인계 draft 저장 Payload:",
+          request,
+        );
+
+
+        try {
+          setIsSavingDraft(
+            true,
+          );
+
+          setErrorMessage(
+            "",
+          );
+
+
+          const response =
+            await saveHandoverDraft(
+              handoverId,
+              request,
+            );
+
+
+          console.log(
+            "인수인계 draft 저장 성공:",
+            response,
+          );
+
+
+          /*
+            저장 후 GET으로 서버 상태 동기화
+          */
+
+          const latestResponse =
+            await getHandover(
+              handoverId,
+            );
+
+
+          const latestData =
+            latestResponse
+              ?.data;
+
+
+          if (latestData) {
+            applyHandoverData(
+              latestData,
+            );
+
+
+            return latestData;
+          }
+
+
+          /*
+            GET에 데이터가 없을 경우
+            저장 응답 version이라도 반영
+          */
+
+          const savedVersion =
+            response?.data
+              ?.version;
+
+
+          const fallbackData = {
+            ...handoverData,
+
+            items,
+
+            delivery,
+
+            version:
+              savedVersion ??
+              version,
+          };
+
+
+          applyHandoverData(
+            fallbackData,
+          );
+
+
+          return fallbackData;
+        } catch (error) {
+          console.error(
+            "인수인계 draft 저장 실패:",
+            error,
+          );
+
+
+          console.error(
+            "서버 응답:",
+            error.response?.data ||
+              error.data,
+          );
+
+
+          setErrorMessage(
+            getErrorMessage(
+              error,
+            ),
+          );
+
+
+          throw error;
+        } finally {
+          setIsSavingDraft(
+            false,
+          );
+        }
+      },
+      [
+        handoverData,
+        deliveryDraft,
+        applyHandoverData,
+      ],
     );
 
 
-  /* =========================
-      AI 최신 활동 재반영
+  /* ==================================================
+     전달 정보 변경
+  ================================================== */
 
-      POST
-      /api/v1/handovers/{handoverId}/refresh
-  ========================= */
+  const handleDeliveryChange =
+    useCallback(
+      (delivery) => {
+        setDeliveryDraft(
+          delivery,
+        );
+      },
+      [],
+    );
+
+
+  const handleDeliverySave =
+    useCallback(
+      async (
+        delivery,
+      ) => {
+        setDeliveryDraft(
+          delivery,
+        );
+
+
+        await saveCurrentDraft({
+          delivery,
+        });
+      },
+      [
+        saveCurrentDraft,
+      ],
+    );
+
+
+  /* ==================================================
+     항목 추가
+
+     임시 prompt UI
+     +
+     PUT /draft
+  ================================================== */
+
+  const handleAddItem =
+    async (
+      category,
+    ) => {
+      const title =
+        window.prompt(
+          "인수인계 항목 제목을 입력해주세요.",
+        );
+
+
+      if (
+        !title?.trim()
+      ) {
+        return;
+      }
+
+
+      const description =
+        window.prompt(
+          "인수인계 항목 내용을 입력해주세요.",
+        );
+
+
+      if (
+        !description?.trim()
+      ) {
+        return;
+      }
+
+
+      const newItem = {
+        itemId:
+          null,
+
+        category,
+
+        title:
+          title.trim(),
+
+        description:
+          description.trim(),
+
+        assigneeMemberId:
+          null,
+
+        evidenceIds:
+          [],
+
+        evidences:
+          [],
+
+        reviewStatus:
+          "NEEDS_REVIEW",
+      };
+
+
+      const nextItems = [
+        ...(handoverData
+          ?.items ?? []),
+
+        newItem,
+      ];
+
+
+      try {
+        await saveCurrentDraft({
+          items:
+            nextItems,
+        });
+      } catch {
+        // errorMessage에서 표시
+      }
+    };
+
+
+  /* ==================================================
+     항목 수정
+
+     임시 prompt UI
+     +
+     PUT /draft
+  ================================================== */
+
+  const handleEditItem =
+    async (
+      itemId,
+    ) => {
+      const items =
+        handoverData
+          ?.items ?? [];
+
+
+      const target =
+        items.find(
+          (item) =>
+            Number(
+              item.itemId,
+            ) ===
+            Number(
+              itemId,
+            ),
+        );
+
+
+      if (!target) {
+        return;
+      }
+
+
+      const title =
+        window.prompt(
+          "제목을 수정해주세요.",
+          target.title ||
+            "",
+        );
+
+
+      if (
+        title === null
+      ) {
+        return;
+      }
+
+
+      const description =
+        window.prompt(
+          "내용을 수정해주세요.",
+          target.description ||
+            "",
+        );
+
+
+      if (
+        description ===
+        null
+      ) {
+        return;
+      }
+
+
+      if (
+        !title.trim() ||
+        !description.trim()
+      ) {
+        alert(
+          "제목과 내용은 비워둘 수 없습니다.",
+        );
+
+        return;
+      }
+
+
+      const nextItems =
+        items.map(
+          (item) =>
+            Number(
+              item.itemId,
+            ) ===
+            Number(
+              itemId,
+            )
+              ? {
+                  ...item,
+
+                  title:
+                    title.trim(),
+
+                  description:
+                    description.trim(),
+                }
+              : item,
+        );
+
+
+      try {
+        await saveCurrentDraft({
+          items:
+            nextItems,
+        });
+      } catch {
+        // errorMessage에서 표시
+      }
+    };
+
+
+  /* ==================================================
+     Refresh
+  ================================================== */
 
   const handleRefresh =
     async () => {
@@ -544,36 +1830,23 @@ function HandoverDashboard() {
         getCurrentHandoverId();
 
 
-      if (!handoverId) {
-        console.warn(
-          "handoverId가 없습니다."
-        );
-
-        return;
-      }
-
-
-      if (isRefreshing) {
+      if (
+        !handoverId ||
+        isRefreshing
+      ) {
         return;
       }
 
 
       try {
         setIsRefreshing(
-          true
+          true,
         );
 
+        setErrorMessage(
+          "",
+        );
 
-        /*
-          실제 명세 기준
-
-          sourceTypes
-          → 선택값
-          → 미입력 시 전체 협업 도구
-
-          preserveManualEdits
-          → 사용자 수정 내용 보존
-        */
 
         const response =
           await refreshHandover(
@@ -581,270 +1854,169 @@ function HandoverDashboard() {
             {
               preserveManualEdits:
                 true,
-            }
+            },
           );
 
 
         console.log(
-          "AI 최신 활동 재반영 요청 성공:",
-          response
+          "AI 최신 활동 재반영 성공:",
+          response,
         );
 
 
-        /*
-          응답은 202 Accepted.
-
-          data 예시:
-          {
+        await fetchHandoverUntilReady(
+          response?.data
+            ?.handoverId ||
             handoverId,
-            generationJobId,
-            status: "AI_GENERATING"
-          }
-
-          비동기 작업이므로
-          요청 성공 직후 기존 내용을
-          임의로 변경하지 않음.
-        */
-      } catch (error) {
-        console.error(
-          "AI 최신 활동 재반영 요청 실패:",
-          error
         );
-
-
-        console.error(
-          "서버 응답:",
-          error.response?.data
+      } catch (error) {
+        setErrorMessage(
+          getErrorMessage(
+            error,
+          ),
         );
       } finally {
         setIsRefreshing(
-          false
+          false,
         );
       }
     };
 
 
-  /* =========================
-      이슈 전체 보기
-  ========================= */
+  /* ==================================================
+     최종 전달
 
-  const handleViewAllIssues =
-    () => {
-      navigate(
-        ROUTES.ISSUE
-      );
-    };
-
-
-  /* =========================
-      새 이슈 추가
-  ========================= */
-
-  const handleAddIssue =
-    () => {
-      navigate(
-        ROUTES.CREATE_ISSUE
-      );
-    };
-
-
-  /* =========================
-      인수인계 항목 수정
-  ========================= */
-
-  const handleEditIssue =
-    (
-      itemId
-    ) => {
-      /*
-        전체 조회 명세에는
-        itemId는 있지만 실제 issueId는 없음.
-
-        따라서 itemId를 이용해
-        /issue/{id}/edit로 이동시키지 않음.
-      */
-
-      console.warn(
-        "인수인계 itemId:",
-        itemId,
-        "전체 조회 응답에 실제 issueId가 없습니다."
-      );
-    };
-
-
-  /* =========================
-      실제 인수인계 전달
-
-      POST
-      /api/v1/handovers/{handoverId}/deliver
-  ========================= */
+     draft 저장
+     ↓
+     최신 version
+     ↓
+     deliver
+  ================================================== */
 
   const handleDeliverHandover =
     async () => {
-      const handoverId =
-        getCurrentHandoverId();
-
-
-      /* =========================
-          handoverId 확인
-      ========================= */
-
-      if (!handoverId) {
-        console.warn(
-          "handoverId가 없습니다."
-        );
-
-        return;
-      }
-
-
-      /* =========================
-          최신 version 확인
-
-          전체 조회 명세에서
-          version이 내려옴.
-      ========================= */
-
-      const version =
-        handoverData?.version;
-
-
       if (
-        version === null ||
-        version === undefined
+        isDelivering
       ) {
-        console.warn(
-          "인수인계 version이 없습니다."
-        );
-
-        return;
-      }
-
-
-      if (isDelivering) {
         return;
       }
 
 
       try {
         setIsDelivering(
-          true
+          true,
+        );
+
+        setErrorMessage(
+          "",
         );
 
 
         /*
-          실제 명세 기준
-
-          version
-          → GET 전체 조회에서 받은 최신 버전
-
-          acknowledgeReviewAlerts
-          → 사용자가 최종 전달 버튼을 눌렀으므로
-             확인 필요 / 미답변 항목을 인지하고
-             전달하는 것으로 처리
-
-          deliveryRequestId
-          → 중복 전달 방지를 위한
-             새로운 UUID 생성
+          전달 직전 현재 화면 상태 저장
         */
 
-        const deliveryRequestId =
-          crypto.randomUUID();
+        const savedData =
+          await saveCurrentDraft();
+
+
+        const handoverId =
+          savedData
+            ?.handoverId ||
+          getCurrentHandoverId();
+
+
+        const version =
+          savedData
+            ?.version;
+
+
+        if (
+          !handoverId ||
+          version === null ||
+          version === undefined
+        ) {
+          throw new Error(
+            "전달에 필요한 인수인계 정보가 없습니다.",
+          );
+        }
 
 
         const response =
           await deliverHandover(
             handoverId,
             {
-              version,
+              version:
+                Number(
+                  version,
+                ),
 
               acknowledgeReviewAlerts:
                 true,
 
-              deliveryRequestId,
-            }
+              deliveryRequestId:
+                crypto.randomUUID(),
+            },
           );
 
 
         console.log(
-          "인수인계 전달 요청 성공:",
-          response
+          "인수인계 전달 성공:",
+          response,
         );
 
-
-        /*
-          실제 성공 응답은
-          202 Accepted.
-
-          API 요청이 성공했을 때만
-          완료 모달 표시.
-        */
 
         setIsCompleteModalOpen(
-          true
+          true,
         );
-
-
-        /*
-          반환된 전달 정보가 있다면
-          현재 handoverData에 보존.
-
-          response.data 예시:
-          {
-            handoverId,
-            deliveryId,
-            status,
-            scheduledAt,
-            timezone
-          }
-        */
-
-        if (response?.data) {
-          setHandoverData(
-            (prev) => {
-              if (!prev) {
-                return prev;
-              }
-
-
-              return {
-                ...prev,
-
-                deliveryResult:
-                  response.data,
-              };
-            }
-          );
-        }
       } catch (error) {
         console.error(
-          "인수인계 전달 요청 실패:",
-          error
+          "인수인계 전달 실패:",
+          error,
         );
 
 
-        console.error(
-          "서버 응답:",
-          error.response?.data
+        setErrorMessage(
+          getErrorMessage(
+            error,
+          ),
         );
       } finally {
         setIsDelivering(
-          false
+          false,
         );
       }
     };
 
 
-  /* =========================
-      전달 완료 모달 닫기
-  ========================= */
+  const generationStatus =
+    handoverData
+      ?.generation
+      ?.status;
 
-  const handleCloseCompleteModal =
-    () => {
-      navigate(
-        ROUTES.DASHBOARD
-      );
-    };
+
+  const generationProgress =
+    handoverData
+      ?.generation
+      ?.progress ??
+    0;
+
+
+  const isGenerating =
+    [
+      "PENDING",
+      "RUNNING",
+      "AI_GENERATING",
+    ].includes(
+      generationStatus,
+    );
+
+
+  const lastSyncedText =
+    getRelativeTimeText(
+      handoverData
+        ?.lastSyncedAt,
+    );
 
 
   return (
@@ -854,10 +2026,6 @@ function HandoverDashboard() {
           styles.dashboard
         }
       >
-        {/* =========================
-            HEADER
-        ========================= */}
-
         <header
           className={
             styles.pageHeader
@@ -891,7 +2059,7 @@ function HandoverDashboard() {
                 }
               >
                 {
-                  cycleName
+                  cycleLabel
                 }
               </span>
             </div>
@@ -911,19 +2079,23 @@ function HandoverDashboard() {
 
 
               <span>
-                {lastSyncedText
-                  ? `AI가 ${lastSyncedText}에 최신 활동을 반영했습니다.`
-                  : isLoading
-                    ? "AI 인수인계 정보를 불러오는 중입니다."
-                    : "AI 최신 활동 정보가 없습니다."}
+                {errorMessage
+                  ? errorMessage
+
+                  : isGenerating
+                    ? `AI 인수인계를 생성하고 있습니다. (${generationProgress}%)`
+
+                    : lastSyncedText
+                      ? `AI가 ${lastSyncedText}에 최신 활동을 반영했습니다.`
+
+                      : isLoading
+                        ? "AI 인수인계 정보를 불러오는 중입니다."
+
+                        : "AI 최신 활동 정보가 없습니다."}
               </span>
             </div>
           </div>
 
-
-          {/* =========================
-              상단 버튼
-          ========================= */}
 
           <div
             className={
@@ -939,10 +2111,14 @@ function HandoverDashboard() {
                 handleRefresh
               }
               disabled={
-                isRefreshing
+                isRefreshing ||
+                isLoading ||
+                !handoverData
               }
             >
-              새로 고침
+              {isRefreshing
+                ? "반영 중"
+                : "새로 고침"}
             </button>
 
 
@@ -953,7 +2129,7 @@ function HandoverDashboard() {
               }
               onClick={() =>
                 navigate(
-                  ROUTES.CREATE_ISSUE
+                  ROUTES.CREATE_ISSUE,
                 )
               }
             >
@@ -962,10 +2138,6 @@ function HandoverDashboard() {
           </div>
         </header>
 
-
-        {/* =========================
-            CONTENT
-        ========================= */}
 
         <div
           className={
@@ -977,10 +2149,6 @@ function HandoverDashboard() {
               styles.mainColumn
             }
           >
-            {/* =========================
-                AI 검토 결과
-            ========================= */}
-
             <section
               className={
                 styles.reviewSection
@@ -1001,9 +2169,7 @@ function HandoverDashboard() {
                 }
               >
                 {reviewSummary.map(
-                  (
-                    item
-                  ) => (
+                  (item) => (
                     <ReviewSummaryCard
                       key={
                         item.label
@@ -1015,15 +2181,11 @@ function HandoverDashboard() {
                         item.count
                       }
                     />
-                  )
+                  ),
                 )}
               </div>
             </section>
 
-
-            {/* =========================
-                할 일
-            ========================= */}
 
             <section
               className={
@@ -1049,14 +2211,15 @@ function HandoverDashboard() {
                   className={
                     styles.viewAllButton
                   }
-                  onClick={
-                    handleViewAllIssues
+                  onClick={() =>
+                    navigate(
+                      ROUTES.ISSUE,
+                    )
                   }
                 >
                   <span>
                     전체 보기
                   </span>
-
 
                   <img
                     src={
@@ -1067,10 +2230,6 @@ function HandoverDashboard() {
                 </button>
               </div>
 
-
-              {/* =========================
-                  인수인계 항목
-              ========================= */}
 
               <div
                 className={
@@ -1083,12 +2242,10 @@ function HandoverDashboard() {
                   }
                 >
                   {handoverSections.map(
-                    (
-                      section
-                    ) => (
+                    (section) => (
                       <HandoverSection
                         key={
-                          section.number
+                          section.category
                         }
                         number={
                           section.number
@@ -1102,22 +2259,20 @@ function HandoverDashboard() {
                         items={
                           section.items
                         }
-                        onAdd={
-                          handleAddIssue
+                        onAdd={() =>
+                          handleAddItem(
+                            section.category,
+                          )
                         }
                         onEdit={
-                          handleEditIssue
+                          handleEditItem
                         }
                       />
-                    )
+                    ),
                   )}
                 </div>
               </div>
 
-
-              {/* =========================
-                  인수인계 전달
-              ========================= */}
 
               <div
                 className={
@@ -1133,7 +2288,10 @@ function HandoverDashboard() {
                     handleDeliverHandover
                   }
                   disabled={
-                    isDelivering
+                    isDelivering ||
+                    isSavingDraft ||
+                    isLoading ||
+                    !handoverData
                   }
                 >
                   <span
@@ -1141,7 +2299,10 @@ function HandoverDashboard() {
                       styles.transferText
                     }
                   >
-                    인수인계 전달 →
+                    {isDelivering ||
+                    isSavingDraft
+                      ? "처리 중..."
+                      : "인수인계 전달 →"}
                   </span>
                 </button>
               </div>
@@ -1149,29 +2310,31 @@ function HandoverDashboard() {
           </main>
 
 
-          {/* =========================
-              오른쪽 패널
-          ========================= */}
-
           <aside
             className={
               styles.sideColumn
             }
           >
-            <SourcePanel />
-
             <AiCheckPanel />
 
-            <TransferInfoPanel />
+
+            <TransferInfoPanel
+              initialDelivery={
+                handoverData
+                  ?.delivery ??
+                null
+              }
+              onChange={
+                handleDeliveryChange
+              }
+              onSave={
+                handleDeliverySave
+              }
+            />
           </aside>
         </div>
       </div>
 
-
-      {/* =========================
-          실제 전달 성공 후에만
-          표시되는 완료 모달
-      ========================= */}
 
       {isCompleteModalOpen && (
         <div
@@ -1190,8 +2353,10 @@ function HandoverDashboard() {
                 styles.modalCloseButton
               }
               aria-label="닫기"
-              onClick={
-                handleCloseCompleteModal
+              onClick={() =>
+                navigate(
+                  ROUTES.DASHBOARD,
+                )
               }
             >
               <img
