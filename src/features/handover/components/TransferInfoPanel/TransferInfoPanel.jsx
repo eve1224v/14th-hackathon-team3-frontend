@@ -15,21 +15,78 @@ import {
   getProjectMembers,
 } from "../../../../api/projectApi";
 
-const normalizeName = (value) =>
-  String(value || "").trim().toLowerCase();
 
-const belongsToTeam = (member, team) => {
-  if (!member || !team) {
+const normalizeName = (
+  value,
+) =>
+  String(value || "")
+    .trim()
+    .toLowerCase();
+
+
+const belongsToTeam = (
+  member,
+  team,
+) => {
+  if (
+    !member ||
+    !team
+  ) {
     return false;
   }
 
-  if (member.teamId != null && team.teamId != null) {
-    return Number(member.teamId) === Number(team.teamId);
+
+  if (
+    member.teamId != null &&
+    team.teamId != null
+  ) {
+    return (
+      Number(member.teamId) ===
+      Number(team.teamId)
+    );
   }
 
-  return Boolean(member.teamName && team.teamName) &&
-    normalizeName(member.teamName) === normalizeName(team.teamName);
+
+  return (
+    Boolean(
+      member.teamName &&
+      team.teamName,
+    ) &&
+    normalizeName(
+      member.teamName,
+    ) ===
+      normalizeName(
+        team.teamName,
+      )
+  );
 };
+
+
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+
+const WEEKDAYS = [
+  "SUN",
+  "MON",
+  "TUE",
+  "WED",
+  "THU",
+  "FRI",
+  "SAT",
+];
 
 
 function TransferInfoPanel({
@@ -37,7 +94,10 @@ function TransferInfoPanel({
   onChange,
   onSave,
 }) {
-  const calendarRef = useRef(null);
+  const calendarRef =
+    useRef(null);
+
+
   const [
     isEditing,
     setIsEditing,
@@ -103,19 +163,60 @@ function TransferInfoPanel({
     setTimingOption,
   ] = useState("next");
 
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(() => new Date());
-  const [calendarMonth, setCalendarMonth] = useState(() => new Date());
+
+  const [
+    isCalendarOpen,
+    setIsCalendarOpen,
+  ] = useState(false);
+
+
+  const [
+    selectedDate,
+    setSelectedDate,
+  ] = useState(
+    () => new Date(),
+  );
+
+
+  const [
+    calendarMonth,
+    setCalendarMonth,
+  ] = useState(
+    () => new Date(),
+  );
+
+
+  /* ==================================================
+     달력 외부 클릭
+  ================================================== */
 
   useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
-        setIsCalendarOpen(false);
-      }
-    };
+    const handleOutsideClick =
+      (event) => {
+        if (
+          calendarRef.current &&
+          !calendarRef.current.contains(
+            event.target,
+          )
+        ) {
+          setIsCalendarOpen(
+            false,
+          );
+        }
+      };
 
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => document.removeEventListener("mousedown", handleOutsideClick);
+
+    document.addEventListener(
+      "mousedown",
+      handleOutsideClick,
+    );
+
+
+    return () =>
+      document.removeEventListener(
+        "mousedown",
+        handleOutsideClick,
+      );
   }, []);
 
 
@@ -157,7 +258,9 @@ function TransferInfoPanel({
             ]);
 
 
-          if (cancelled) {
+          if (
+            cancelled
+          ) {
             return;
           }
 
@@ -201,6 +304,7 @@ function TransferInfoPanel({
           setTeams(
             teamList,
           );
+
 
           setMembers(
             memberList,
@@ -249,9 +353,11 @@ function TransferInfoPanel({
             teamId,
           );
 
+
           setTeamName(
             resolvedTeamName,
           );
+
 
           setEditTeamName(
             resolvedTeamName,
@@ -264,7 +370,11 @@ function TransferInfoPanel({
 
           const teamMembers =
             memberList.filter(
-              (member) => belongsToTeam(member, initialTeam),
+              (member) =>
+                belongsToTeam(
+                  member,
+                  initialTeam,
+                ),
             );
 
 
@@ -299,9 +409,11 @@ function TransferInfoPanel({
             memberId,
           );
 
+
           setManagerName(
             resolvedManagerName,
           );
+
 
           setEditManagerName(
             resolvedManagerName,
@@ -345,6 +457,10 @@ function TransferInfoPanel({
   ]);
 
 
+  /* ==================================================
+     선택된 팀
+  ================================================== */
+
   const selectedTeam =
     useMemo(
       () =>
@@ -358,12 +474,17 @@ function TransferInfoPanel({
             ),
         ) ||
         null,
+
       [
         teams,
         selectedTeamId,
       ],
     );
 
+
+  /* ==================================================
+     선택된 담당자
+  ================================================== */
 
   const selectedMember =
     useMemo(
@@ -378,6 +499,7 @@ function TransferInfoPanel({
             ),
         ) ||
         null,
+
       [
         members,
         selectedMemberId,
@@ -409,78 +531,146 @@ function TransferInfoPanel({
       .timeZone ||
     "Asia/Seoul";
 
-  const calendarDays = useMemo(() => {
-    const year = calendarMonth.getFullYear();
-    const month = calendarMonth.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const start = new Date(year, month, 1 - firstDay.getDay());
 
-    return Array.from({ length: 42 }, (_, index) => {
-      const date = new Date(start);
-      date.setDate(start.getDate() + index);
-      return date;
-    });
-  }, [calendarMonth]);
+  /* ==================================================
+     Calendar 날짜
+  ================================================== */
 
-  const formattedDate = new Intl.DateTimeFormat("ko-KR", {
-    month: "long",
-    day: "numeric",
-    weekday: "short",
-    timeZone: timezone,
-  }).format(selectedDate);
+  const calendarDays =
+    useMemo(() => {
+      const year =
+        calendarMonth.getFullYear();
 
-  const isSameDate = (left, right) =>
-    left.getFullYear() === right.getFullYear() &&
-    left.getMonth() === right.getMonth() &&
-    left.getDate() === right.getDate();
+
+      const month =
+        calendarMonth.getMonth();
+
+
+      const firstDay =
+        new Date(
+          year,
+          month,
+          1,
+        );
+
+
+      const start =
+        new Date(
+          year,
+          month,
+          1 -
+            firstDay.getDay(),
+        );
+
+
+      return Array.from(
+        {
+          length: 42,
+        },
+
+        (
+          _,
+          index,
+        ) => {
+          const date =
+            new Date(
+              start,
+            );
+
+
+          date.setDate(
+            start.getDate() +
+              index,
+          );
+
+
+          return date;
+        },
+      );
+    }, [
+      calendarMonth,
+    ]);
+
+
+  const formattedDate =
+    new Intl.DateTimeFormat(
+      "ko-KR",
+      {
+        month:
+          "long",
+
+        day:
+          "numeric",
+
+        weekday:
+          "short",
+      },
+    ).format(
+      selectedDate,
+    );
+
+
+  const isSameDate =
+    (
+      left,
+      right,
+    ) =>
+      left.getFullYear() ===
+        right.getFullYear() &&
+      left.getMonth() ===
+        right.getMonth() &&
+      left.getDate() ===
+        right.getDate();
 
 
   /* ==================================================
      현재 전달 정보
   ================================================== */
 
-  const getDeliveryValue = useCallback(
-    (
-      teamId =
+  const getDeliveryValue =
+    useCallback(
+      (
+        teamId =
+          selectedTeamId,
+
+        memberId =
+          selectedMemberId,
+      ) => {
+        return {
+          targetTeamId:
+            teamId
+              ? Number(
+                  teamId,
+                )
+              : null,
+
+          recipientMemberId:
+            memberId
+              ? Number(
+                  memberId,
+                )
+              : null,
+
+          timingType:
+            timingOption ===
+            "next"
+              ? "NEXT_SHIFT_START"
+              : null,
+
+          scheduledAt:
+            null,
+
+          timezone,
+        };
+      },
+
+      [
         selectedTeamId,
-
-      memberId =
         selectedMemberId,
-    ) => {
-      return {
-        targetTeamId:
-          teamId
-            ? Number(
-                teamId,
-              )
-            : null,
-
-        recipientMemberId:
-          memberId
-            ? Number(
-                memberId,
-              )
-            : null,
-
-        /*
-          현재 확인된 명세 enum은
-          NEXT_SHIFT_START만 사용
-        */
-
-        timingType:
-          timingOption ===
-          "next"
-            ? "NEXT_SHIFT_START"
-            : null,
-
-        scheduledAt:
-          null,
-
+        timingOption,
         timezone,
-      };
-    },
-    [selectedTeamId, selectedMemberId, timingOption, timezone],
-  );
+      ],
+    );
 
 
   /* ==================================================
@@ -492,10 +682,6 @@ function TransferInfoPanel({
       getDeliveryValue(),
     );
   }, [
-    selectedTeamId,
-    selectedMemberId,
-    timingOption,
-    timezone,
     getDeliveryValue,
     onChange,
   ]);
@@ -511,9 +697,11 @@ function TransferInfoPanel({
         teamName,
       );
 
+
       setEditManagerName(
         managerName,
       );
+
 
       setIsEditing(
         true,
@@ -523,12 +711,6 @@ function TransferInfoPanel({
 
   /* ==================================================
      전달 정보 저장
-
-     팀명/담당자명
-     ↓
-     실제 teamId/memberId 찾기
-     ↓
-     PUT /draft
   ================================================== */
 
   const handleSave =
@@ -537,24 +719,53 @@ function TransferInfoPanel({
         editTeamName.trim();
 
 
+      const trimmedManagerName =
+        editManagerName.trim();
+
+
+      if (
+        !trimmedTeamName
+      ) {
+        alert(
+          "팀을 입력해주세요.",
+        );
+
+
+        return;
+      }
+
+
       const matchedTeam =
         teams.find(
           (team) =>
-            String(
-              team.teamName ||
-                "",
-            )
-              .trim()
-              .toLowerCase() ===
-            trimmedTeamName
-              .toLowerCase(),
+            normalizeName(
+              team.teamName,
+            ) ===
+            normalizeName(
+              trimmedTeamName,
+            ),
         );
 
 
-      if (!matchedTeam) {
+      if (
+        !matchedTeam
+      ) {
         alert(
           "프로젝트에 등록된 팀 이름을 입력해주세요.",
         );
+
+
+        return;
+      }
+
+
+      if (
+        !trimmedManagerName
+      ) {
+        alert(
+          "담당자를 입력해주세요.",
+        );
+
 
         return;
       }
@@ -563,23 +774,26 @@ function TransferInfoPanel({
       const matchedMember =
         members.find(
           (member) =>
-            belongsToTeam(member, matchedTeam) &&
-            String(
-              member.name ||
-                "",
-            )
-              .trim()
-              .toLowerCase() ===
-              editManagerName
-                .trim()
-                .toLowerCase(),
+            belongsToTeam(
+              member,
+              matchedTeam,
+            ) &&
+            normalizeName(
+              member.name,
+            ) ===
+              normalizeName(
+                trimmedManagerName,
+              ),
         );
 
 
-      if (!matchedMember) {
+      if (
+        !matchedMember
+      ) {
         alert(
           "선택한 팀에 등록된 담당자를 입력해주세요.",
         );
+
 
         return;
       }
@@ -592,6 +806,7 @@ function TransferInfoPanel({
         alert(
           "지금 바로 전달의 timingType 값이 아직 확인되지 않았습니다. 현재는 다음 업무 시작 시간 전달로 테스트해주세요.",
         );
+
 
         return;
       }
@@ -626,11 +841,6 @@ function TransferInfoPanel({
         );
 
 
-        /*
-          HandoverDashboard의
-          PUT /draft 호출
-        */
-
         await onSave?.(
           nextDelivery,
         );
@@ -640,14 +850,17 @@ function TransferInfoPanel({
           matchedTeam.teamId,
         );
 
+
         setSelectedMemberId(
           matchedMember.memberId,
         );
+
 
         setTeamName(
           matchedTeam.teamName ||
             "",
         );
+
 
         setManagerName(
           matchedMember.name ||
@@ -657,6 +870,11 @@ function TransferInfoPanel({
 
         onChange?.(
           nextDelivery,
+        );
+
+
+        setIsCalendarOpen(
+          false,
         );
 
 
@@ -676,12 +894,38 @@ function TransferInfoPanel({
     };
 
 
+  /* ==================================================
+     달력 열기
+  ================================================== */
+
+  const handleCalendarToggle =
+    () => {
+      if (
+        !isEditing ||
+        timingOption !==
+          "next"
+      ) {
+        return;
+      }
+
+
+      setIsCalendarOpen(
+        (open) =>
+          !open,
+      );
+    };
+
+
   return (
     <section
       className={
         styles.panel
       }
     >
+      {/* =========================
+          HEADER
+      ========================= */}
+
       <div
         className={
           styles.header
@@ -690,6 +934,7 @@ function TransferInfoPanel({
         <h2>
           전달 정보
         </h2>
+
 
         <button
           type="button"
@@ -714,6 +959,10 @@ function TransferInfoPanel({
       </div>
 
 
+      {/* =========================
+          전달 대상
+      ========================= */}
+
       <div
         className={
           styles.targetSection
@@ -736,6 +985,7 @@ function TransferInfoPanel({
           <strong>
             {companyName}
           </strong>
+
 
           <span
             className={
@@ -777,6 +1027,10 @@ function TransferInfoPanel({
       </div>
 
 
+      {/* =========================
+          담당자
+      ========================= */}
+
       <div
         className={
           styles.managerSection
@@ -801,6 +1055,7 @@ function TransferInfoPanel({
               styles.avatar
             }
           />
+
 
           {isEditing ? (
             <input
@@ -829,6 +1084,10 @@ function TransferInfoPanel({
       </div>
 
 
+      {/* =========================
+          전달 시점
+      ========================= */}
+
       <div
         className={
           styles.timeSection
@@ -856,19 +1115,28 @@ function TransferInfoPanel({
               timingOption ===
               "now"
             }
-            onChange={() =>
+            onChange={() => {
               setTimingOption(
                 "now",
-              )
+              );
+
+
+              setIsCalendarOpen(
+                false,
+              );
+            }}
+            disabled={
+              !isEditing
             }
-            disabled={!isEditing}
           />
+
 
           <span
             className={
               styles.customRadio
             }
           />
+
 
           <span
             className={
@@ -898,14 +1166,18 @@ function TransferInfoPanel({
                 "next",
               )
             }
-            disabled={!isEditing}
+            disabled={
+              !isEditing
+            }
           />
+
 
           <span
             className={
               styles.customRadio
             }
           />
+
 
           <span
             className={
@@ -917,21 +1189,17 @@ function TransferInfoPanel({
         </label>
 
 
+        {/* =========================
+            날짜 + Calendar
+        ========================= */}
+
         <div
           className={
             styles.dateBox
           }
-          role="button"
-          tabIndex={isEditing ? 0 : -1}
-          aria-disabled={!isEditing}
-          onClick={() => isEditing && setIsCalendarOpen((open) => !open)}
-          onKeyDown={(event) => {
-            if (isEditing && (event.key === "Enter" || event.key === " ")) {
-              event.preventDefault();
-              setIsCalendarOpen((open) => !open);
-            }
-          }}
-          ref={calendarRef}
+          ref={
+            calendarRef
+          }
         >
           <span>
             {timingOption ===
@@ -940,38 +1208,201 @@ function TransferInfoPanel({
               : "지금 바로 전달"}
           </span>
 
-          <img
-            src={
-              calendarIcon2
-            }
-            alt=""
-          />
 
-          {isCalendarOpen && isEditing && (
-            <div className={styles.calendar} onClick={(event) => event.stopPropagation()}>
-              <div className={styles.calendarHeader}>
-                <button type="button" onClick={() => setCalendarMonth((date) => new Date(date.getFullYear(), date.getMonth() - 1, 1))}>‹</button>
-                <strong>{calendarMonth.getFullYear()}년 {calendarMonth.getMonth() + 1}월</strong>
-                <button type="button" onClick={() => setCalendarMonth((date) => new Date(date.getFullYear(), date.getMonth() + 1, 1))}>›</button>
-              </div>
-              <div className={styles.calendarGrid}>
-                {["일", "월", "화", "수", "목", "금", "토"].map((day) => <span key={day} className={styles.weekday}>{day}</span>)}
-                {calendarDays.map((date) => (
+          <button
+            type="button"
+            className={
+              styles.calendarButton
+            }
+            disabled={
+              !isEditing ||
+              timingOption !==
+                "next"
+            }
+            onClick={
+              handleCalendarToggle
+            }
+            aria-label="날짜 선택"
+          >
+            <img
+              src={
+                calendarIcon2
+              }
+              alt=""
+            />
+          </button>
+
+
+          {/* =========================
+              CUSTOM CALENDAR
+          ========================= */}
+
+          {isCalendarOpen &&
+            isEditing &&
+            timingOption ===
+              "next" && (
+              <div
+                className={
+                  styles.calendar
+                }
+                onClick={(
+                  event,
+                ) =>
+                  event.stopPropagation()
+                }
+              >
+                <div
+                  className={
+                    styles.calendarHeader
+                  }
+                >
                   <button
                     type="button"
-                    key={date.toISOString()}
-                    className={`${styles.calendarDay} ${date.getMonth() !== calendarMonth.getMonth() ? styles.otherMonth : ""} ${isSameDate(date, selectedDate) ? styles.selectedDay : ""}`}
-                    onClick={() => {
-                      setSelectedDate(date);
-                      setIsCalendarOpen(false);
-                    }}
+                    onClick={() =>
+                      setCalendarMonth(
+                        (date) =>
+                          new Date(
+                            date.getFullYear(),
+                            date.getMonth() -
+                              1,
+                            1,
+                          ),
+                      )
+                    }
+                    aria-label="이전 달"
                   >
-                    {date.getDate()}
+                    ‹
                   </button>
-                ))}
+
+
+                  <strong>
+                    {
+                      MONTH_NAMES[
+                        calendarMonth.getMonth()
+                      ]
+                    }{" "}
+                    {
+                      calendarMonth.getFullYear()
+                    }
+                  </strong>
+
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCalendarMonth(
+                        (date) =>
+                          new Date(
+                            date.getFullYear(),
+                            date.getMonth() +
+                              1,
+                            1,
+                          ),
+                      )
+                    }
+                    aria-label="다음 달"
+                  >
+                    ›
+                  </button>
+                </div>
+
+
+                <div
+                  className={
+                    styles.calendarDivider
+                  }
+                />
+
+
+                <div
+                  className={
+                    styles.calendarGrid
+                  }
+                >
+                  {WEEKDAYS.map(
+                    (day) => (
+                      <span
+                        key={
+                          day
+                        }
+                        className={
+                          styles.weekday
+                        }
+                      >
+                        {day}
+                      </span>
+                    ),
+                  )}
+
+
+                  {calendarDays.map(
+                    (date) => {
+                      const isOtherMonth =
+                        date.getMonth() !==
+                        calendarMonth.getMonth();
+
+
+                      const isSunday =
+                        date.getDay() ===
+                        0 &&
+                        !isOtherMonth;
+
+
+                      const isSelected =
+                        isSameDate(
+                          date,
+                          selectedDate,
+                        );
+
+
+                      return (
+                        <button
+                          type="button"
+                          key={
+                            date.toISOString()
+                          }
+                          className={[
+                            styles.calendarDay,
+
+                            isOtherMonth
+                              ? styles.otherMonth
+                              : "",
+
+                            isSunday
+                              ? styles.sunday
+                              : "",
+
+                            isSelected
+                              ? styles.selectedDay
+                              : "",
+                          ]
+                            .filter(
+                              Boolean,
+                            )
+                            .join(
+                              " ",
+                            )}
+                          onClick={() => {
+                            setSelectedDate(
+                              date,
+                            );
+
+
+                            setIsCalendarOpen(
+                              false,
+                            );
+                          }}
+                        >
+                          {
+                            date.getDate()
+                          }
+                        </button>
+                      );
+                    },
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       </div>
     </section>

@@ -17,8 +17,13 @@ import {
   getIssue,
   deleteIssue,
   updateChecklistItem,
+  updateIssueStatus,
   downloadIssueFile,
 } from "../../../../api/issueApi";
+
+import {
+  getCycles,
+} from "../../../../api/cycleApi";
 
 import checkboxIcon from "../../../../assets/icons/checkboxIcon.svg";
 import checkboxCheckedIcon from "../../../../assets/icons/checkboxCheckedIcon.svg";
@@ -35,9 +40,66 @@ const PRIORITY_TEXT = {
 };
 
 
+/* ==================================================
+   Cycle 기간 순 정렬
+================================================== */
+
+const sortCyclesByPeriod = (
+  cycles
+) => {
+  return [...cycles].sort(
+    (a, b) => {
+      const startCompare =
+        String(
+          a.startDate || ""
+        ).localeCompare(
+          String(
+            b.startDate || ""
+          )
+        );
+
+
+      if (
+        startCompare !== 0
+      ) {
+        return startCompare;
+      }
+
+
+      const endCompare =
+        String(
+          a.endDate || ""
+        ).localeCompare(
+          String(
+            b.endDate || ""
+          )
+        );
+
+
+      if (
+        endCompare !== 0
+      ) {
+        return endCompare;
+      }
+
+
+      return (
+        Number(
+          a.cycleId || 0
+        ) -
+        Number(
+          b.cycleId || 0
+        )
+      );
+    }
+  );
+};
+
+
 function IssueDetailPage() {
   const navigate =
     useNavigate();
+
 
   const {
     issueId,
@@ -68,9 +130,15 @@ function IssueDetailPage() {
   ] = useState(false);
 
 
-  /* =========================
-      이슈 상세 조회
-  ========================= */
+  const [
+    cycleLabel,
+    setCycleLabel,
+  ] = useState("Cycle");
+
+
+  /* ==================================================
+     이슈 상세 조회
+  ================================================== */
 
   useEffect(() => {
     const fetchIssue =
@@ -121,6 +189,141 @@ function IssueDetailPage() {
               })
             )
           );
+
+
+          /* ==================================================
+             Cycle N 계산
+          ================================================== */
+
+          const projectId =
+            issueData.projectId ||
+            localStorage.getItem(
+              "projectId"
+            );
+
+
+          const currentCycleId =
+            issueData.cycleId ||
+            localStorage.getItem(
+              "cycleId"
+            );
+
+
+          if (
+            !projectId ||
+            !currentCycleId
+          ) {
+            console.warn(
+              "Cycle N 계산에 필요한 projectId 또는 cycleId가 없습니다.",
+              {
+                projectId,
+                currentCycleId,
+              }
+            );
+
+
+            setCycleLabel(
+              "Cycle"
+            );
+
+
+            return;
+          }
+
+
+          try {
+            const cycleResponse =
+              await getCycles(
+                projectId
+              );
+
+
+            console.log(
+              "이슈 상세 Cycle 목록 조회 성공:",
+              cycleResponse
+            );
+
+
+            const cycleList =
+              Array.isArray(
+                cycleResponse?.data
+              )
+                ? cycleResponse.data
+                : [];
+
+
+            const sortedCycles =
+              sortCyclesByPeriod(
+                cycleList
+              );
+
+
+            const cycleIndex =
+              sortedCycles.findIndex(
+                (
+                  cycle
+                ) =>
+                  Number(
+                    cycle.cycleId
+                  ) ===
+                  Number(
+                    currentCycleId
+                  )
+              );
+
+
+            const nextCycleLabel =
+              cycleIndex >= 0
+                ? `Cycle ${
+                    cycleIndex + 1
+                  }`
+                : "Cycle";
+
+
+            setCycleLabel(
+              nextCycleLabel
+            );
+
+
+            console.log(
+              "이슈 상세 Cycle 표시:",
+              {
+                issueId:
+                  Number(
+                    issueId
+                  ),
+
+                cycleId:
+                  Number(
+                    currentCycleId
+                  ),
+
+                originalCycleName:
+                  issueData.cycleName,
+
+                cycleLabel:
+                  nextCycleLabel,
+              }
+            );
+          } catch (
+            cycleError
+          ) {
+            console.error(
+              "이슈 상세 Cycle 목록 조회 실패:",
+              cycleError
+            );
+
+
+            console.error(
+              "서버 응답:",
+              cycleError.response?.data
+            );
+
+
+            setCycleLabel(
+              "Cycle"
+            );
+          }
         } catch (error) {
           console.error(
             "이슈 상세 조회 실패:",
@@ -153,9 +356,9 @@ function IssueDetailPage() {
   ]);
 
 
-  /* =========================
-      수정
-  ========================= */
+  /* ==================================================
+     수정
+  ================================================== */
 
   const handleEdit =
     () => {
@@ -165,9 +368,9 @@ function IssueDetailPage() {
     };
 
 
-  /* =========================
-      삭제
-  ========================= */
+  /* ==================================================
+     삭제
+  ================================================== */
 
   const handleDelete =
     async () => {
@@ -257,9 +460,15 @@ function IssueDetailPage() {
     };
 
 
-  /* =========================
-      완료 조건 체크 변경
-  ========================= */
+  /* ==================================================
+     완료 조건 체크 변경
+
+     체크리스트
+     false → true
+
+     현재 이슈 상태가 TODO라면
+     TODO → IN_PROGRESS
+  ================================================== */
 
   const handleToggleCondition =
     async (
@@ -287,11 +496,35 @@ function IssueDetailPage() {
 
 
       try {
+        /* =========================
+           완료 조건 체크 저장
+        ========================= */
+
+        console.log(
+          "완료 조건 체크 변경 Payload:",
+          {
+            issueId:
+              Number(
+                issueId
+              ),
+
+            itemId:
+              conditionId,
+
+            isDone:
+              nextChecked,
+          }
+        );
+
+
         const response =
           await updateChecklistItem(
             issueId,
             conditionId,
-            nextChecked
+            {
+              isDone:
+                nextChecked,
+            }
           );
 
 
@@ -321,9 +554,68 @@ function IssueDetailPage() {
                   : condition
             )
         );
+
+
+        /* ==================================================
+           진행 전 상태에서
+           완료 조건을 체크하면 진행 중으로 변경
+
+           체크 해제 시에는 상태를 되돌리지 않음
+        ================================================== */
+
+        if (
+          nextChecked &&
+          issue?.status ===
+            "TODO"
+        ) {
+          console.log(
+            "이슈 상태 자동 변경 Payload:",
+            {
+              issueId:
+                Number(
+                  issueId
+                ),
+
+              status:
+                "IN_PROGRESS",
+            }
+          );
+
+
+          const statusResponse =
+            await updateIssueStatus(
+              issueId,
+              {
+                status:
+                  "IN_PROGRESS",
+              }
+            );
+
+
+          console.log(
+            "이슈 상태 자동 변경 성공:",
+            statusResponse
+          );
+
+
+          setIssue(
+            (
+              prev
+            ) =>
+              prev
+                ? {
+                    ...prev,
+
+                    status:
+                      "IN_PROGRESS",
+                  }
+
+                : prev
+          );
+        }
       } catch (error) {
         console.error(
-          "완료 조건 체크 변경 실패:",
+          "완료 조건 또는 이슈 상태 변경 실패:",
           error
         );
 
@@ -336,9 +628,9 @@ function IssueDetailPage() {
     };
 
 
-  /* =========================
-      첨부파일 다운로드
-  ========================= */
+  /* ==================================================
+     첨부파일 다운로드
+  ================================================== */
 
   const handleDownloadFile =
     async (
@@ -432,9 +724,9 @@ function IssueDetailPage() {
     };
 
 
-  /* =========================
-      완료 조건 개수
-  ========================= */
+  /* ==================================================
+     완료 조건 개수
+  ================================================== */
 
   const checkedCount =
     conditions.filter(
@@ -445,9 +737,9 @@ function IssueDetailPage() {
     ).length;
 
 
-  /* =========================
-      날짜 표시
-  ========================= */
+  /* ==================================================
+     날짜 표시
+  ================================================== */
 
   const formatDate =
     (
@@ -470,9 +762,9 @@ function IssueDetailPage() {
     };
 
 
-  /* =========================
-      파일 크기
-  ========================= */
+  /* ==================================================
+     파일 크기
+  ================================================== */
 
   const formatFileSize =
     (
@@ -517,9 +809,9 @@ function IssueDetailPage() {
     };
 
 
-  /* =========================
-      로딩
-  ========================= */
+  /* ==================================================
+     로딩
+  ================================================== */
 
   if (loading) {
     return (
@@ -539,9 +831,9 @@ function IssueDetailPage() {
   }
 
 
-  /* =========================
-      조회 실패
-  ========================= */
+  /* ==================================================
+     조회 실패
+  ================================================== */
 
   if (!issue) {
     return (
@@ -568,19 +860,15 @@ function IssueDetailPage() {
           styles.page
         }
       >
-        {/* =========================
-            상단
-        ========================= */}
+        {/* ==================================================
+            HEADER
+        ================================================== */}
 
         <section
           className={
             styles.header
           }
         >
-          {/* =========================
-              원래 있던 뒤로가기 버튼
-          ========================= */}
-
           <div
             className={
               styles.backButtonWrap
@@ -621,7 +909,7 @@ function IssueDetailPage() {
               }
             >
               {
-                issue.cycleName
+                cycleLabel
               }
             </span>
 
@@ -651,9 +939,9 @@ function IssueDetailPage() {
         </section>
 
 
-        {/* =========================
+        {/* ==================================================
             담당자 / 처리 일자
-        ========================= */}
+        ================================================== */}
 
         <section
           className={
@@ -747,9 +1035,9 @@ function IssueDetailPage() {
         </section>
 
 
-        {/* =========================
+        {/* ==================================================
             내용
-        ========================= */}
+        ================================================== */}
 
         <section
           className={
@@ -779,9 +1067,9 @@ function IssueDetailPage() {
         </section>
 
 
-        {/* =========================
+        {/* ==================================================
             완료 조건
-        ========================= */}
+        ================================================== */}
 
         <section
           className={
@@ -874,9 +1162,9 @@ function IssueDetailPage() {
         </section>
 
 
-        {/* =========================
-            첨부된 파일
-        ========================= */}
+        {/* ==================================================
+            첨부 파일
+        ================================================== */}
 
         <section
           className={
@@ -1002,9 +1290,9 @@ function IssueDetailPage() {
         </section>
 
 
-        {/* =========================
+        {/* ==================================================
             하단 버튼
-        ========================= */}
+        ================================================== */}
 
         <div
           className={

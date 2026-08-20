@@ -6,7 +6,6 @@ import {
 import styles from "./WorkspaceMembers.module.css";
 
 import chatIcon3 from "../../../../assets/icons/chatIcon3.svg";
-import dropdownIcon from "../../../../assets/icons/dropdownIcon.svg";
 
 import MessageModal from "../../../../components/MessageModal/MessageModal";
 
@@ -14,20 +13,6 @@ import {
   getOrganizationChart,
   getWorkspaceMembers,
 } from "../../../../api/memberApi";
-
-
-/* ==================================================
-   기존 UI 역할
-
-   담당자 / 검토자 / 승인자 / 참조자
-================================================== */
-
-const ROLE_OPTIONS = [
-  "담당자",
-  "검토자",
-  "승인자",
-  "참조자",
-];
 
 
 function WorkspaceMembers() {
@@ -58,16 +43,6 @@ function WorkspaceMembers() {
 
 
   /* ==================================================
-     기존 역할 드롭다운
-  ================================================== */
-
-  const [
-    openRoleId,
-    setOpenRoleId,
-  ] = useState(null);
-
-
-  /* ==================================================
      채팅
   ================================================== */
 
@@ -75,6 +50,12 @@ function WorkspaceMembers() {
     isMessageOpen,
     setIsMessageOpen,
   ] = useState(false);
+
+
+  const [
+    selectedMember,
+    setSelectedMember,
+  ] = useState(null);
 
 
   /* ==================================================
@@ -98,19 +79,12 @@ function WorkspaceMembers() {
   ================================================== */
 
   useEffect(() => {
-    let cancelled = false;
+    let cancelled =
+      false;
 
 
     const loadMembers =
       async () => {
-        await Promise.resolve();
-
-
-        if (cancelled) {
-          return;
-        }
-
-
         const workspaceId =
           localStorage.getItem(
             "workspaceId"
@@ -146,13 +120,22 @@ function WorkspaceMembers() {
             "선택된 워크스페이스가 없습니다."
           );
 
-          setLoading(false);
+
+          setLoading(
+            false
+          );
+
 
           return;
         }
 
 
         try {
+          setLoading(
+            true
+          );
+
+
           const [
             organizationResponse,
             workspaceMembersResponse,
@@ -165,7 +148,8 @@ function WorkspaceMembers() {
               getWorkspaceMembers(
                 workspaceId,
                 {
-                  status: "ACTIVE",
+                  status:
+                    "ACTIVE",
                 }
               ),
             ]);
@@ -189,7 +173,7 @@ function WorkspaceMembers() {
 
 
           /* ==================================================
-             1. 조직도 데이터
+             조직도 데이터
           ================================================== */
 
           const teams =
@@ -205,7 +189,7 @@ function WorkspaceMembers() {
 
 
           /* ==================================================
-             2. 워크스페이스 멤버 데이터
+             워크스페이스 멤버 데이터
           ================================================== */
 
           const workspaceMembers =
@@ -220,26 +204,18 @@ function WorkspaceMembers() {
               : [];
 
 
-          console.log(
-            "조직도 teams:",
-            teams
-          );
-
-
-          console.log(
-            "워크스페이스 members:",
-            workspaceMembers
-          );
-
-
           /* ==================================================
              memberId 기준 Map
+
+             조직도 응답에 없는 값 보완
           ================================================== */
 
           const workspaceMemberMap =
             new Map(
               workspaceMembers.map(
-                (member) => [
+                (
+                  member
+                ) => [
                   member.memberId,
                   member,
                 ]
@@ -248,25 +224,21 @@ function WorkspaceMembers() {
 
 
           /* ==================================================
-             화면용 멤버 데이터
-
-             - 이름
-             - 기업
-             - 팀
-             - 직책
-             - 활동 상태
-
-             정보 수정 / 권한 관리 기능은 사용하지 않음
+             조직도 화면 데이터
           ================================================== */
 
           const formattedMembers =
             teams.flatMap(
-              (team) =>
+              (
+                team
+              ) =>
                 (
                   team.members ||
                   []
                 ).map(
-                  (member) => {
+                  (
+                    member
+                  ) => {
                     const workspaceMember =
                       workspaceMemberMap.get(
                         member.memberId
@@ -292,8 +264,9 @@ function WorkspaceMembers() {
                         "-",
 
                       /*
-                        이메일은 화면에는 표시하지 않지만
-                        현재 사용자 판별에만 사용
+                        화면에는 이메일 표시 안 함.
+
+                        현재 사용자 판별용으로만 유지
                       */
                       email:
                         member.email ??
@@ -323,12 +296,6 @@ function WorkspaceMembers() {
                           ?.status ===
                           "ACTIVE",
 
-                      /*
-                        기존 카드의 역할 UI 유지
-                      */
-                      displayRole:
-                        "담당자",
-
                       isMe:
                         false,
                     };
@@ -340,15 +307,20 @@ function WorkspaceMembers() {
           /* ==================================================
              현재 로그인 사용자 찾기
 
-             1순위: 이메일
-             2순위: 이름 + 기업
+             1순위 이메일
+             2순위 이름 + 기업
           ================================================== */
 
           let currentMember =
             formattedMembers.find(
-              (member) =>
-                userEmail &&
-                member.email !== "-" &&
+              (
+                member
+              ) =>
+                Boolean(
+                  userEmail
+                ) &&
+                member.email !==
+                  "-" &&
                 member.email ===
                   userEmail
             );
@@ -357,8 +329,12 @@ function WorkspaceMembers() {
           if (!currentMember) {
             currentMember =
               formattedMembers.find(
-                (member) =>
-                  userName &&
+                (
+                  member
+                ) =>
+                  Boolean(
+                    userName
+                  ) &&
                   member.name ===
                     userName &&
                   (
@@ -382,7 +358,9 @@ function WorkspaceMembers() {
 
           const membersWithMe =
             formattedMembers.map(
-              (member) => ({
+              (
+                member
+              ) => ({
                 ...member,
 
                 isMe:
@@ -399,13 +377,18 @@ function WorkspaceMembers() {
              자사 / 파트너사 분리
           ================================================== */
 
-          const company = [];
+          const company =
+            [];
 
-          const partner = [];
+
+          const partner =
+            [];
 
 
           membersWithMe.forEach(
-            (member) => {
+            (
+              member
+            ) => {
               if (
                 workspaceCompanyName &&
                 member.company ===
@@ -433,9 +416,9 @@ function WorkspaceMembers() {
           );
 
 
-          setErrorMessage("");
-
-          setLoading(false);
+          setErrorMessage(
+            ""
+          );
         } catch (error) {
           if (cancelled) {
             return;
@@ -481,13 +464,17 @@ function WorkspaceMembers() {
             );
           } else {
             setErrorMessage(
-              responseData?.message ||
+              responseData
+                ?.message ||
                 "멤버 정보를 불러오지 못했습니다."
             );
           }
-
-
-          setLoading(false);
+        } finally {
+          if (!cancelled) {
+            setLoading(
+              false
+            );
+          }
         }
       };
 
@@ -496,7 +483,8 @@ function WorkspaceMembers() {
 
 
     return () => {
-      cancelled = true;
+      cancelled =
+        true;
     };
   }, []);
 
@@ -513,62 +501,15 @@ function WorkspaceMembers() {
 
 
   /* ==================================================
-     기존 역할 선택
-
-     담당자 / 검토자 / 승인자 / 참조자
-  ================================================== */
-
-  const handleRoleSelect = (
-    memberId,
-    role
-  ) => {
-    const updateMembers =
-      (prev) =>
-        prev.map(
-          (member) =>
-            member.id ===
-            memberId
-              ? {
-                  ...member,
-
-                  displayRole:
-                    role,
-                }
-              : member
-        );
-
-
-    if (
-      activeTab ===
-      "company"
-    ) {
-      setCompanyMembers(
-        updateMembers
-      );
-    } else {
-      setPartnerMembers(
-        updateMembers
-      );
-    }
-
-
-    setOpenRoleId(null);
-  };
-
-
-  /* ==================================================
      탭 변경
   ================================================== */
 
   const handleTabChange =
-    (tab) => {
+    (
+      tab
+    ) => {
       setActiveTab(
         tab
-      );
-
-
-      setOpenRoleId(
-        null
       );
     };
 
@@ -578,7 +519,14 @@ function WorkspaceMembers() {
   ================================================== */
 
   const handleChatOpen =
-    () => {
+    (
+      member
+    ) => {
+      setSelectedMember(
+        member
+      );
+
+
       setIsMessageOpen(
         true
       );
@@ -589,6 +537,11 @@ function WorkspaceMembers() {
     () => {
       setIsMessageOpen(
         false
+      );
+
+
+      setSelectedMember(
+        null
       );
     };
 
@@ -686,7 +639,9 @@ function WorkspaceMembers() {
                   styles.stateText
                 }
               >
-                {errorMessage}
+                {
+                  errorMessage
+                }
               </p>
             )}
 
@@ -708,7 +663,9 @@ function WorkspaceMembers() {
           {!loading &&
             !errorMessage &&
             members.map(
-              (member) => (
+              (
+                member
+              ) => (
                 <article
                   key={
                     member.id
@@ -722,7 +679,9 @@ function WorkspaceMembers() {
                       styles.memberMain
                     }
                   >
-                    {/* 프로필 */}
+                    {/* =========================
+                        프로필 이미지
+                    ========================= */}
 
                     <div
                       className={
@@ -731,13 +690,15 @@ function WorkspaceMembers() {
                     />
 
 
+                    {/* =========================
+                        멤버 정보
+                    ========================= */}
+
                     <div
                       className={
                         styles.memberInfo
                       }
                     >
-                      {/* 이름 */}
-
                       <div
                         className={
                           styles.nameRow
@@ -790,7 +751,9 @@ function WorkspaceMembers() {
                       </div>
 
 
-                      {/* 기업 · 팀 · 직책 */}
+                      {/* =========================
+                          기업 · 팀 · 직책
+                      ========================= */}
 
                       <p
                         className={
@@ -800,118 +763,25 @@ function WorkspaceMembers() {
                         {
                           member.company
                         }
+
                         {" · "}
+
                         {
                           member.team
                         }
+
                         {" · "}
+
                         {
                           member.position
                         }
                       </p>
-
-
-                      {/* 역할 */}
-
-                      <div
-                        className={
-                          styles.bottomRow
-                        }
-                      >
-                        <div
-                          className={
-                            styles.roleDropdown
-                          }
-                        >
-                          <button
-                            type="button"
-                            className={
-                              styles.roleButton
-                            }
-                            onClick={() =>
-                              setOpenRoleId(
-                                (
-                                  prev
-                                ) =>
-                                  prev ===
-                                  member.id
-                                    ? null
-                                    : member.id
-                              )
-                            }
-                          >
-                            <span>
-                              {
-                                member.displayRole
-                              }
-                            </span>
-
-
-                            <img
-                              src={
-                                dropdownIcon
-                              }
-                              alt=""
-                              className={`${
-                                styles.dropdownIcon
-                              } ${
-                                openRoleId ===
-                                member.id
-                                  ? styles.dropdownIconOpen
-                                  : ""
-                              }`}
-                            />
-                          </button>
-
-
-                          {openRoleId ===
-                            member.id && (
-                            <div
-                              className={
-                                styles.roleMenu
-                              }
-                            >
-                              {ROLE_OPTIONS
-                                .filter(
-                                  (
-                                    role
-                                  ) =>
-                                    role !==
-                                    member.displayRole
-                                )
-                                .map(
-                                  (
-                                    role
-                                  ) => (
-                                    <button
-                                      key={
-                                        role
-                                      }
-                                      type="button"
-                                      className={
-                                        styles.roleOption
-                                      }
-                                      onClick={() =>
-                                        handleRoleSelect(
-                                          member.id,
-                                          role
-                                        )
-                                      }
-                                    >
-                                      {
-                                        role
-                                      }
-                                    </button>
-                                  )
-                                )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
                     </div>
 
 
-                    {/* 채팅 */}
+                    {/* =========================
+                        채팅
+                    ========================= */}
 
                     <button
                       type="button"
@@ -919,8 +789,10 @@ function WorkspaceMembers() {
                         styles.chatButton
                       }
                       aria-label={`${member.name}에게 메시지 보내기`}
-                      onClick={
-                        handleChatOpen
+                      onClick={() =>
+                        handleChatOpen(
+                          member
+                        )
                       }
                     >
                       <img
@@ -939,11 +811,14 @@ function WorkspaceMembers() {
 
 
       {/* ==================================================
-          기존 채팅 모달
+          채팅 모달
       ================================================== */}
 
       {isMessageOpen && (
         <MessageModal
+          member={
+            selectedMember
+          }
           onClose={
             handleChatClose
           }
