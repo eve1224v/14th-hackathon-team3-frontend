@@ -338,7 +338,7 @@
   position: relative;
 
   width: 690px;
-  height: 973px;
+  min-height: 973px;
 
   box-sizing: border-box;
 
@@ -348,6 +348,37 @@
 
   border: 1px solid rgba(37, 42, 68, 0.4);
   border-radius: 8px;
+}
+
+
+.emptyDraftNotice {
+  margin-bottom: 22px;
+
+  padding: 14px 16px;
+
+  border: 1px solid rgba(77, 103, 255, 0.45);
+  border-radius: 8px;
+
+  background: rgba(57, 87, 255, 0.1);
+
+  color: rgba(255, 255, 255, 0.86);
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+.emptyDraftNotice strong {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 14px;
+}
+
+
+.emptyDraftNotice p {
+  margin: 6px 0 0;
 }
 
 
