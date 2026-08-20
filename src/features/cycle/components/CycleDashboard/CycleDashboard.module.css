@@ -1,25 +1,44 @@
 .dashboard {
   width: 1206px;
   min-height: 1024px;
+
   box-sizing: border-box;
 
   padding: 93px 92px 100px 57px;
 
   background: #0d1021;
+
   color: #ffffff;
 
   font-family: Pretendard, sans-serif;
 }
 
+
+/* =========================
+   Header
+========================= */
+
 .header {
   width: 1057px;
 }
 
+
+.headerTop {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
 .titleRow {
   display: flex;
   align-items: center;
+
   gap: 14px;
 }
+
 
 .titleRow h1 {
   margin: 0;
@@ -32,6 +51,7 @@
 
   white-space: nowrap;
 }
+
 
 .cycleBadge {
   min-width: 77.43px;
@@ -47,7 +67,12 @@
 
   border-radius: 10.17px;
 
-  background: rgba(57, 87, 255, 0.74);
+  background: rgba(
+    57,
+    87,
+    255,
+    0.74
+  );
 
   color: #ffffff;
 
@@ -57,15 +82,55 @@
   white-space: nowrap;
 }
 
+
+/* =========================
+   새 사이클 생성
+========================= */
+
+.createCycleButton {
+  min-width: 88px;
+  height: 32px;
+
+  box-sizing: border-box;
+
+  padding: 0 12px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+
+  font-family: Pretendard, sans-serif;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+.createCycleButton:hover {
+  background: #5a72ff;
+}
+
+
 .description {
   margin: 14px 0 0;
 
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(
+    255,
+    255,
+    255,
+    0.45
+  );
 
   font-size: 12px;
   font-weight: 400;
   line-height: 110%;
 }
+
 
 /* =========================
    Tabs
@@ -80,8 +145,11 @@
 
   margin-top: 22px;
 
-  border-bottom: 1px solid #343a58;
+  border-bottom:
+    1px solid
+    #343a58;
 }
+
 
 .tab {
   position: relative;
@@ -95,18 +163,26 @@
 
   background: transparent;
 
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(
+    255,
+    255,
+    255,
+    0.82
+  );
 
   font-family: Pretendard, sans-serif;
+
   font-size: 14px;
   font-weight: 600;
 
   cursor: pointer;
 }
 
+
 .activeTab {
   color: #4d67ff;
 }
+
 
 .activeTab::after {
   content: "";
@@ -122,6 +198,7 @@
   background: #4d67ff;
 }
 
+
 /* =========================
    Overview
 ========================= */
@@ -130,7 +207,10 @@
   width: 1057px;
 
   display: grid;
-  grid-template-columns: 352px 687px;
+
+  grid-template-columns:
+    352px
+    687px;
 
   gap: 18px;
 

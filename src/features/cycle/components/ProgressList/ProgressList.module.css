@@ -13,182 +13,11 @@
   color: #ffffff;
 
   font-family: Pretendard, sans-serif;
-}
-
-.card h2 {
-  margin: 0;
-
-  color: #ffffff;
-
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 110%;
-}
-
-.divider {
-  width: 100%;
-  height: 1px;
-
-  margin-top: 20px;
-
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.list {
-  width: 617px;
-}
-
-.item {
-  width: 617px;
-  height: 82px;
-
-  box-sizing: border-box;
-
-  display: flex;
-  align-items: center;
-
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.statusDot {
-  width: 17px;
-  height: 17px;
-
-  flex-shrink: 0;
-
-  border-radius: 50%;
-}
-
-.complete {
-  background: #28c840;
-}
-
-.progress {
-  background: #4d67ff;
-}
-
-.check {
-  background: #febc2e;
-}
-
-.delay {
-  background: #fe6057;
-}
-
-.text {
-  margin-left: 32px;
-}
-
-.text strong {
-  display: block;
-
-  color: #ffffff;
-
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 110%;
-}
-
-.text p {
-  margin: 6px 0 0;
-
-  color: rgba(255, 255, 255, 0.45);
-
-  font-size: 12px;
-  font-weight: 400;
-}
-
-.text .progressDescription {
-  color: #8799ff;
-}
-
-.badge {
-  min-width: 44.68px;
-  height: 23.85px;
-
-  margin-left: auto;
-
-  box-sizing: border-box;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0 10.84px;
-
-  border-radius: 8.67px;
-
-  font-size: 12px;
-  font-weight: 400;
-
-  white-space: nowrap;
-}
-
-.completeBadge {
-  background: rgba(40, 200, 64, 0.3);
-  color: #ffffff;
-}
-
-.progressBadge {
-  min-width: 48.68px;
-
-  background: rgba(77, 103, 255, 0.4);
-  color: #ffffff;
-}
-
-.checkBadge {
-  min-width: 70.68px;
-
-  background: rgba(254, 188, 46, 0.3);
-  color: #ffffff;
-}
-
-.delayBadge {
-  min-width: 55.68px;
-
-  background: rgba(254, 96, 87, 0.3);
-  color: #ffffff;
-}
-
-.moreButton {
-  width: 617px;
-  height: 48px;
-
-  margin-top: 17px;
-
-  box-sizing: border-box;
-
-  border: 1px solid #252a44;
-  border-radius: 8px;
-
-  background: #1b1f35;
-
-  color: #ffffff;
-
-  font-family: Pretendard, sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-
-  cursor: pointer;
-}.card {
-  width: 687px;
-  height: 529px;
-
-  box-sizing: border-box;
-
-  padding: 25px 35px 18px;
-
-  border-radius: 8px;
-
-  background: #15192f;
-
-  color: #ffffff;
-
-  font-family: Pretendard, sans-serif;
 
   overflow: hidden;
 }
 
+
 .card h2 {
   margin: 0;
 
@@ -199,6 +28,7 @@
   line-height: 110%;
 }
 
+
 .divider {
   width: 100%;
   height: 1px;
@@ -208,9 +38,16 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+
+/* =========================
+   이슈 목록
+========================= */
+
 .list {
   width: 617px;
+  min-height: 380px;
 }
+
 
 .item {
   width: 617px;
@@ -221,8 +58,15 @@
   display: flex;
   align-items: center;
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.08);
 }
+
+
+/* =========================
+   상태 점
+========================= */
 
 .statusDot {
   width: 17px;
@@ -233,28 +77,67 @@
   border-radius: 50%;
 }
 
+
+/* 진행 전 */
+
+.todo {
+  background: #828282;
+}
+
+
+/* 완료 */
+
 .complete {
   background: #28c840;
 }
+
+
+/* 진행 중 */
 
 .progress {
   background: #4d67ff;
 }
 
+
+/* 확인 필요 */
+
 .check {
   background: #febc2e;
 }
+
+
+/* 지연 */
 
 .delay {
   background: #fe6057;
 }
 
+
+/* 취소 */
+
+.canceled {
+  background: #666b7c;
+}
+
+
+/* =========================
+   텍스트
+========================= */
+
 .text {
+  min-width: 0;
+
   margin-left: 32px;
 }
 
+
 .text strong {
   display: block;
+
+  max-width: 410px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   color: #ffffff;
 
@@ -265,10 +148,22 @@
   white-space: nowrap;
 }
 
+
 .text p {
+  max-width: 410px;
+
   margin: 6px 0 0;
 
-  color: rgba(255, 255, 255, 0.45);
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.45
+    );
 
   font-size: 12px;
   font-weight: 400;
@@ -276,9 +171,17 @@
   white-space: nowrap;
 }
 
+
+/* 진행률 문구 */
+
 .text .progressDescription {
   color: #8799ff;
 }
+
+
+/* =========================
+   상태 배지
+========================= */
 
 .badge {
   min-width: 44.68px;
@@ -292,6 +195,8 @@
   align-items: center;
   justify-content: center;
 
+  flex-shrink: 0;
+
   padding: 0 10.84px;
 
   border-radius: 8.67px;
@@ -302,31 +207,135 @@
   white-space: nowrap;
 }
 
-.completeBadge {
-  background: rgba(40, 200, 64, 0.3);
+
+/* 진행 전 */
+
+.todoBadge {
+  min-width: 55px;
+
+  background:
+    rgba(
+      130,
+      130,
+      130,
+      0.3
+    );
+
   color: #ffffff;
 }
+
+
+/* 완료 */
+
+.completeBadge {
+  background:
+    rgba(
+      40,
+      200,
+      64,
+      0.3
+    );
+
+  color: #ffffff;
+}
+
+
+/* 진행 중 */
 
 .progressBadge {
   min-width: 48.68px;
 
-  background: rgba(77, 103, 255, 0.4);
+  background:
+    rgba(
+      77,
+      103,
+      255,
+      0.4
+    );
+
   color: #ffffff;
 }
+
+
+/* 확인 필요 */
 
 .checkBadge {
   min-width: 70.68px;
 
-  background: rgba(254, 188, 46, 0.3);
+  background:
+    rgba(
+      254,
+      188,
+      46,
+      0.3
+    );
+
   color: #ffffff;
 }
+
+
+/* 지연 */
 
 .delayBadge {
   min-width: 55.68px;
 
-  background: rgba(254, 96, 87, 0.3);
+  background:
+    rgba(
+      254,
+      96,
+      87,
+      0.3
+    );
+
   color: #ffffff;
 }
+
+
+/* 취소 */
+
+.canceledBadge {
+  min-width: 55px;
+
+  background:
+    rgba(
+      102,
+      107,
+      124,
+      0.35
+    );
+
+  color: #ffffff;
+}
+
+
+/* =========================
+   이슈 없음
+========================= */
+
+.empty {
+  width: 617px;
+  height: 380px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.4
+    );
+
+  font-size: 13px;
+  font-weight: 400;
+}
+
+
+/* =========================
+   모든 이슈 보기
+========================= */
 
 .moreButton {
   width: 617px;
@@ -336,14 +345,20 @@
 
   box-sizing: border-box;
 
-  border: 1px solid #252a44;
+  border:
+    1px solid
+    #252a44;
+
   border-radius: 8px;
 
   background: #1b1f35;
 
   color: #ffffff;
 
-  font-family: Pretendard, sans-serif;
+  font-family:
+    Pretendard,
+    sans-serif;
+
   font-size: 16px;
   font-weight: 500;
 

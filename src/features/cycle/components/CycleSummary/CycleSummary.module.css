@@ -5,7 +5,11 @@
   box-sizing: border-box;
 
   display: grid;
-  grid-template-columns: 215px 579px 263px;
+
+  grid-template-columns:
+    215px
+    579px
+    263px;
 
   margin-top: 48px;
 
@@ -13,6 +17,7 @@
 
   background: #15192f;
 }
+
 
 /* =========================
    Progress
@@ -23,6 +28,7 @@
   align-items: center;
   justify-content: center;
 }
+
 
 .progressCircle {
   position: relative;
@@ -35,12 +41,14 @@
   justify-content: center;
 }
 
+
 .progressSvg {
   position: absolute;
 
   left: 0;
   top: 0;
 }
+
 
 .progressInner {
   position: relative;
@@ -58,6 +66,7 @@
   background: #15192f;
 }
 
+
 .progressInner strong {
   color: #ffffff;
 
@@ -66,15 +75,22 @@
   line-height: 98%;
 }
 
+
 .progressInner span {
   margin-top: 8px;
 
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(
+    255,
+    255,
+    255,
+    0.6
+  );
 
   font-size: 12px;
   font-weight: 400;
   line-height: 110%;
 }
+
 
 /* =========================
    Current Cycle
@@ -83,15 +99,37 @@
 .currentCycle {
   box-sizing: border-box;
 
-  padding: 32px 0 0 20px;
+  padding:
+    30px
+    18px
+    0
+    20px;
 }
 
+
+/* =========================
+   Top
+========================= */
+
+.currentTopRow {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+}
+
+
 .cycleTitle {
+  min-width: 0;
+
   display: flex;
   align-items: center;
 
   gap: 12px;
 }
+
 
 .blueDot {
   width: 12px;
@@ -104,30 +142,52 @@
   background: #4d67ff;
 }
 
+
 .cycleTitle strong {
+  max-width: 260px;
+
+  overflow: hidden;
+
   color: #ffffff;
 
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 110%;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
 }
+
+
+/* =========================
+   기간
+========================= */
 
 .periodRow {
   display: flex;
   align-items: center;
 
-  gap: 12px;
+  gap: 8px;
 
-  margin-top: 13px;
+  margin-left: auto;
 
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(
+    255,
+    255,
+    255,
+    0.45
+  );
 
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 400;
+
+  white-space: nowrap;
 }
 
+
 .dayBadge {
-  width: 33px;
+  min-width: 33px;
   height: 16.5px;
 
   display: flex;
@@ -136,9 +196,16 @@
 
   box-sizing: border-box;
 
+  padding: 0 6px;
+
   border-radius: 6px;
 
-  background: rgba(77, 103, 255, 0.55);
+  background: rgba(
+    77,
+    103,
+    255,
+    0.55
+  );
 
   color: #ffffff;
 
@@ -146,11 +213,93 @@
   font-weight: 400;
 }
 
+
+/* =========================
+   수정
+========================= */
+
+.editButton {
+  width: 43px;
+  height: 31px;
+
+  flex-shrink: 0;
+
+  box-sizing: border-box;
+
+  border:
+    1px solid
+    #4d67ff;
+
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+
+.editButton:hover {
+  background:
+    rgba(
+      77,
+      103,
+      255,
+      0.12
+    );
+}
+
+
+/* =========================
+   사이클 목표
+========================= */
+
+.goal {
+  max-width: 510px;
+
+  margin:
+    13px
+    0
+    0
+    24px;
+
+  overflow: hidden;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.55
+  );
+
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 140%;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+/* =========================
+   Statistics
+========================= */
+
 .statistics {
   display: flex;
 
-  margin-top: 29px;
+  margin-top: 22px;
 }
+
 
 .statItem {
   position: relative;
@@ -165,6 +314,7 @@
   padding-left: 24px;
 }
 
+
 .statItem::before {
   content: "";
 
@@ -178,18 +328,31 @@
 
   border-radius: 3px;
 
-  background: rgba(166, 180, 255, 0.28);
+  background:
+    rgba(
+      166,
+      180,
+      255,
+      0.28
+    );
 }
 
-.statItem span {
-  color: rgba(255, 255, 255, 0.7);
 
-  font-size: 14px;
+.statItem span {
+  color: rgba(
+    255,
+    255,
+    255,
+    0.7
+  );
+
+  font-size: 12px;
   font-weight: 400;
   line-height: 110%;
 
   white-space: nowrap;
 }
+
 
 .statItem strong {
   margin-top: 10px;
@@ -201,6 +364,7 @@
   line-height: 110%;
 }
 
+
 /* =========================
    Next Cycle
 ========================= */
@@ -210,8 +374,13 @@
 
   box-sizing: border-box;
 
-  padding: 31px 0 0 50px;
+  padding:
+    31px
+    0
+    0
+    50px;
 }
+
 
 .nextCycle::before {
   content: "";
@@ -224,8 +393,15 @@
   width: 2px;
   height: 131px;
 
-  background: rgba(166, 180, 255, 0.2);
+  background:
+    rgba(
+      166,
+      180,
+      255,
+      0.2
+    );
 }
+
 
 .nextTitleRow {
   display: flex;
@@ -234,7 +410,9 @@
   gap: 15px;
 }
 
-.nextTitleRow > span:first-child {
+
+.nextTitleRow
+  > span:first-child {
   color: #ffffff;
 
   font-size: 18px;
@@ -242,6 +420,7 @@
 
   white-space: nowrap;
 }
+
 
 .nextBadge {
   min-width: 65.68px;
@@ -265,16 +444,23 @@
   font-weight: 400;
 }
 
+
 .expected {
   display: block;
 
   margin-top: 18px;
 
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(
+    255,
+    255,
+    255,
+    0.6
+  );
 
   font-size: 14px;
   font-weight: 400;
 }
+
 
 .nextDate {
   display: block;

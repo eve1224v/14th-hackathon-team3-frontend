@@ -48,7 +48,7 @@
 
 .summaryCard {
   width: 1057px;
-  height: 145px;
+  min-height: 137px;
 
   box-sizing: border-box;
 
@@ -59,7 +59,7 @@
 
   margin-top: 22px;
 
-  padding: 0 38px;
+  padding: 26px 38px;
 
   border-radius: 8px;
 
@@ -80,28 +80,39 @@
 
 
 .summaryText {
+  min-width: 0;
+
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 
 .summaryText strong {
+  display: block;
+
+  margin: 0;
+
   color: #ffffff;
 
   font-size: 20px;
   font-weight: 600;
-  line-height: 110%;
+  line-height: 120%;
 }
 
 
 .summaryText p {
-  margin: 14px 0 0;
+  max-width: 885px;
 
-  color: rgba(255, 255, 255, 0.85);
+  margin: 15px 0 0;
+
+  color: rgba(255, 255, 255, 0.8);
 
   font-size: 13px;
   font-weight: 400;
   line-height: 160%;
+
+  word-break: keep-all;
 }
 
 
@@ -341,7 +352,7 @@
 
 
 /* =========================
-   78%
+   현재 진행률
 ========================= */
 
 .percentLabel {
@@ -365,7 +376,7 @@
 
 
 /* =========================
-   Cycle 1 ~ 5
+   X축
 ========================= */
 
 .xAxis {

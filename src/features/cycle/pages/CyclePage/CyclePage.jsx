@@ -40,6 +40,57 @@ function CyclePage() {
 
 
   /* =========================
+     현재 선택한 cycleId 저장
+  ========================= */
+
+  useEffect(() => {
+    if (!cycleId) {
+      return;
+    }
+
+
+    const nextCycleId =
+      String(cycleId);
+
+
+    const previousCycleId =
+      localStorage.getItem(
+        "cycleId"
+      );
+
+
+    /*
+      다른 Cycle로 이동한 경우
+      기존 인수인계 ID 제거
+
+      이전 Cycle의 handoverId를
+      새 Cycle에서 사용하는 문제 방지
+    */
+
+    if (
+      previousCycleId !==
+      nextCycleId
+    ) {
+      localStorage.removeItem(
+        "handoverId"
+      );
+
+      localStorage.removeItem(
+        "cycleName"
+      );
+    }
+
+
+    localStorage.setItem(
+      "cycleId",
+      nextCycleId
+    );
+  }, [
+    cycleId,
+  ]);
+
+
+  /* =========================
      cycleId가 없는 경우
      현재 프로젝트 첫 사이클로 이동
   ========================= */
@@ -59,6 +110,20 @@ function CyclePage() {
 
 
         if (!projectId) {
+          /*
+            현재 프로젝트도 없다면
+            이전 선택 정보 제거
+          */
+
+          localStorage.removeItem(
+            "cycleId"
+          );
+
+          localStorage.removeItem(
+            "handoverId"
+          );
+
+
           setErrorMessage(
             "선택된 프로젝트가 없습니다."
           );
@@ -171,6 +236,7 @@ function CyclePage() {
           style={{
             padding:
               "80px 57px",
+
             color:
               "#ffffff",
           }}
