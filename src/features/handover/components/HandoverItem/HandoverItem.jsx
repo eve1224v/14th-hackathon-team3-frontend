@@ -4,7 +4,7 @@ import editPencilIcon from "../../../../assets/icons/editPencilIcon.svg";
 
 
 function HandoverItem({
-  issueId,
+  itemId,
   title,
   description,
   manager,
@@ -55,7 +55,7 @@ function HandoverItem({
           styles.editButton
         }
         onClick={() =>
-          onEdit(issueId)
+          onEdit(itemId)
         }
       >
         <img

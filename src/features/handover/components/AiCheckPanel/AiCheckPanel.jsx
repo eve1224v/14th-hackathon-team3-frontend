@@ -1,17 +1,22 @@
-import { useNavigate } from "react-router-dom";
-
 import styles from "./AiCheckPanel.module.css";
 
 import warningTriangleIcon from "../../../../assets/icons/warningTriangleIcon.svg";
 import questionCircleIcon from "../../../../assets/icons/questionCircleIcon.svg";
-import rightArrowIcon from "../../../../assets/icons/rightArrowIcon.svg";
+const isUnansweredQuestion = (item) =>
+  item.category === "QUESTION" && item.reviewStatus !== "VERIFIED";
 
-function AiCheckPanel() {
-  const navigate = useNavigate();
-
-  const handleIssueDetail = () => {
-    navigate("/issue/1");
-  };
+function AiCheckPanel({ items = [], reviewSummary = null }) {
+  const reviewItems = items.filter(
+    (item) => item.reviewStatus !== "VERIFIED",
+  );
+  const unansweredItems = reviewItems.filter(isUnansweredQuestion);
+  const needsReviewItems = reviewItems.filter(
+    (item) => !isUnansweredQuestion(item),
+  );
+  const needsReviewCount =
+    reviewSummary?.needsReviewCount ?? needsReviewItems.length;
+  const unansweredCount =
+    reviewSummary?.unansweredCount ?? unansweredItems.length;
 
   return (
     <section className={styles.panel}>
@@ -19,13 +24,12 @@ function AiCheckPanel() {
         <h2>AI 확인 필요</h2>
 
         <span className={styles.totalBadge}>
-          2
+          {needsReviewCount + unansweredCount}
         </span>
       </div>
 
       <div
         className={styles.firstItem}
-        onClick={handleIssueDetail}
       >
         <img
           src={warningTriangleIcon}
@@ -34,26 +38,19 @@ function AiCheckPanel() {
         />
 
         <div className={styles.textArea}>
-          <strong>근거가 부족한 내용</strong>
-          <p>A 업무 담당자를 찾지 못했습니다.</p>
+          <strong>확인이 필요한 내용</strong>
+          <p>{needsReviewItems[0]?.title || "확인이 필요한 항목이 없습니다."}</p>
         </div>
 
         <span className={styles.countBadge}>
-          3
+          {needsReviewCount}
         </span>
-
-        <img
-          src={rightArrowIcon}
-          alt=""
-          className={styles.arrowIcon}
-        />
       </div>
 
       <div className={styles.divider} />
 
       <div
         className={styles.secondItem}
-        onClick={handleIssueDetail}
       >
         <img
           src={questionCircleIcon}
@@ -63,18 +60,12 @@ function AiCheckPanel() {
 
         <div className={styles.textArea}>
           <strong>미답변 질문</strong>
-          <p>파트너사의 개발 일정은 언제인가요?</p>
+          <p>{unansweredItems[0]?.title || "미답변 질문이 없습니다."}</p>
         </div>
 
         <span className={styles.countBadge}>
-          1
+          {unansweredCount}
         </span>
-
-        <img
-          src={rightArrowIcon}
-          alt=""
-          className={styles.arrowIcon}
-        />
       </div>
     </section>
   );

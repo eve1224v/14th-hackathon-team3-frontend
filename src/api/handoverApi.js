@@ -20,8 +20,6 @@ export const createHandoverDraft = async (
       `/api/v1/projects/${projectId}/cycles/${cycleId}/handovers`,
       {
         sourceRange,
-
-        sourceTypes: [],
       },
     );
 

@@ -43,7 +43,7 @@ function HandoverSection({
       <div className={styles.itemList}>
         {items.map((item, index) => (
           <HandoverItem
-            key={item.issueId ?? `${number}-${index}`}
+            key={item.itemId ?? `${number}-${index}`}
             {...item}
             onEdit={onEdit}
           />

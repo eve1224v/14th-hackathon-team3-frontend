@@ -669,13 +669,7 @@ function HandoverDashboard() {
         );
 
 
-        if (
-          data.delivery
-        ) {
-          setDeliveryDraft(
-            data.delivery,
-          );
-        }
+        setDeliveryDraft(data.delivery ?? null);
 
 
         const summary =
@@ -1321,9 +1315,6 @@ function HandoverDashboard() {
                   itemId:
                     item.itemId,
 
-                  issueId:
-                    item.itemId,
-
                   title:
                     item.title ||
                     "",
@@ -1930,6 +1921,14 @@ function HandoverDashboard() {
           savedData
             ?.version;
 
+        if (!savedData?.delivery) {
+          throw new Error("전달 정보를 먼저 저장해주세요.");
+        }
+
+        if (!Array.isArray(savedData?.items) || savedData.items.length === 0) {
+          throw new Error("전달할 인수인계 항목이 없습니다.");
+        }
+
 
         if (
           !handoverId ||
@@ -2315,7 +2314,10 @@ function HandoverDashboard() {
               styles.sideColumn
             }
           >
-            <AiCheckPanel />
+            <AiCheckPanel
+              items={handoverData?.items ?? []}
+              reviewSummary={handoverData?.reviewSummary ?? null}
+            />
 
 
             <TransferInfoPanel
