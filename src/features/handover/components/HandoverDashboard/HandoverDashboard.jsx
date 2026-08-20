@@ -2011,6 +2011,22 @@ function HandoverDashboard() {
     );
 
 
+  const itemCount =
+    Array.isArray(
+      handoverData?.items,
+    )
+      ? handoverData.items.length
+      : 0;
+
+
+  const isEmptyDraft =
+    Boolean(
+      handoverData,
+    ) &&
+    !isGenerating &&
+    itemCount === 0;
+
+
   const lastSyncedText =
     getRelativeTimeText(
       handoverData
@@ -2083,6 +2099,9 @@ function HandoverDashboard() {
 
                   : isGenerating
                     ? `AI 인수인계를 생성하고 있습니다. (${generationProgress}%)`
+
+                    : isEmptyDraft
+                      ? "분석할 활동 기록이 없어 빈 초안이 생성되었습니다."
 
                     : lastSyncedText
                       ? `AI가 ${lastSyncedText}에 최신 활동을 반영했습니다.`
@@ -2235,6 +2254,23 @@ function HandoverDashboard() {
                   styles.taskBoard
                 }
               >
+                {isEmptyDraft && (
+                  <div
+                    className={
+                      styles.emptyDraftNotice
+                    }
+                  >
+                    <strong>
+                      아직 AI가 정리할 활동 기록이 없습니다.
+                    </strong>
+
+                    <p>
+                      외부 연동을 사용하지 않는 경우에는 이슈를 등록하거나
+                      아래에서 인수인계 항목을 직접 추가해 초안을 작성할 수 있습니다.
+                    </p>
+                  </div>
+                )}
+
                 <div
                   className={
                     styles.sectionList
