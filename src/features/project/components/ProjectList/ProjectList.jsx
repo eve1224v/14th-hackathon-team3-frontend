@@ -7,7 +7,6 @@ import { ROUTES } from "../../../../router/routes.constant";
 
 import {
   getProjects,
-  getProjectDetail,
   joinProject,
 } from "../../../../api/projectApi";
 
@@ -56,7 +55,6 @@ function ProjectList() {
 
   /* =========================
      프로젝트 목록 조회
-     + 프로젝트 상세 조회
   ========================= */
 
   useEffect(() => {
@@ -69,7 +67,9 @@ function ProjectList() {
         if (!isCancelled) {
           setProjects([]);
 
-          setErrorMessage("워크스페이스 정보가 없습니다.");
+          setErrorMessage(
+            "워크스페이스 정보가 없습니다.",
+          );
 
           setIsLoading(false);
         }
@@ -80,9 +80,7 @@ function ProjectList() {
       try {
         const result = await getProjects({
           workspaceId,
-
           status: selectedStatus,
-
           keyword: "",
         });
 
@@ -90,73 +88,25 @@ function ProjectList() {
           return;
         }
 
-        console.log("프로젝트 목록 조회 성공:", result);
-
-        const projectList = Array.isArray(result?.data) ? result.data : [];
-
-        /* =========================
-           각 프로젝트 상세 조회
-        ========================= */
-
-        const projectsWithDetail = await Promise.all(
-          projectList.map(async (project) => {
-            try {
-              const detailResult = await getProjectDetail(project.projectId);
-
-              const detail = detailResult?.data || {};
-
-              return {
-                ...project,
-
-                participatingCompanies: detail.participatingCompanies || [],
-
-                teamSchedules: detail.teamSchedules || [],
-
-                members: detail.members || [],
-
-                objective: detail.objective || "",
-
-                version: detail.version,
-
-                issueCount:
-                  detail.issueCount ??
-                  detail.totalIssueCount ??
-                  project.issueCount ??
-                  project.totalIssueCount ??
-                  0,
-
-                completedIssueCount:
-                  detail.completedIssueCount ??
-                  detail.completeIssueCount ??
-                  project.completedIssueCount ??
-                  project.completeIssueCount ??
-                  0,
-
-                progressRate:
-                  detail.progressRate ??
-                  detail.progress ??
-                  project.progressRate ??
-                  project.progress ??
-                  0,
-              };
-            } catch (error) {
-              console.error(
-                `프로젝트 ${project.projectId} 상세 조회 실패:`,
-                error,
-              );
-
-              return project;
-            }
-          }),
+        console.log(
+          "프로젝트 목록 조회 성공:",
+          result,
         );
 
-        if (isCancelled) {
-          return;
-        }
+        const projectList = Array.isArray(result?.data)
+          ? result.data
+          : [];
 
-        console.log("상세 정보 병합 프로젝트 목록:", projectsWithDetail);
+        /*
+          중요:
+          여기서 getProjectDetail()을 추가 호출하지 않음.
 
-        setProjects(projectsWithDetail);
+          미참가 프로젝트의 상세 API는
+          403PROJECT_ACCESS_DENIED가 발생할 수 있으므로
+          목록 API Response만 사용함.
+        */
+
+        setProjects(projectList);
 
         setErrorMessage("");
       } catch (error) {
@@ -164,27 +114,37 @@ function ProjectList() {
           return;
         }
 
-        console.error("프로젝트 목록 조회 실패:", error);
+        console.error(
+          "프로젝트 목록 조회 실패:",
+          error,
+        );
 
         setProjects([]);
 
         switch (error.code) {
           case "403WORKSPACE_ACCESS_DENIED":
-            setErrorMessage("워크스페이스 접근 권한이 없습니다.");
+            setErrorMessage(
+              "워크스페이스 접근 권한이 없습니다.",
+            );
 
             break;
 
           case "404WORKSPACE_NOT_FOUND":
-            setErrorMessage("워크스페이스를 찾을 수 없습니다.");
+            setErrorMessage(
+              "워크스페이스를 찾을 수 없습니다.",
+            );
 
             break;
 
           default:
             if (error.status === 401) {
-              setErrorMessage("로그인이 만료되었습니다. 다시 로그인해주세요.");
+              setErrorMessage(
+                "로그인이 만료되었습니다. 다시 로그인해주세요.",
+              );
             } else {
               setErrorMessage(
-                error.message || "프로젝트 목록을 불러오지 못했습니다.",
+                error.message ||
+                  "프로젝트 목록을 불러오지 못했습니다.",
               );
             }
         }
@@ -229,40 +189,92 @@ function ProjectList() {
   ========================= */
 
   const saveSelectedProject = (project) => {
-    localStorage.setItem("projectId", String(project.projectId));
+    localStorage.setItem(
+      "projectId",
+      String(project.projectId),
+    );
 
-    localStorage.setItem("projectName", project.name || "");
+    localStorage.setItem(
+      "projectName",
+      project.name || "",
+    );
 
-    localStorage.setItem("selectedProject", JSON.stringify(project));
+    localStorage.setItem(
+      "selectedProject",
+      JSON.stringify(project),
+    );
 
     if (project.cycleId) {
-      localStorage.setItem("cycleId", String(project.cycleId));
+      localStorage.setItem(
+        "cycleId",
+        String(project.cycleId),
+      );
     }
 
-    window.dispatchEvent(new Event("projectChanged"));
+    window.dispatchEvent(
+      new Event("projectChanged"),
+    );
   };
 
   /* =========================
-     실제 파트너사 이름
+     파트너사 이름
   ========================= */
 
   const getPartnerCompanyName = (project) => {
-    if (!Array.isArray(project.participatingCompanies)) {
-      return "-";
+    /*
+      목록 API에 partnerCompanyName이
+      추가되면 우선 사용
+    */
+
+    if (project.partnerCompanyName) {
+      return project.partnerCompanyName;
     }
 
-    const partners = project.participatingCompanies.filter(
-      (company) => company.role === "PARTNER",
-    );
+    /*
+      여러 파트너사 배열이 내려오는 경우
+    */
 
-    if (partners.length === 0) {
-      return "-";
+    if (
+      Array.isArray(project.partnerCompanies) &&
+      project.partnerCompanies.length > 0
+    ) {
+      return project.partnerCompanies
+        .map(
+          (company) =>
+            company.name ||
+            company.companyName,
+        )
+        .filter(Boolean)
+        .join(", ");
     }
 
-    return partners
-      .map((company) => company.name || company.companyName)
-      .filter(Boolean)
-      .join(", ");
+    /*
+      participatingCompanies가
+      목록 API에도 내려오는 경우
+    */
+
+    if (
+      Array.isArray(project.participatingCompanies)
+    ) {
+      const partners =
+        project.participatingCompanies.filter(
+          (company) =>
+            company.role === "PARTNER",
+        );
+
+      if (partners.length > 0) {
+        return partners
+          .map(
+            (company) =>
+              company.name ||
+              company.companyName,
+          )
+          .filter(Boolean)
+          .join(", ");
+      }
+    }
+
+    return "-";
   };
 
   /* =========================
@@ -281,7 +293,9 @@ function ProjectList() {
 
   const handleProjectClick = (project) => {
     if (!project.cycleId) {
-      alert("프로젝트 사이클 정보를 확인할 수 없습니다.");
+      alert(
+        "프로젝트 사이클 정보를 확인할 수 없습니다.",
+      );
 
       return;
     }
@@ -305,7 +319,10 @@ function ProjectList() {
      프로젝트 참가
   ========================= */
 
-  const handleJoinProject = async (event, project) => {
+  const handleJoinProject = async (
+    event,
+    project,
+  ) => {
     event.stopPropagation();
 
     const projectId = project.projectId;
@@ -317,7 +334,9 @@ function ProjectList() {
     }
 
     if (!project.cycleId) {
-      alert("프로젝트 사이클 정보를 확인할 수 없습니다.");
+      alert(
+        "프로젝트 사이클 정보를 확인할 수 없습니다.",
+      );
 
       return;
     }
@@ -335,7 +354,10 @@ function ProjectList() {
 
       const result = await joinProject(projectId);
 
-      console.log("프로젝트 참가 성공:", result);
+      console.log(
+        "프로젝트 참가 성공:",
+        result,
+      );
 
       const data = result?.data;
 
@@ -347,16 +369,30 @@ function ProjectList() {
       saveSelectedProject(joinedProject);
 
       if (data?.memberId) {
-        localStorage.setItem("projectMemberId", String(data.memberId));
+        localStorage.setItem(
+          "projectMemberId",
+          String(data.memberId),
+        );
       }
 
       if (data?.role) {
-        localStorage.setItem("projectRole", data.role);
+        localStorage.setItem(
+          "projectRole",
+          data.role,
+        );
       }
 
       if (data?.accessScope) {
-        localStorage.setItem("projectAccessScope", data.accessScope);
+        localStorage.setItem(
+          "projectAccessScope",
+          data.accessScope,
+        );
       }
+
+      /*
+        현재 화면에서도 즉시
+        참가하기 버튼 제거
+      */
 
       setProjects((prev) =>
         prev.map((item) =>
@@ -369,7 +405,10 @@ function ProjectList() {
         ),
       );
 
-      alert(result?.message || "프로젝트에 참가했습니다.");
+      alert(
+        result?.message ||
+          "프로젝트에 참가했습니다.",
+      );
 
       navigate(`/cycle/${project.cycleId}`, {
         state: {
@@ -377,7 +416,8 @@ function ProjectList() {
 
           joined: true,
 
-          projectId: data?.projectId || projectId,
+          projectId:
+            data?.projectId || projectId,
 
           cycleId: project.cycleId,
 
@@ -389,7 +429,10 @@ function ProjectList() {
         },
       });
     } catch (error) {
-      console.error("프로젝트 참가 실패:", error);
+      console.error(
+        "프로젝트 참가 실패:",
+        error,
+      );
 
       switch (error.code) {
         case "401UNAUTHORIZED":
@@ -405,22 +448,30 @@ function ProjectList() {
           break;
 
         case "403PROJECT_ACCESS_DENIED":
-          alert("현재 사용자의 회사는 이 프로젝트의 참여 회사가 아닙니다.");
+          alert(
+            "현재 사용자의 회사는 이 프로젝트의 참여 회사가 아닙니다.",
+          );
 
           break;
 
         case "404PROJECT_NOT_FOUND":
-          alert("프로젝트를 찾을 수 없습니다.");
+          alert(
+            "프로젝트를 찾을 수 없습니다.",
+          );
 
           break;
 
         case "404TEAM_NOT_FOUND":
-          alert("사용자 회사에 배정 가능한 프로젝트 팀이 없습니다.");
+          alert(
+            "사용자 회사에 배정 가능한 프로젝트 팀이 없습니다.",
+          );
 
           break;
 
         case "409ALREADY_PROJECT_MEMBER":
-          alert("이미 참가한 프로젝트입니다.");
+          alert(
+            "이미 참가한 프로젝트입니다.",
+          );
 
           setProjects((prev) =>
             prev.map((item) =>
@@ -439,7 +490,10 @@ function ProjectList() {
           if (error.status === 401) {
             alert("로그인이 필요합니다.");
           } else {
-            alert(error.message || "프로젝트 참가에 실패했습니다.");
+            alert(
+              error.message ||
+                "프로젝트 참가에 실패했습니다.",
+            );
           }
       }
     } finally {
@@ -448,12 +502,14 @@ function ProjectList() {
   };
 
   /* =========================
-     현재 선택 필터 이름
+     현재 필터 이름
   ========================= */
 
   const selectedStatusLabel =
-    STATUS_OPTIONS.find((option) => option.value === selectedStatus)?.label ||
-    "모든 프로젝트";
+    STATUS_OPTIONS.find(
+      (option) =>
+        option.value === selectedStatus,
+    )?.label || "모든 프로젝트";
 
   /* =========================
      필터 선택
@@ -470,7 +526,9 @@ function ProjectList() {
   ========================= */
 
   const activeProjectCount = projects.filter(
-    (project) => !project.status || project.status === "ACTIVE",
+    (project) =>
+      !project.status ||
+      project.status === "ACTIVE",
   ).length;
 
   return (
@@ -481,13 +539,16 @@ function ProjectList() {
 
       <div className={styles.header}>
         <div className={styles.headerText}>
-          <h1 className={styles.title}>프로젝트</h1>
+          <h1 className={styles.title}>
+            프로젝트
+          </h1>
 
           <p className={styles.summary}>
             총{" "}
             {selectedStatus === "ACTIVE"
               ? projects.length
-              : activeProjectCount || projects.length}
+              : activeProjectCount ||
+                projects.length}
             개의 프로젝트가 진행 중입니다.
           </p>
         </div>
@@ -499,7 +560,9 @@ function ProjectList() {
             onClick={handleRefresh}
             disabled={isLoading}
           >
-            {isLoading ? "새로 고침 중" : "새로 고침"}
+            {isLoading
+              ? "새로 고침 중"
+              : "새로 고침"}
           </button>
 
           <button
@@ -527,9 +590,13 @@ function ProjectList() {
           <button
             type="button"
             className={`${styles.statusFilterButton} ${
-              isStatusOpen ? styles.statusFilterButtonOpen : ""
+              isStatusOpen
+                ? styles.statusFilterButtonOpen
+                : ""
             }`}
-            onClick={() => setIsStatusOpen((prev) => !prev)}
+            onClick={() =>
+              setIsStatusOpen((prev) => !prev)
+            }
           >
             <span>{selectedStatusLabel}</span>
 
@@ -537,7 +604,9 @@ function ProjectList() {
               src={dropdownIcon}
               alt=""
               className={`${styles.statusDropdownIcon} ${
-                isStatusOpen ? styles.statusDropdownIconOpen : ""
+                isStatusOpen
+                  ? styles.statusDropdownIconOpen
+                  : ""
               }`}
             />
           </button>
@@ -545,21 +614,34 @@ function ProjectList() {
           {isStatusOpen && (
             <div className={styles.statusMenu}>
               {STATUS_OPTIONS.map((option) => {
-                const isSelected = selectedStatus === option.value;
+                const isSelected =
+                  selectedStatus === option.value;
 
                 return (
                   <button
                     key={option.value || "ALL"}
                     type="button"
                     className={`${styles.statusOption} ${
-                      isSelected ? styles.statusOptionActive : ""
+                      isSelected
+                        ? styles.statusOptionActive
+                        : ""
                     }`}
-                    onClick={() => handleStatusSelect(option.value)}
+                    onClick={() =>
+                      handleStatusSelect(
+                        option.value,
+                      )
+                    }
                   >
                     <span>{option.label}</span>
 
                     {isSelected && (
-                      <span className={styles.statusCheck}>✓</span>
+                      <span
+                        className={
+                          styles.statusCheck
+                        }
+                      >
+                        ✓
+                      </span>
                     )}
                   </button>
                 );
@@ -574,7 +656,9 @@ function ProjectList() {
       ========================= */}
 
       {isLoading && (
-        <p className={styles.stateMessage}>프로젝트를 불러오는 중입니다.</p>
+        <p className={styles.stateMessage}>
+          프로젝트를 불러오는 중입니다.
+        </p>
       )}
 
       {/* =========================
@@ -582,129 +666,246 @@ function ProjectList() {
       ========================= */}
 
       {!isLoading && errorMessage && (
-        <p className={styles.errorMessage}>{errorMessage}</p>
+        <p className={styles.errorMessage}>
+          {errorMessage}
+        </p>
       )}
 
       {/* =========================
           EMPTY
       ========================= */}
 
-      {!isLoading && !errorMessage && projects.length === 0 && (
-        <p className={styles.stateMessage}>등록된 프로젝트가 없습니다.</p>
-      )}
+      {!isLoading &&
+        !errorMessage &&
+        projects.length === 0 && (
+          <p className={styles.stateMessage}>
+            등록된 프로젝트가 없습니다.
+          </p>
+        )}
 
       {/* =========================
           PROJECT LIST
       ========================= */}
 
-      {!isLoading && !errorMessage && projects.length > 0 && (
-        <div className={styles.projectList}>
-          {projects.map((project) => {
-            const cycleText =
-              project.cycleName ||
-              project.currentCycleName ||
-              (project.cycleNumber
-                ? `Cycle ${project.cycleNumber}`
-                : project.cycleId
-                  ? `Cycle ${project.cycleId}`
-                  : "Cycle");
+      {!isLoading &&
+        !errorMessage &&
+        projects.length > 0 && (
+          <div className={styles.projectList}>
+            {projects.map((project) => {
+              /* =========================
+                 Cycle
+              ========================= */
 
-            const progress =
-              Number(project.progressRate ?? project.progress ?? 0) || 0;
+              const cycleText =
+                project.cycleName ||
+                project.currentCycleName ||
+                (project.cycleNumber
+                  ? `Cycle ${project.cycleNumber}`
+                  : project.cycleId
+                    ? `Cycle ${project.cycleId}`
+                    : "Cycle");
 
-            const partnerCompanyName = getPartnerCompanyName(project);
+              /* =========================
+                 Progress
+              ========================= */
 
-            const issueCount =
-              project.issueCount ??
-              project.totalIssueCount ??
-              project.totalIssues ??
-              0;
+              const progress =
+                Number(
+                  project.progressRate ??
+                    project.progress ??
+                    0,
+                ) || 0;
 
-            const completedIssueCount =
-              project.completedIssueCount ??
-              project.completeIssueCount ??
-              project.completedIssues ??
-              0;
+              /* =========================
+                 Partner
+              ========================= */
 
-            const isJoining = joiningProjectId === project.projectId;
+              const partnerCompanyName =
+                getPartnerCompanyName(project);
 
-            return (
-              <article
-                key={project.projectId}
-                className={styles.projectCard}
-                onClick={() => handleProjectClick(project)}
-              >
-                {/* CARD TOP */}
+              /* =========================
+                 Issue
+              ========================= */
 
-                <div className={styles.cardTop}>
-                  <div className={styles.projectInfo}>
-                    <h3>{project.name}</h3>
+              const issueCount =
+                project.issueCount ??
+                project.totalIssueCount ??
+                project.totalIssues ??
+                0;
 
-                    <p className={styles.partnerText}>
-                      파트너사 · {partnerCompanyName}
-                    </p>
-                  </div>
+              const completedIssueCount =
+                project.completedIssueCount ??
+                project.completeIssueCount ??
+                project.completedIssues ??
+                0;
 
-                  <div className={styles.cardActions}>
-                    {!project.joined && (
+              const isJoining =
+                joiningProjectId ===
+                project.projectId;
+
+              return (
+                <article
+                  key={project.projectId}
+                  className={styles.projectCard}
+                  onClick={() =>
+                    handleProjectClick(project)
+                  }
+                >
+                  {/* =========================
+                      CARD TOP
+                  ========================= */}
+
+                  <div className={styles.cardTop}>
+                    <div
+                      className={
+                        styles.projectInfo
+                      }
+                    >
+                      <h3>{project.name}</h3>
+
+                      <p
+                        className={
+                          styles.partnerText
+                        }
+                      >
+                        파트너사 ·{" "}
+                        {partnerCompanyName}
+                      </p>
+                    </div>
+
+                    {/* =========================
+                        ACTIONS
+                    ========================= */}
+
+                    <div
+                      className={
+                        styles.cardActions
+                      }
+                    >
+                      {!project.joined && (
+                        <button
+                          type="button"
+                          className={
+                            styles.joinButton
+                          }
+                          disabled={isJoining}
+                          onClick={(event) =>
+                            handleJoinProject(
+                              event,
+                              project,
+                            )
+                          }
+                        >
+                          {isJoining
+                            ? "참가 중..."
+                            : "참가하기"}
+                        </button>
+                      )}
+
                       <button
                         type="button"
-                        className={styles.joinButton}
-                        disabled={isJoining}
-                        onClick={(event) => handleJoinProject(event, project)}
+                        className={
+                          styles.settingButton
+                        }
+                        onClick={(event) => {
+                          event.stopPropagation();
+
+                          handleProjectSettings(
+                            project,
+                          );
+                        }}
+                        aria-label="프로젝트 설정"
                       >
-                        {isJoining ? "참가 중..." : "참가하기"}
+                        <img
+                          src={settingIcon}
+                          alt=""
+                        />
                       </button>
-                    )}
-
-                    <button
-                      type="button"
-                      className={styles.settingButton}
-                      onClick={(event) => {
-                        event.stopPropagation();
-
-                        handleProjectSettings(project);
-                      }}
-                      aria-label="프로젝트 설정"
-                    >
-                      <img src={settingIcon} alt="" />
-                    </button>
+                    </div>
                   </div>
-                </div>
 
-                {/* CYCLE */}
+                  {/* =========================
+                      CYCLE
+                  ========================= */}
 
-                <p className={styles.cycleText}>{cycleText}</p>
+                  <p
+                    className={
+                      styles.cycleText
+                    }
+                  >
+                    {cycleText}
+                  </p>
 
-                {/* PROGRESS */}
+                  {/* =========================
+                      PROGRESS
+                  ========================= */}
 
-                <div className={styles.progressRow}>
-                  <div className={styles.progressBar}>
+                  <div
+                    className={
+                      styles.progressRow
+                    }
+                  >
                     <div
-                      className={styles.progressFill}
-                      style={{
-                        width: `${Math.min(Math.max(progress, 0), 100)}%`,
-                      }}
-                    />
+                      className={
+                        styles.progressBar
+                      }
+                    >
+                      <div
+                        className={
+                          styles.progressFill
+                        }
+                        style={{
+                          width: `${Math.min(
+                            Math.max(
+                              progress,
+                              0,
+                            ),
+                            100,
+                          )}%`,
+                        }}
+                      />
+                    </div>
+
+                    <span
+                      className={
+                        styles.progressText
+                      }
+                    >
+                      {progress}%
+                    </span>
                   </div>
 
-                  <span className={styles.progressText}>{progress}%</span>
-                </div>
+                  {/* =========================
+                      ISSUE INFO
+                  ========================= */}
 
-                {/* ISSUE */}
+                  <div
+                    className={
+                      styles.issueInfo
+                    }
+                  >
+                    <span>
+                      이슈 {issueCount}
+                    </span>
 
-                <div className={styles.issueInfo}>
-                  <span>이슈 {issueCount}</span>
+                    <span
+                      className={
+                        styles.separator
+                      }
+                    >
+                      ·
+                    </span>
 
-                  <span className={styles.separator}>·</span>
-
-                  <span>완료 {completedIssueCount}</span>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      )}
+                    <span>
+                      완료{" "}
+                      {completedIssueCount}
+                    </span>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
     </section>
   );
 }
