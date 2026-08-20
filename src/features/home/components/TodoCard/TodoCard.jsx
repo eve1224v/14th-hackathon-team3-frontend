@@ -7,39 +7,72 @@ function TodoCard({
   manager,
   startDate,
   endDate,
+  dueLabel,
 }) {
   return (
-    <article className={styles.todoCard}>
-      <div className={styles.todoLeft}>
-        <div className={styles.todoTitle}>
-          <span className={styles.todoDot} />
+    <article
+      className={
+        styles.todoCard
+      }
+    >
+      <div
+        className={
+          styles.todoLeft
+        }
+      >
+        <div
+          className={
+            styles.todoTitle
+          }
+        >
+          <span
+            className={
+              styles.todoDot
+            }
+          />
 
           <strong>
             {title}
           </strong>
         </div>
 
-        <p>
-          프로젝트 · {project}
-        </p>
 
         <p>
-          담당자 · {manager}
+          프로젝트 ·{" "}
+          {project}
+        </p>
+
+
+        <p>
+          담당자 ·{" "}
+          {manager}
         </p>
       </div>
 
-      <div className={styles.todoRight}>
+
+      <div
+        className={
+          styles.todoRight
+        }
+      >
         <strong>
-          오늘까지
+          {dueLabel}
         </strong>
 
-        <div className={styles.todoDates}>
+
+        <div
+          className={
+            styles.todoDates
+          }
+        >
           <span>
-            시작일 {startDate}
+            시작일{" "}
+            {startDate}
           </span>
 
           <span>
-            마감일 {endDate}
+            마감일{" "}
+            {endDate}
           </span>
         </div>
       </div>

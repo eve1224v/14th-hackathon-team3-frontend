@@ -1,46 +1,127 @@
 import styles from "./ProjectCard.module.css";
 
 
+/* ========================================
+   상태 한글 변환
+======================================== */
+
+const getStatusText = (status) => {
+  switch (status) {
+    case "DRAFT":
+      return "초안";
+
+    case "ACTIVE":
+      return "진행 중";
+
+    case "ENDED":
+      return "종료";
+
+    default:
+      return status || "-";
+  }
+};
+
+
 function ProjectCard({
-  title,
-  company,
-  cycle,
-  progress,
-  issueCount,
-  completeCount,
+  name,
+  status,
+  startDate,
+  endDate,
+  memberCount,
 }) {
+  /*
+    현재 프로젝트 목록 API에는
+    진행률 값이 없기 때문에
+    기존 프로젝트 페이지와 동일하게
+    디자인 유지용 78% 사용
+  */
+
+  const progress = 78;
+
+
   return (
-    <article className={styles.projectCard}>
+    <article
+      className={
+        styles.projectCard
+      }
+    >
+      {/* 프로젝트명 */}
+
       <h3>
-        {title}
+        {name || "프로젝트"}
       </h3>
 
-      <p className={styles.projectCompany}>
-        {company}
+
+      {/* 상태 */}
+
+      <p
+        className={
+          styles.projectStatus
+        }
+      >
+        {getStatusText(
+          status,
+        )}
       </p>
 
-      <p className={styles.projectCycle}>
-        {cycle}
+
+      {/* 프로젝트 기간 */}
+
+      <p
+        className={
+          styles.projectPeriod
+        }
+      >
+        {startDate || "-"}
+        {" ~ "}
+        {endDate || "-"}
       </p>
 
-      <div className={styles.progressRow}>
-        <div className={styles.progressTrack}>
+
+      {/* 멤버 */}
+
+      <p
+        className={
+          styles.projectMember
+        }
+      >
+        멤버{" "}
+        {memberCount ?? 0}명
+      </p>
+
+
+      {/* 진행률 */}
+
+      <div
+        className={
+          styles.progressRow
+        }
+      >
+        <div
+          className={
+            styles.progressTrack
+          }
+        >
           <div
-            className={styles.progressFill}
+            className={
+              styles.progressFill
+            }
             style={{
-              width: `${progress}%`,
+              width:
+                `${progress}%`,
             }}
           />
         </div>
 
-        <span className={styles.progressText}>
+
+        <span
+          className={
+            styles.progressText
+          }
+        >
           {progress}%
         </span>
       </div>
-
-      <p className={styles.projectMeta}>
-        이슈 {issueCount} · 완료 {completeCount}
-      </p>
     </article>
   );
 }
