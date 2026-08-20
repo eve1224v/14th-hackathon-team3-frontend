@@ -16,50 +16,61 @@ import {
 } from "../../../../api/projectApi";
 
 
-const normalizeName = (
-  value,
-) =>
-  String(value || "")
-    .trim()
-    .toLowerCase();
+const normalizeName =
+  (
+    value
+  ) =>
+    String(
+      value ||
+        ""
+    )
+      .trim()
+      .toLowerCase();
 
 
-const belongsToTeam = (
-  member,
-  team,
-) => {
-  if (
-    !member ||
-    !team
-  ) {
-    return false;
-  }
+const belongsToTeam =
+  (
+    member,
+    team
+  ) => {
+    if (
+      !member ||
+      !team
+    ) {
+      return false;
+    }
 
 
-  if (
-    member.teamId != null &&
-    team.teamId != null
-  ) {
+    if (
+      member.teamId !=
+        null &&
+      team.teamId !=
+        null
+    ) {
+      return (
+        Number(
+          member.teamId
+        ) ===
+        Number(
+          team.teamId
+        )
+      );
+    }
+
+
     return (
-      Number(member.teamId) ===
-      Number(team.teamId)
-    );
-  }
-
-
-  return (
-    Boolean(
-      member.teamName &&
-      team.teamName,
-    ) &&
-    normalizeName(
-      member.teamName,
-    ) ===
+      Boolean(
+        member.teamName &&
+        team.teamName
+      ) &&
       normalizeName(
-        team.teamName,
-      )
-  );
-};
+        member.teamName
+      ) ===
+        normalizeName(
+          team.teamName
+        )
+    );
+  };
 
 
 const MONTH_NAMES = [
@@ -93,6 +104,7 @@ function TransferInfoPanel({
   initialDelivery = null,
   onChange,
   onSave,
+  isLocked = false,
 }) {
   const calendarRef =
     useRef(null);
@@ -161,7 +173,9 @@ function TransferInfoPanel({
   const [
     timingOption,
     setTimingOption,
-  ] = useState("next");
+  ] = useState(
+    "next"
+  );
 
 
   const [
@@ -174,7 +188,8 @@ function TransferInfoPanel({
     selectedDate,
     setSelectedDate,
   ] = useState(
-    () => new Date(),
+    () =>
+      new Date()
   );
 
 
@@ -182,7 +197,8 @@ function TransferInfoPanel({
     calendarMonth,
     setCalendarMonth,
   ] = useState(
-    () => new Date(),
+    () =>
+      new Date()
   );
 
 
@@ -192,15 +208,17 @@ function TransferInfoPanel({
 
   useEffect(() => {
     const handleOutsideClick =
-      (event) => {
+      (
+        event
+      ) => {
         if (
           calendarRef.current &&
           !calendarRef.current.contains(
-            event.target,
+            event.target
           )
         ) {
           setIsCalendarOpen(
-            false,
+            false
           );
         }
       };
@@ -208,14 +226,14 @@ function TransferInfoPanel({
 
     document.addEventListener(
       "mousedown",
-      handleOutsideClick,
+      handleOutsideClick
     );
 
 
     return () =>
       document.removeEventListener(
         "mousedown",
-        handleOutsideClick,
+        handleOutsideClick
       );
   }, []);
 
@@ -233,11 +251,13 @@ function TransferInfoPanel({
       async () => {
         const projectId =
           localStorage.getItem(
-            "projectId",
+            "projectId"
           );
 
 
-        if (!projectId) {
+        if (
+          !projectId
+        ) {
           return;
         }
 
@@ -249,11 +269,15 @@ function TransferInfoPanel({
           ] =
             await Promise.all([
               getProjectDetail(
-                projectId,
+                projectId
               ),
 
               getProjectMembers(
                 projectId,
+                {
+                  status:
+                    "ACTIVE",
+                }
               ),
             ]);
 
@@ -267,13 +291,13 @@ function TransferInfoPanel({
 
           console.log(
             "인수인계 전달 프로젝트 정보:",
-            projectResponse,
+            projectResponse
           );
 
 
           console.log(
             "인수인계 전달 멤버 정보:",
-            memberResponse,
+            memberResponse
           );
 
 
@@ -281,7 +305,7 @@ function TransferInfoPanel({
             Array.isArray(
               projectResponse
                 ?.data
-                ?.teamSchedules,
+                ?.teamSchedules
             )
               ? projectResponse
                   .data
@@ -293,7 +317,7 @@ function TransferInfoPanel({
             Array.isArray(
               memberResponse
                 ?.data
-                ?.members,
+                ?.members
             )
               ? memberResponse
                   .data
@@ -302,39 +326,60 @@ function TransferInfoPanel({
 
 
           setTeams(
-            teamList,
+            teamList
           );
 
 
           setMembers(
-            memberList,
+            memberList
           );
 
 
-          /* =========================
-             전달 팀
-          ========================= */
+          /*
+            멤버가 실제로 있는 팀을
+            기본값으로 우선 사용
+          */
+
+          const firstTeamWithMember =
+            teamList.find(
+              (
+                team
+              ) =>
+                memberList.some(
+                  (
+                    member
+                  ) =>
+                    belongsToTeam(
+                      member,
+                      team
+                    )
+                )
+            ) ||
+            teamList[0] ||
+            null;
+
 
           const initialTeamId =
             initialDelivery
               ?.targetTeamId ??
-            teamList[0]
+            firstTeamWithMember
               ?.teamId ??
             null;
 
 
           const initialTeam =
             teamList.find(
-              (team) =>
+              (
+                team
+              ) =>
                 Number(
-                  team.teamId,
+                  team.teamId
                 ) ===
                 Number(
-                  initialTeamId,
-                ),
+                  initialTeamId
+                )
             ) ||
-            teamList[0] ||
-            null;
+            firstTeamWithMember;
 
 
           const teamId =
@@ -343,51 +388,49 @@ function TransferInfoPanel({
             null;
 
 
-          const resolvedTeamName =
-            initialTeam
-              ?.teamName ||
-            "";
-
-
           setSelectedTeamId(
-            teamId,
+            teamId
           );
 
 
           setTeamName(
-            resolvedTeamName,
+            initialTeam
+              ?.teamName ||
+              ""
           );
 
 
           setEditTeamName(
-            resolvedTeamName,
+            initialTeam
+              ?.teamName ||
+              ""
           );
 
 
-          /* =========================
-             전달 담당자
-          ========================= */
-
           const teamMembers =
             memberList.filter(
-              (member) =>
+              (
+                member
+              ) =>
                 belongsToTeam(
                   member,
-                  initialTeam,
-                ),
+                  initialTeam
+                )
             );
 
 
           const initialMember =
             teamMembers.find(
-              (member) =>
+              (
+                member
+              ) =>
                 Number(
-                  member.memberId,
+                  member.memberId
                 ) ===
                 Number(
                   initialDelivery
-                    ?.recipientMemberId,
-                ),
+                    ?.recipientMemberId
+                )
             ) ||
             teamMembers[0] ||
             null;
@@ -399,24 +442,22 @@ function TransferInfoPanel({
             null;
 
 
-          const resolvedManagerName =
-            initialMember
-              ?.name ||
-            "";
-
-
           setSelectedMemberId(
-            memberId,
+            memberId
           );
 
 
           setManagerName(
-            resolvedManagerName,
+            initialMember
+              ?.name ||
+              ""
           );
 
 
           setEditManagerName(
-            resolvedManagerName,
+            initialMember
+              ?.name ||
+              ""
           );
 
 
@@ -426,19 +467,21 @@ function TransferInfoPanel({
             "NEXT_SHIFT_START"
           ) {
             setTimingOption(
-              "next",
+              "next"
             );
           }
-        } catch (error) {
+        } catch (
+          error
+        ) {
           console.error(
             "인수인계 전달 정보 조회 실패:",
-            error,
+            error
           );
         }
       };
 
 
-    fetchTransferData();
+    void fetchTransferData();
 
 
     return () => {
@@ -457,53 +500,49 @@ function TransferInfoPanel({
   ]);
 
 
-  /* ==================================================
-     선택된 팀
-  ================================================== */
-
   const selectedTeam =
     useMemo(
       () =>
         teams.find(
-          (team) =>
+          (
+            team
+          ) =>
             Number(
-              team.teamId,
+              team.teamId
             ) ===
             Number(
-              selectedTeamId,
-            ),
+              selectedTeamId
+            )
         ) ||
         null,
 
       [
         teams,
         selectedTeamId,
-      ],
+      ]
     );
 
-
-  /* ==================================================
-     선택된 담당자
-  ================================================== */
 
   const selectedMember =
     useMemo(
       () =>
         members.find(
-          (member) =>
+          (
+            member
+          ) =>
             Number(
-              member.memberId,
+              member.memberId
             ) ===
             Number(
-              selectedMemberId,
-            ),
+              selectedMemberId
+            )
         ) ||
         null,
 
       [
         members,
         selectedMemberId,
-      ],
+      ]
     );
 
 
@@ -518,7 +557,7 @@ function TransferInfoPanel({
       ?.workStartTime
       ?.slice(
         0,
-        5,
+        5
       ) ||
     "09:00";
 
@@ -533,63 +572,68 @@ function TransferInfoPanel({
 
 
   /* ==================================================
-     Calendar 날짜
+     달력
   ================================================== */
 
   const calendarDays =
-    useMemo(() => {
-      const year =
-        calendarMonth.getFullYear();
+    useMemo(
+      () => {
+        const year =
+          calendarMonth.getFullYear();
 
 
-      const month =
-        calendarMonth.getMonth();
+        const month =
+          calendarMonth.getMonth();
 
 
-      const firstDay =
-        new Date(
-          year,
-          month,
-          1,
-        );
-
-
-      const start =
-        new Date(
-          year,
-          month,
-          1 -
-            firstDay.getDay(),
-        );
-
-
-      return Array.from(
-        {
-          length: 42,
-        },
-
-        (
-          _,
-          index,
-        ) => {
-          const date =
-            new Date(
-              start,
-            );
-
-
-          date.setDate(
-            start.getDate() +
-              index,
+        const firstDay =
+          new Date(
+            year,
+            month,
+            1
           );
 
 
-          return date;
-        },
-      );
-    }, [
-      calendarMonth,
-    ]);
+        const start =
+          new Date(
+            year,
+            month,
+            1 -
+              firstDay.getDay()
+          );
+
+
+        return Array.from(
+          {
+            length:
+              42,
+          },
+
+          (
+            _,
+            index
+          ) => {
+            const date =
+              new Date(
+                start
+              );
+
+
+            date.setDate(
+              start.getDate() +
+                index
+            );
+
+
+            return date;
+          }
+        );
+      },
+
+      [
+        calendarMonth,
+      ]
+    );
 
 
   const formattedDate =
@@ -604,16 +648,16 @@ function TransferInfoPanel({
 
         weekday:
           "short",
-      },
+      }
     ).format(
-      selectedDate,
+      selectedDate
     );
 
 
   const isSameDate =
     (
       left,
-      right,
+      right
     ) =>
       left.getFullYear() ===
         right.getFullYear() &&
@@ -624,7 +668,7 @@ function TransferInfoPanel({
 
 
   /* ==================================================
-     현재 전달 정보
+     delivery 값
   ================================================== */
 
   const getDeliveryValue =
@@ -634,77 +678,93 @@ function TransferInfoPanel({
           selectedTeamId,
 
         memberId =
-          selectedMemberId,
-      ) => {
-        return {
-          targetTeamId:
-            teamId
-              ? Number(
-                  teamId,
-                )
-              : null,
+          selectedMemberId
+      ) => ({
+        targetTeamId:
+          teamId
+            ? Number(
+                teamId
+              )
+            : null,
 
-          recipientMemberId:
-            memberId
-              ? Number(
-                  memberId,
-                )
-              : null,
+        recipientMemberId:
+          memberId
+            ? Number(
+                memberId
+              )
+            : null,
 
-          timingType:
-            timingOption ===
-            "next"
-              ? "NEXT_SHIFT_START"
-              : null,
+        timingType:
+          timingOption ===
+          "next"
+            ? "NEXT_SHIFT_START"
+            : null,
 
-          scheduledAt:
-            null,
+        scheduledAt:
+          null,
 
-          timezone,
-        };
-      },
+        timezone,
+      }),
 
       [
         selectedTeamId,
         selectedMemberId,
         timingOption,
         timezone,
-      ],
+      ]
     );
 
 
   /* ==================================================
-     부모에게 현재 전달 정보 전달
+     부모로 전달
+
+     teamId/memberId가 준비되기 전에는
+     null delivery로 부모 값을 덮어쓰지 않음
   ================================================== */
 
   useEffect(() => {
+    if (
+      !selectedTeamId ||
+      !selectedMemberId
+    ) {
+      return;
+    }
+
+
     onChange?.(
-      getDeliveryValue(),
+      getDeliveryValue()
     );
   }, [
+    selectedTeamId,
+    selectedMemberId,
+    timingOption,
+    timezone,
     getDeliveryValue,
     onChange,
   ]);
 
 
-  /* ==================================================
-     수정 시작
-  ================================================== */
-
   const handleEdit =
     () => {
+      if (
+        isLocked
+      ) {
+        return;
+      }
+
+
       setEditTeamName(
-        teamName,
+        teamName
       );
 
 
       setEditManagerName(
-        managerName,
+        managerName
       );
 
 
       setIsEditing(
-        true,
+        true
       );
     };
 
@@ -715,6 +775,13 @@ function TransferInfoPanel({
 
   const handleSave =
     async () => {
+      if (
+        isLocked
+      ) {
+        return;
+      }
+
+
       const trimmedTeamName =
         editTeamName.trim();
 
@@ -727,7 +794,7 @@ function TransferInfoPanel({
         !trimmedTeamName
       ) {
         alert(
-          "팀을 입력해주세요.",
+          "팀을 입력해주세요."
         );
 
 
@@ -737,13 +804,15 @@ function TransferInfoPanel({
 
       const matchedTeam =
         teams.find(
-          (team) =>
+          (
+            team
+          ) =>
             normalizeName(
-              team.teamName,
+              team.teamName
             ) ===
             normalizeName(
-              trimmedTeamName,
-            ),
+              trimmedTeamName
+            )
         );
 
 
@@ -751,7 +820,7 @@ function TransferInfoPanel({
         !matchedTeam
       ) {
         alert(
-          "프로젝트에 등록된 팀 이름을 입력해주세요.",
+          "프로젝트에 등록된 팀 이름을 입력해주세요."
         );
 
 
@@ -763,7 +832,7 @@ function TransferInfoPanel({
         !trimmedManagerName
       ) {
         alert(
-          "담당자를 입력해주세요.",
+          "담당자를 입력해주세요."
         );
 
 
@@ -773,17 +842,19 @@ function TransferInfoPanel({
 
       const matchedMember =
         members.find(
-          (member) =>
+          (
+            member
+          ) =>
             belongsToTeam(
               member,
-              matchedTeam,
+              matchedTeam
             ) &&
             normalizeName(
-              member.name,
+              member.name
             ) ===
               normalizeName(
-                trimmedManagerName,
-              ),
+                trimmedManagerName
+              )
         );
 
 
@@ -791,7 +862,7 @@ function TransferInfoPanel({
         !matchedMember
       ) {
         alert(
-          "선택한 팀에 등록된 담당자를 입력해주세요.",
+          "선택한 팀에 등록된 프로젝트 멤버를 입력해주세요."
         );
 
 
@@ -804,7 +875,7 @@ function TransferInfoPanel({
         "now"
       ) {
         alert(
-          "지금 바로 전달의 timingType 값이 아직 확인되지 않았습니다. 현재는 다음 업무 시작 시간 전달로 테스트해주세요.",
+          "현재는 다음 업무 시작 시간 전달만 지원합니다."
         );
 
 
@@ -815,12 +886,12 @@ function TransferInfoPanel({
       const nextDelivery = {
         targetTeamId:
           Number(
-            matchedTeam.teamId,
+            matchedTeam.teamId
           ),
 
         recipientMemberId:
           Number(
-            matchedMember.memberId,
+            matchedMember.memberId
           ),
 
         timingType:
@@ -837,71 +908,81 @@ function TransferInfoPanel({
 
       try {
         setIsSaving(
-          true,
+          true
         );
 
 
         await onSave?.(
-          nextDelivery,
+          nextDelivery
         );
 
 
         setSelectedTeamId(
-          matchedTeam.teamId,
+          matchedTeam.teamId
         );
 
 
         setSelectedMemberId(
-          matchedMember.memberId,
+          matchedMember.memberId
         );
 
 
         setTeamName(
           matchedTeam.teamName ||
-            "",
+            ""
         );
 
 
         setManagerName(
           matchedMember.name ||
-            "",
+            ""
         );
 
 
         onChange?.(
-          nextDelivery,
+          nextDelivery
         );
 
 
         setIsCalendarOpen(
-          false,
+          false
         );
 
 
         setIsEditing(
-          false,
+          false
         );
-      } catch (error) {
+      } catch (
+        error
+      ) {
         console.error(
           "전달 정보 저장 실패:",
-          error,
+          error
+        );
+
+
+        alert(
+          error.response
+            ?.data
+            ?.message ||
+            error.data
+              ?.message ||
+            error.message ||
+            "전달 정보 저장에 실패했습니다."
         );
       } finally {
         setIsSaving(
-          false,
+          false
         );
       }
     };
 
 
-  /* ==================================================
-     달력 열기
-  ================================================== */
-
   const handleCalendarToggle =
     () => {
       if (
         !isEditing ||
+        isLocked ||
         timingOption !==
           "next"
       ) {
@@ -910,8 +991,10 @@ function TransferInfoPanel({
 
 
       setIsCalendarOpen(
-        (open) =>
-          !open,
+        (
+          open
+        ) =>
+          !open
       );
     };
 
@@ -922,10 +1005,6 @@ function TransferInfoPanel({
         styles.panel
       }
     >
-      {/* =========================
-          HEADER
-      ========================= */}
-
       <div
         className={
           styles.header
@@ -942,7 +1021,8 @@ function TransferInfoPanel({
             styles.editButton
           }
           disabled={
-            isSaving
+            isSaving ||
+            isLocked
           }
           onClick={
             isEditing
@@ -950,18 +1030,16 @@ function TransferInfoPanel({
               : handleEdit
           }
         >
-          {isSaving
-            ? "저장 중"
-            : isEditing
-              ? "저장"
-              : "수정"}
+          {isLocked
+            ? "전달 완료"
+            : isSaving
+              ? "저장 중"
+              : isEditing
+                ? "저장"
+                : "수정"}
         </button>
       </div>
 
-
-      {/* =========================
-          전달 대상
-      ========================= */}
 
       <div
         className={
@@ -983,7 +1061,9 @@ function TransferInfoPanel({
           }
         >
           <strong>
-            {companyName}
+            {
+              companyName
+            }
           </strong>
 
 
@@ -1007,10 +1087,10 @@ function TransferInfoPanel({
               editTeamName
             }
             onChange={(
-              event,
+              event
             ) =>
               setEditTeamName(
-                event.target.value,
+                event.target.value
               )
             }
           />
@@ -1026,10 +1106,6 @@ function TransferInfoPanel({
         )}
       </div>
 
-
-      {/* =========================
-          담당자
-      ========================= */}
 
       <div
         className={
@@ -1067,10 +1143,10 @@ function TransferInfoPanel({
                 editManagerName
               }
               onChange={(
-                event,
+                event
               ) =>
                 setEditManagerName(
-                  event.target.value,
+                  event.target.value
                 )
               }
             />
@@ -1083,10 +1159,6 @@ function TransferInfoPanel({
         </div>
       </div>
 
-
-      {/* =========================
-          전달 시점
-      ========================= */}
 
       <div
         className={
@@ -1117,16 +1189,17 @@ function TransferInfoPanel({
             }
             onChange={() => {
               setTimingOption(
-                "now",
+                "now"
               );
 
 
               setIsCalendarOpen(
-                false,
+                false
               );
             }}
             disabled={
-              !isEditing
+              !isEditing ||
+              isLocked
             }
           />
 
@@ -1163,11 +1236,12 @@ function TransferInfoPanel({
             }
             onChange={() =>
               setTimingOption(
-                "next",
+                "next"
               )
             }
             disabled={
-              !isEditing
+              !isEditing ||
+              isLocked
             }
           />
 
@@ -1188,10 +1262,6 @@ function TransferInfoPanel({
           </span>
         </label>
 
-
-        {/* =========================
-            날짜 + Calendar
-        ========================= */}
 
         <div
           className={
@@ -1216,6 +1286,7 @@ function TransferInfoPanel({
             }
             disabled={
               !isEditing ||
+              isLocked ||
               timingOption !==
                 "next"
             }
@@ -1233,12 +1304,9 @@ function TransferInfoPanel({
           </button>
 
 
-          {/* =========================
-              CUSTOM CALENDAR
-          ========================= */}
-
           {isCalendarOpen &&
             isEditing &&
+            !isLocked &&
             timingOption ===
               "next" && (
               <div
@@ -1246,7 +1314,7 @@ function TransferInfoPanel({
                   styles.calendar
                 }
                 onClick={(
-                  event,
+                  event
                 ) =>
                   event.stopPropagation()
                 }
@@ -1260,16 +1328,17 @@ function TransferInfoPanel({
                     type="button"
                     onClick={() =>
                       setCalendarMonth(
-                        (date) =>
+                        (
+                          date
+                        ) =>
                           new Date(
                             date.getFullYear(),
                             date.getMonth() -
                               1,
-                            1,
-                          ),
+                            1
+                          )
                       )
                     }
-                    aria-label="이전 달"
                   >
                     ‹
                   </button>
@@ -1291,16 +1360,17 @@ function TransferInfoPanel({
                     type="button"
                     onClick={() =>
                       setCalendarMonth(
-                        (date) =>
+                        (
+                          date
+                        ) =>
                           new Date(
                             date.getFullYear(),
                             date.getMonth() +
                               1,
-                            1,
-                          ),
+                            1
+                          )
                       )
                     }
-                    aria-label="다음 달"
                   >
                     ›
                   </button>
@@ -1320,7 +1390,9 @@ function TransferInfoPanel({
                   }
                 >
                   {WEEKDAYS.map(
-                    (day) => (
+                    (
+                      day
+                    ) => (
                       <span
                         key={
                           day
@@ -1329,14 +1401,18 @@ function TransferInfoPanel({
                           styles.weekday
                         }
                       >
-                        {day}
+                        {
+                          day
+                        }
                       </span>
-                    ),
+                    )
                   )}
 
 
                   {calendarDays.map(
-                    (date) => {
+                    (
+                      date
+                    ) => {
                       const isOtherMonth =
                         date.getMonth() !==
                         calendarMonth.getMonth();
@@ -1344,14 +1420,14 @@ function TransferInfoPanel({
 
                       const isSunday =
                         date.getDay() ===
-                        0 &&
+                          0 &&
                         !isOtherMonth;
 
 
                       const isSelected =
                         isSameDate(
                           date,
-                          selectedDate,
+                          selectedDate
                         );
 
 
@@ -1377,19 +1453,19 @@ function TransferInfoPanel({
                               : "",
                           ]
                             .filter(
-                              Boolean,
+                              Boolean
                             )
                             .join(
-                              " ",
+                              " "
                             )}
                           onClick={() => {
                             setSelectedDate(
-                              date,
+                              date
                             );
 
 
                             setIsCalendarOpen(
-                              false,
+                              false
                             );
                           }}
                         >
@@ -1398,7 +1474,7 @@ function TransferInfoPanel({
                           }
                         </button>
                       );
-                    },
+                    }
                   )}
                 </div>
               </div>

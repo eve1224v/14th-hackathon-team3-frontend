@@ -5,120 +5,139 @@ import axiosInstance from "./axios";
    이슈 생성
 ========================= */
 
-export const createIssue = async (data) => {
-  const response =
-    await axiosInstance.post(
-      "/api/v1/issues",
-      data
-    );
+export const createIssue =
+  async (
+    data
+  ) => {
+    const response =
+      await axiosInstance.post(
+        "/api/v1/issues",
+        data
+      );
 
-  return response.data;
-};
+
+    return response.data;
+  };
 
 
 /* =========================
    이슈 리스트 조회
 ========================= */
 
-export const getIssues = async (
-  cycleId,
-  {
-    status,
-    priority,
-    assigneeId,
-    keyword,
-    sort = "createdAt,desc",
-    page = 0,
-    size = 20,
-  } = {}
-) => {
-  const params =
-    new URLSearchParams();
+export const getIssues =
+  async (
+    cycleId,
+    {
+      status,
+      priority,
+      assigneeId,
+      keyword,
+      sort = "createdAt,desc",
+      page = 0,
+      size = 20,
+    } = {}
+  ) => {
+    const params =
+      new URLSearchParams();
 
 
-  if (Array.isArray(status)) {
-    status.forEach(
-      (
-        value
-      ) => {
-        if (value) {
-          params.append(
-            "status",
+    if (
+      Array.isArray(
+        status
+      )
+    ) {
+      status.forEach(
+        (
+          value
+        ) => {
+          if (
             value
-          );
+          ) {
+            params.append(
+              "status",
+              value
+            );
+          }
         }
-      }
-    );
-  } else if (status) {
-    params.append(
-      "status",
+      );
+    } else if (
       status
-    );
-  }
+    ) {
+      params.append(
+        "status",
+        status
+      );
+    }
 
 
-  if (priority) {
-    params.append(
-      "priority",
+    if (
       priority
-    );
-  }
+    ) {
+      params.append(
+        "priority",
+        priority
+      );
+    }
 
 
-  if (
-    assigneeId !==
-      undefined &&
-    assigneeId !==
-      null &&
-    assigneeId !==
-      ""
-  ) {
-    params.append(
-      "assigneeId",
-      assigneeId
-    );
-  }
+    if (
+      assigneeId !==
+        undefined &&
+      assigneeId !==
+        null &&
+      assigneeId !==
+        ""
+    ) {
+      params.append(
+        "assigneeId",
+        assigneeId
+      );
+    }
 
 
-  if (keyword) {
-    params.append(
-      "keyword",
+    if (
       keyword
-    );
-  }
+    ) {
+      params.append(
+        "keyword",
+        keyword
+      );
+    }
 
 
-  if (sort) {
-    params.append(
-      "sort",
+    if (
       sort
-    );
-  }
+    ) {
+      params.append(
+        "sort",
+        sort
+      );
+    }
 
 
-  params.append(
-    "page",
-    page
-  );
-
-
-  params.append(
-    "size",
-    size
-  );
-
-
-  const response =
-    await axiosInstance.get(
-      `/api/v1/cycles/${cycleId}/issues`,
-      {
-        params,
-      }
+    params.append(
+      "page",
+      page
     );
 
 
-  return response.data;
-};
+    params.append(
+      "size",
+      size
+    );
+
+
+    const response =
+      await axiosInstance.get(
+        `/api/v1/cycles/${cycleId}/issues`,
+        {
+          params,
+        }
+      );
+
+
+    return response.data;
+  };
 
 
 /* =========================
@@ -159,19 +178,64 @@ export const updateIssue =
   };
 
 
-/* =========================
+/* ==================================================
    이슈 상태 변경
-========================= */
+
+   아래 두 형태 모두 지원
+
+   updateIssueStatus(
+     issueId,
+     "IN_PROGRESS"
+   )
+
+   또는
+
+   updateIssueStatus(
+     issueId,
+     {
+       status: "IN_PROGRESS"
+     }
+   )
+
+   실제 서버 요청은 항상
+
+   {
+     status,
+     comment
+   }
+
+   형태로 전송
+================================================== */
 
 export const updateIssueStatus =
   async (
     issueId,
-    data
+    statusOrData,
+    comment = ""
   ) => {
+    const requestData =
+      typeof statusOrData ===
+      "string"
+        ? {
+            status:
+              statusOrData,
+
+            comment,
+          }
+        : {
+            ...statusOrData,
+
+            comment:
+              statusOrData
+                ?.comment ??
+              comment,
+          };
+
+
     const response =
       await axiosInstance.put(
         `/api/v1/issues/${issueId}/status`,
-        data
+        requestData
       );
 
 
@@ -179,20 +243,42 @@ export const updateIssueStatus =
   };
 
 
-/* =========================
+/* ==================================================
    완료 조건 체크 변경
-========================= */
+
+   boolean 또는 객체 모두 받을 수 있지만
+
+   실제 서버에는 항상
+
+   {
+     isDone
+   }
+
+   전송
+================================================== */
 
 export const updateChecklistItem =
   async (
     issueId,
     itemId,
-    data
+    isDoneOrData
   ) => {
+    const isDone =
+      typeof isDoneOrData ===
+      "boolean"
+        ? isDoneOrData
+        : Boolean(
+            isDoneOrData
+              ?.isDone
+          );
+
+
     const response =
       await axiosInstance.put(
         `/api/v1/issues/${issueId}/checklist/${itemId}`,
-        data
+        {
+          isDone,
+        }
       );
 
 
@@ -220,9 +306,6 @@ export const deleteIssue =
 
 /* ==================================================
    댓글 목록 조회
-
-   GET
-   /api/v1/issues/{issueId}/comments
 ================================================== */
 
 export const getIssueComments =
@@ -241,13 +324,6 @@ export const getIssueComments =
 
 /* ==================================================
    댓글 작성
-
-   POST
-   /api/v1/issues/{issueId}/comments
-
-   {
-     content
-   }
 ================================================== */
 
 export const createIssueComment =
@@ -270,15 +346,6 @@ export const createIssueComment =
 
 /* ==================================================
    댓글 수정
-
-   PUT
-   /api/v1/comments/{commentId}
-
-   {
-     content
-   }
-
-   성공 시 수정된 댓글 전체 반환
 ================================================== */
 
 export const updateIssueComment =
@@ -301,9 +368,6 @@ export const updateIssueComment =
 
 /* ==================================================
    댓글 삭제
-
-   DELETE
-   /api/v1/comments/{commentId}
 ================================================== */
 
 export const deleteIssueComment =
@@ -371,7 +435,9 @@ export const downloadIssueFile =
   ) => {
     const response =
       await axiosInstance.get(
-        `/api/v1/issues/files/${storedKey}`,
+        `/api/v1/issues/files/${encodeURIComponent(
+          storedKey
+        )}`,
         {
           responseType:
             "blob",
