@@ -9,6 +9,8 @@ import {
 } from "react-router-dom";
 
 import MainLayout from "../../../../components/MainLayout/MainLayout";
+import BackButton from "../../components/BackButton/BackButton";
+
 import styles from "./IssueDetailPage.module.css";
 
 import {
@@ -34,23 +36,31 @@ const PRIORITY_TEXT = {
 
 
 function IssueDetailPage() {
-  const navigate = useNavigate();
-  const { issueId } = useParams();
+  const navigate =
+    useNavigate();
+
+  const {
+    issueId,
+  } = useParams();
+
 
   const [
     issue,
     setIssue,
   ] = useState(null);
 
+
   const [
     conditions,
     setConditions,
   ] = useState([]);
 
+
   const [
     loading,
     setLoading,
   ] = useState(true);
+
 
   const [
     isDeleting,
@@ -63,137 +73,188 @@ function IssueDetailPage() {
   ========================= */
 
   useEffect(() => {
-    const fetchIssue = async () => {
-      try {
-        setLoading(true);
+    const fetchIssue =
+      async () => {
+        try {
+          setLoading(
+            true
+          );
 
-        const response =
-          await getIssue(issueId);
 
-        console.log(
-          "이슈 상세 조회 성공:",
-          response
-        );
+          const response =
+            await getIssue(
+              issueId
+            );
 
-        const issueData =
-          response.data;
 
-        setIssue(issueData);
+          console.log(
+            "이슈 상세 조회 성공:",
+            response
+          );
 
-        setConditions(
-          (
-            issueData.checklist ||
-            []
-          ).map(
-            (condition) => ({
-              id:
-                condition.itemId,
-              text:
-                condition.content,
-              checked:
-                condition.isDone,
-            })
-          )
-        );
-      } catch (error) {
-        console.error(
-          "이슈 상세 조회 실패:",
-          error
-        );
 
-        console.error(
-          "서버 응답:",
-          error.response?.data
-        );
+          const issueData =
+            response.data;
 
-        setIssue(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+
+          setIssue(
+            issueData
+          );
+
+
+          setConditions(
+            (
+              issueData.checklist ||
+              []
+            ).map(
+              (
+                condition
+              ) => ({
+                id:
+                  condition.itemId,
+
+                text:
+                  condition.content,
+
+                checked:
+                  condition.isDone,
+              })
+            )
+          );
+        } catch (error) {
+          console.error(
+            "이슈 상세 조회 실패:",
+            error
+          );
+
+
+          console.error(
+            "서버 응답:",
+            error.response?.data
+          );
+
+
+          setIssue(
+            null
+          );
+        } finally {
+          setLoading(
+            false
+          );
+        }
+      };
+
 
     if (issueId) {
       fetchIssue();
     }
-  }, [issueId]);
+  }, [
+    issueId,
+  ]);
 
 
   /* =========================
       수정
   ========================= */
 
-  const handleEdit = () => {
-    navigate(
-      `/issue/${issueId}/edit`
-    );
-  };
+  const handleEdit =
+    () => {
+      navigate(
+        `/issue/${issueId}/edit`
+      );
+    };
 
 
   /* =========================
       삭제
   ========================= */
 
-  const handleDelete = async () => {
-    if (isDeleting) {
-      return;
-    }
-
-    const confirmed =
-      window.confirm(
-        "이 이슈를 삭제하시겠습니까?"
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      setIsDeleting(true);
-
-      const response =
-        await deleteIssue(issueId);
-
-      console.log(
-        "이슈 삭제 성공:",
-        response
-      );
-
-      navigate("/issue");
-    } catch (error) {
-      console.error(
-        "이슈 삭제 실패:",
-        error
-      );
-
-      console.error(
-        "서버 응답:",
-        error.response?.data
-      );
-
-      const responseData =
-        error.response?.data;
-
+  const handleDelete =
+    async () => {
       if (
-        responseData?.code ===
-        "404ISSUE"
+        isDeleting
       ) {
-        alert(
-          "존재하지 않는 이슈입니다."
-        );
-
-        navigate("/issue");
-
         return;
       }
 
-      alert(
-        responseData?.message ||
-          "이슈 삭제에 실패했습니다."
-      );
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+
+      const confirmed =
+        window.confirm(
+          "이 이슈를 삭제하시겠습니까?"
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      try {
+        setIsDeleting(
+          true
+        );
+
+
+        const response =
+          await deleteIssue(
+            issueId
+          );
+
+
+        console.log(
+          "이슈 삭제 성공:",
+          response
+        );
+
+
+        navigate(
+          "/issue"
+        );
+      } catch (error) {
+        console.error(
+          "이슈 삭제 실패:",
+          error
+        );
+
+
+        console.error(
+          "서버 응답:",
+          error.response?.data
+        );
+
+
+        const responseData =
+          error.response?.data;
+
+
+        if (
+          responseData?.code ===
+          "404ISSUE"
+        ) {
+          alert(
+            "존재하지 않는 이슈입니다."
+          );
+
+
+          navigate(
+            "/issue"
+          );
+
+
+          return;
+        }
+
+
+        alert(
+          responseData?.message ||
+            "이슈 삭제에 실패했습니다."
+        );
+      } finally {
+        setIsDeleting(
+          false
+        );
+      }
+    };
 
 
   /* =========================
@@ -201,20 +262,29 @@ function IssueDetailPage() {
   ========================= */
 
   const handleToggleCondition =
-    async (conditionId) => {
+    async (
+      conditionId
+    ) => {
       const targetCondition =
         conditions.find(
-          (condition) =>
+          (
+            condition
+          ) =>
             condition.id ===
             conditionId
         );
 
-      if (!targetCondition) {
+
+      if (
+        !targetCondition
+      ) {
         return;
       }
 
+
       const nextChecked =
         !targetCondition.checked;
+
 
       try {
         const response =
@@ -224,22 +294,30 @@ function IssueDetailPage() {
             nextChecked
           );
 
+
         console.log(
           "완료 조건 체크 변경 성공:",
           response
         );
 
+
         setConditions(
-          (prev) =>
+          (
+            prev
+          ) =>
             prev.map(
-              (condition) =>
+              (
+                condition
+              ) =>
                 condition.id ===
                 conditionId
                   ? {
                       ...condition,
+
                       checked:
                         nextChecked,
                     }
+
                   : condition
             )
         );
@@ -248,6 +326,7 @@ function IssueDetailPage() {
           "완료 조건 체크 변경 실패:",
           error
         );
+
 
         console.error(
           "서버 응답:",
@@ -262,20 +341,27 @@ function IssueDetailPage() {
   ========================= */
 
   const handleDownloadFile =
-    async (file) => {
-      if (!file.fileUrl) {
+    async (
+      file
+    ) => {
+      if (
+        !file.fileUrl
+      ) {
         console.warn(
           "다운로드할 파일 URL이 없습니다."
         );
 
+
         return;
       }
+
 
       try {
         const url =
           new URL(
             file.fileUrl
           );
+
 
         const storedKey =
           decodeURIComponent(
@@ -284,38 +370,48 @@ function IssueDetailPage() {
               .pop()
           );
 
+
         const response =
           await downloadIssueFile(
             storedKey
           );
+
 
         const blobUrl =
           window.URL.createObjectURL(
             response.data
           );
 
+
         const link =
           document.createElement(
             "a"
           );
 
+
         link.href =
           blobUrl;
 
+
         link.download =
           file.fileName;
+
 
         document.body.appendChild(
           link
         );
 
+
         link.click();
 
+
         link.remove();
+
 
         window.URL.revokeObjectURL(
           blobUrl
         );
+
 
         console.log(
           "첨부파일 다운로드 성공:",
@@ -326,6 +422,7 @@ function IssueDetailPage() {
           "첨부파일 다운로드 실패:",
           error
         );
+
 
         console.error(
           "서버 응답:",
@@ -341,7 +438,9 @@ function IssueDetailPage() {
 
   const checkedCount =
     conditions.filter(
-      (condition) =>
+      (
+        condition
+      ) =>
         condition.checked
     ).length;
 
@@ -350,55 +449,72 @@ function IssueDetailPage() {
       날짜 표시
   ========================= */
 
-  const formatDate = (
-    date
-  ) => {
-    if (!date) {
-      return "-";
-    }
+  const formatDate =
+    (
+      date
+    ) => {
+      if (!date) {
+        return "-";
+      }
 
-    const [
-      year,
-      month,
-      day,
-    ] = date.split("-");
 
-    return `${day} / ${month} / ${year}`;
-  };
+      const [
+        year,
+        month,
+        day,
+      ] =
+        date.split("-");
+
+
+      return `${day} / ${month} / ${year}`;
+    };
 
 
   /* =========================
       파일 크기
   ========================= */
 
-  const formatFileSize = (
-    size
-  ) => {
-    if (
-      size === null ||
-      size === undefined
-    ) {
-      return "-";
-    }
+  const formatFileSize =
+    (
+      size
+    ) => {
+      if (
+        size === null ||
+        size === undefined
+      ) {
+        return "-";
+      }
 
-    if (size < 1024) {
-      return `${size} B`;
-    }
 
-    if (
-      size <
-      1024 * 1024
-    ) {
+      if (
+        size < 1024
+      ) {
+        return `${size} B`;
+      }
+
+
+      if (
+        size <
+        1024 * 1024
+      ) {
+        return `${(
+          size / 1024
+        ).toFixed(
+          1
+        )} KB`;
+      }
+
+
       return `${(
-        size / 1024
-      ).toFixed(1)} KB`;
-    }
-
-    return `${(
-      size /
-      (1024 * 1024)
-    ).toFixed(1)} MB`;
-  };
+        size /
+        (
+          1024 *
+          1024
+        )
+      ).toFixed(
+        1
+      )} MB`;
+    };
 
 
   /* =========================
@@ -461,6 +577,19 @@ function IssueDetailPage() {
             styles.header
           }
         >
+          {/* =========================
+              원래 있던 뒤로가기 버튼
+          ========================= */}
+
+          <div
+            className={
+              styles.backButtonWrap
+            }
+          >
+            <BackButton />
+          </div>
+
+
           <span
             className={
               styles.issueLabel
@@ -469,13 +598,17 @@ function IssueDetailPage() {
             이슈
           </span>
 
+
           <h1
             className={
               styles.title
             }
           >
-            {issue.title}
+            {
+              issue.title
+            }
           </h1>
+
 
           <div
             className={
@@ -492,6 +625,7 @@ function IssueDetailPage() {
               }
             </span>
 
+
             <span
               className={
                 styles.priority
@@ -507,12 +641,10 @@ function IssueDetailPage() {
                     : ""
                 }
               >
-                {
-                  PRIORITY_TEXT[
-                    issue.priority
-                  ] ||
+                {PRIORITY_TEXT[
                   issue.priority
-                }
+                ] ||
+                  issue.priority}
               </span>
             </span>
           </div>
@@ -541,6 +673,7 @@ function IssueDetailPage() {
               담당자
             </span>
 
+
             <div
               className={
                 styles.managerContent
@@ -552,41 +685,35 @@ function IssueDetailPage() {
                 }
               />
 
+
               <div
                 className={
                   styles.managerText
                 }
               >
                 <strong>
-                  {
-                    issue.assignee
-                      ?.name ||
-                    "-"
-                  }
+                  {issue.assignee
+                    ?.name ||
+                    "-"}
                 </strong>
 
+
                 <span>
-                  {
-                    issue.assignee
-                      ?.company ||
-                    "-"
-                  }
+                  {issue.assignee
+                    ?.company ||
+                    "-"}
 
                   {" · "}
 
-                  {
-                    issue.assignee
-                      ?.team ||
-                    "-"
-                  }
+                  {issue.assignee
+                    ?.team ||
+                    "-"}
 
                   {" · "}
 
-                  {
-                    issue.assignee
-                      ?.position ||
-                    "-"
-                  }
+                  {issue.assignee
+                    ?.position ||
+                    "-"}
                 </span>
               </div>
             </div>
@@ -606,16 +733,15 @@ function IssueDetailPage() {
               처리 일자
             </span>
 
+
             <span
               className={
                 styles.dateText
               }
             >
-              {
-                formatDate(
-                  issue.dueDate
-                )
-              }
+              {formatDate(
+                issue.dueDate
+              )}
             </span>
           </div>
         </section>
@@ -637,6 +763,7 @@ function IssueDetailPage() {
           >
             내용
           </span>
+
 
           <div
             className={
@@ -674,6 +801,7 @@ function IssueDetailPage() {
               완료 조건
             </span>
 
+
             <span
               className={
                 styles.countBadge
@@ -685,6 +813,7 @@ function IssueDetailPage() {
               }
             </span>
           </div>
+
 
           <div
             className={
@@ -732,6 +861,7 @@ function IssueDetailPage() {
                     />
                   </button>
 
+
                   <span>
                     {
                       condition.text
@@ -766,19 +896,19 @@ function IssueDetailPage() {
               첨부된 파일
             </span>
 
+
             <span
               className={
                 styles.countBadge
               }
             >
-              {
-                issue.attachments
-                  ?.length ||
-                0
-              }
+              {issue.attachments
+                ?.length ||
+                0}
               개
             </span>
           </div>
+
 
           <div
             className={
@@ -815,6 +945,7 @@ function IssueDetailPage() {
                       }
                     />
 
+
                     <button
                       type="button"
                       className={
@@ -832,6 +963,7 @@ function IssueDetailPage() {
                     </button>
                   </div>
 
+
                   <div
                     className={
                       styles.fileRight
@@ -842,12 +974,11 @@ function IssueDetailPage() {
                         styles.fileSize
                       }
                     >
-                      {
-                        formatFileSize(
-                          file.fileSize
-                        )
-                      }
+                      {formatFileSize(
+                        file.fileSize
+                      )}
                     </span>
+
 
                     <button
                       type="button"
@@ -897,6 +1028,7 @@ function IssueDetailPage() {
               : "삭제"}
           </button>
 
+
           <button
             type="button"
             className={
@@ -912,6 +1044,7 @@ function IssueDetailPage() {
               }
               alt=""
             />
+
 
             <span>
               수정

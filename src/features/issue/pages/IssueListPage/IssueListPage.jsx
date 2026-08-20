@@ -4,6 +4,10 @@ import {
   useState,
 } from "react";
 
+import {
+  useNavigate,
+} from "react-router-dom";
+
 import MainLayout from "../../../../components/MainLayout/MainLayout";
 import IssueBoard from "../../components/IssueBoard/IssueBoard";
 
@@ -11,6 +15,10 @@ import styles from "./IssueListPage.module.css";
 
 import dropdownIcon from "../../../../assets/icons/dropdownIcon.svg";
 import searchIcon from "../../../../assets/icons/searchIcon.svg";
+
+import {
+  ROUTES,
+} from "../../../../router/routes.constant";
 
 import {
   getCycles,
@@ -21,57 +29,149 @@ import {
 } from "../../../../api/issueApi";
 
 
+/* ==================================================
+   사이클 기간순 정렬
+================================================== */
+
+const sortCyclesByPeriod = (
+  cycleList
+) => {
+  return [
+    ...cycleList,
+  ].sort(
+    (
+      a,
+      b
+    ) => {
+      const startCompare =
+        String(
+          a.startDate || ""
+        ).localeCompare(
+          String(
+            b.startDate || ""
+          )
+        );
+
+
+      if (
+        startCompare !== 0
+      ) {
+        return startCompare;
+      }
+
+
+      const endCompare =
+        String(
+          a.endDate || ""
+        ).localeCompare(
+          String(
+            b.endDate || ""
+          )
+        );
+
+
+      if (
+        endCompare !== 0
+      ) {
+        return endCompare;
+      }
+
+
+      return (
+        Number(
+          a.cycleId || 0
+        ) -
+        Number(
+          b.cycleId || 0
+        )
+      );
+    }
+  );
+};
+
+
 function IssueListPage() {
+  const navigate =
+    useNavigate();
+
+
   const [
     dateSort,
     setDateSort,
-  ] = useState("최신순");
+  ] = useState(
+    "최신순"
+  );
+
 
   const [
     prioritySort,
     setPrioritySort,
-  ] = useState("높은순");
+  ] = useState(
+    "높은순"
+  );
+
 
   const [
     activeSortField,
     setActiveSortField,
-  ] = useState("date");
+  ] = useState(
+    "date"
+  );
+
 
   const [
     dateOpen,
     setDateOpen,
   ] = useState(false);
 
+
   const [
     priorityOpen,
     setPriorityOpen,
   ] = useState(false);
+
 
   const [
     keyword,
     setKeyword,
   ] = useState("");
 
+
   const [
     cycle,
     setCycle,
   ] = useState(null);
+
+
+  const [
+    cycleLabel,
+    setCycleLabel,
+  ] = useState(
+    "Cycle"
+  );
+
 
   const [
     issues,
     setIssues,
   ] = useState([]);
 
+
   const [
     loading,
     setLoading,
   ] = useState(true);
+
 
   const [
     errorMessage,
     setErrorMessage,
   ] = useState("");
 
+
+  /* =========================
+     등록일 옵션
+  ========================= */
 
   const dateOptions =
     useMemo(() => {
@@ -80,10 +180,14 @@ function IssueListPage() {
         "등록순",
       ];
 
+
       return [
         dateSort,
+
         ...options.filter(
-          (option) =>
+          (
+            option
+          ) =>
             option !==
             dateSort
         ),
@@ -93,6 +197,10 @@ function IssueListPage() {
     ]);
 
 
+  /* =========================
+     우선순위 옵션
+  ========================= */
+
   const priorityOptions =
     useMemo(() => {
       const options = [
@@ -100,10 +208,14 @@ function IssueListPage() {
         "낮은순",
       ];
 
+
       return [
         prioritySort,
+
         ...options.filter(
-          (option) =>
+          (
+            option
+          ) =>
             option !==
             prioritySort
         ),
@@ -113,10 +225,9 @@ function IssueListPage() {
     ]);
 
 
-  /* =========================
-     현재 프로젝트의
-     실제 사이클 찾기
-  ========================= */
+  /* ==================================================
+     현재 프로젝트 Cycle 조회
+  ================================================== */
 
   useEffect(() => {
     const fetchCycle =
@@ -132,7 +243,11 @@ function IssueListPage() {
             "선택된 프로젝트가 없습니다."
           );
 
-          setLoading(false);
+
+          setLoading(
+            false
+          );
+
 
           return;
         }
@@ -145,7 +260,13 @@ function IssueListPage() {
             );
 
 
-          const cycles =
+          console.log(
+            "사이클 리스트 조회 성공:",
+            response
+          );
+
+
+          const cycleList =
             Array.isArray(
               response?.data
             )
@@ -154,40 +275,89 @@ function IssueListPage() {
 
 
           if (
-            cycles.length === 0
+            cycleList.length ===
+            0
           ) {
             setErrorMessage(
               "등록된 사이클이 없습니다."
             );
 
-            setLoading(false);
+
+            setCycle(
+              null
+            );
+
+
+            setCycleLabel(
+              "Cycle"
+            );
+
+
+            setLoading(
+              false
+            );
+
 
             return;
           }
 
 
-          /*
-            진행 중 사이클 우선
-            없으면 첫 번째 사이클
-          */
+          const sortedCycles =
+            sortCyclesByPeriod(
+              cycleList
+            );
+
 
           const currentCycle =
-            cycles.find(
-              (item) =>
+            sortedCycles.find(
+              (
+                item
+              ) =>
                 item.status ===
                 "IN_PROGRESS"
             ) ||
-            cycles[0];
+            sortedCycles[0];
+
+
+          const currentCycleIndex =
+            sortedCycles.findIndex(
+              (
+                item
+              ) =>
+                Number(
+                  item.cycleId
+                ) ===
+                Number(
+                  currentCycle
+                    ?.cycleId
+                )
+            );
 
 
           setCycle(
             currentCycle
+          );
+
+
+          setCycleLabel(
+            currentCycleIndex >= 0
+              ? `Cycle ${
+                  currentCycleIndex +
+                  1
+                }`
+              : "Cycle"
+          );
+
+
+          setErrorMessage(
+            ""
           );
         } catch (error) {
           console.error(
             "사이클 조회 실패:",
             error
           );
+
 
           console.error(
             "서버 응답:",
@@ -201,7 +371,20 @@ function IssueListPage() {
               "사이클을 불러오지 못했습니다."
           );
 
-          setLoading(false);
+
+          setCycle(
+            null
+          );
+
+
+          setCycleLabel(
+            "Cycle"
+          );
+
+
+          setLoading(
+            false
+          );
         }
       };
 
@@ -210,12 +393,14 @@ function IssueListPage() {
   }, []);
 
 
-  /* =========================
-     이슈 리스트 조회
-  ========================= */
+  /* ==================================================
+     이슈 목록 조회
+  ================================================== */
 
   useEffect(() => {
-    if (!cycle?.cycleId) {
+    if (
+      !cycle?.cycleId
+    ) {
       return;
     }
 
@@ -223,9 +408,14 @@ function IssueListPage() {
     const fetchIssues =
       async () => {
         try {
-          setLoading(true);
+          setLoading(
+            true
+          );
 
-          setErrorMessage("");
+
+          setErrorMessage(
+            ""
+          );
 
 
           let sort =
@@ -296,6 +486,7 @@ function IssueListPage() {
             error
           );
 
+
           console.error(
             "서버 응답:",
             error.response?.data
@@ -323,7 +514,9 @@ function IssueListPage() {
 
           setIssues([]);
         } finally {
-          setLoading(false);
+          setLoading(
+            false
+          );
         }
       };
 
@@ -338,46 +531,106 @@ function IssueListPage() {
   ]);
 
 
+  /* ==================================================
+     댓글 개수 즉시 변경
+
+     IssueCommentPanel
+     → IssueBoard
+     → 여기까지 전달됨
+
+     페이지 재조회 없이
+     해당 이슈의 commentCount만 변경
+  ================================================== */
+
+  const handleCommentCountChange =
+    (
+      issueId,
+      count
+    ) => {
+      setIssues(
+        (
+          prev
+        ) =>
+          prev.map(
+            (
+              issue
+            ) =>
+              Number(
+                issue.issueId
+              ) ===
+              Number(
+                issueId
+              )
+                ? {
+                    ...issue,
+
+                    commentCount:
+                      count,
+                  }
+                : issue
+          )
+      );
+    };
+
+
   /* =========================
      등록일 정렬
   ========================= */
 
-  const handleDateSelect = (
-    option
-  ) => {
-    setDateSort(
+  const handleDateSelect =
+    (
       option
-    );
+    ) => {
+      setDateSort(
+        option
+      );
 
-    setActiveSortField(
-      "date"
-    );
 
-    setDateOpen(
-      false
-    );
-  };
+      setActiveSortField(
+        "date"
+      );
+
+
+      setDateOpen(
+        false
+      );
+    };
 
 
   /* =========================
      우선순위 정렬
   ========================= */
 
-  const handlePrioritySelect = (
-    option
-  ) => {
-    setPrioritySort(
+  const handlePrioritySelect =
+    (
       option
-    );
+    ) => {
+      setPrioritySort(
+        option
+      );
 
-    setActiveSortField(
-      "priority"
-    );
 
-    setPriorityOpen(
-      false
-    );
-  };
+      setActiveSortField(
+        "priority"
+      );
+
+
+      setPriorityOpen(
+        false
+      );
+    };
+
+
+  /* =========================
+     이슈 생성
+  ========================= */
+
+  const handleCreateIssue =
+    () => {
+      navigate(
+        ROUTES.CREATE_ISSUE
+      );
+    };
 
 
   return (
@@ -388,7 +641,7 @@ function IssueListPage() {
         }
       >
         {/* =========================
-            상단 제목
+            Header
         ========================= */}
 
         <div
@@ -411,8 +664,9 @@ function IssueListPage() {
                 styles.cycleBadge
               }
             >
-              {cycle?.name ||
-                "-"}
+              {
+                cycleLabel
+              }
             </span>
           </div>
 
@@ -424,7 +678,7 @@ function IssueListPage() {
 
 
         {/* =========================
-            정렬 / 검색
+            Toolbar
         ========================= */}
 
         <div
@@ -437,7 +691,7 @@ function IssueListPage() {
               styles.sort
             }
           >
-            {/* 등록일 정렬 */}
+            {/* 등록일 */}
 
             <div
               className={
@@ -451,9 +705,12 @@ function IssueListPage() {
                 }
                 onClick={() => {
                   setDateOpen(
-                    (prev) =>
+                    (
+                      prev
+                    ) =>
                       !prev
                   );
+
 
                   setPriorityOpen(
                     false
@@ -462,8 +719,11 @@ function IssueListPage() {
               >
                 <span>
                   등록일{" "}
-                  {dateSort}
+                  {
+                    dateSort
+                  }
                 </span>
+
 
                 <img
                   src={
@@ -486,7 +746,9 @@ function IssueListPage() {
                   }
                 >
                   {dateOptions.map(
-                    (option) => (
+                    (
+                      option
+                    ) => (
                       <button
                         key={
                           option
@@ -515,7 +777,7 @@ function IssueListPage() {
             </div>
 
 
-            {/* 우선순위 정렬 */}
+            {/* 우선순위 */}
 
             <div
               className={
@@ -529,9 +791,12 @@ function IssueListPage() {
                 }
                 onClick={() => {
                   setPriorityOpen(
-                    (prev) =>
+                    (
+                      prev
+                    ) =>
                       !prev
                   );
+
 
                   setDateOpen(
                     false
@@ -540,8 +805,11 @@ function IssueListPage() {
               >
                 <span>
                   우선순위{" "}
-                  {prioritySort}
+                  {
+                    prioritySort
+                  }
                 </span>
+
 
                 <img
                   src={
@@ -564,7 +832,9 @@ function IssueListPage() {
                   }
                 >
                   {priorityOptions.map(
-                    (option) => (
+                    (
+                      option
+                    ) => (
                       <button
                         key={
                           option
@@ -594,7 +864,7 @@ function IssueListPage() {
           </div>
 
 
-          {/* 검색 */}
+          {/* 검색 / 이슈 생성 */}
 
           <div
             className={
@@ -615,6 +885,7 @@ function IssueListPage() {
                   styles.searchIcon
                 }
               />
+
 
               <input
                 type="text"
@@ -639,16 +910,17 @@ function IssueListPage() {
               className={
                 styles.createButton
               }
+              onClick={
+                handleCreateIssue
+              }
             >
-              프로젝트 생성
+              이슈 생성
             </button>
           </div>
         </div>
 
 
-        {/* =========================
-            상태
-        ========================= */}
+        {/* 로딩 */}
 
         {loading && (
           <p>
@@ -657,16 +929,20 @@ function IssueListPage() {
         )}
 
 
+        {/* 오류 */}
+
         {!loading &&
           errorMessage && (
           <p>
-            {errorMessage}
+            {
+              errorMessage
+            }
           </p>
         )}
 
 
         {/* =========================
-            이슈 보드
+            Board
         ========================= */}
 
         {!loading &&
@@ -674,6 +950,9 @@ function IssueListPage() {
           <IssueBoard
             issues={
               issues
+            }
+            onCommentCountChange={
+              handleCommentCountChange
             }
           />
         )}

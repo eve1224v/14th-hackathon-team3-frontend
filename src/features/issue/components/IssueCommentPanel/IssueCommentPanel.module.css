@@ -1,0 +1,900 @@
+.panel {
+  position: fixed;
+
+  top: 110px;
+  right: 36px;
+
+  width: 324px;
+  min-height: 750px;
+
+  box-sizing: border-box;
+
+  padding:
+    42px
+    30px
+    32px;
+
+  border-radius: 14px;
+
+  border-left:
+    4px solid #4d67ff;
+
+  background: #1b2038;
+
+  color: #ffffff;
+
+  box-shadow:
+    0 12px 30px
+    rgba(0, 0, 0, 0.25);
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  z-index: 1000;
+
+  overflow-y: auto;
+}
+
+
+/* ==================================================
+   닫기
+================================================== */
+
+.closeButton {
+  position: absolute;
+
+  top: 14px;
+  right: 16px;
+
+  width: 26px;
+  height: 26px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.65
+  );
+
+  font-size: 24px;
+
+  cursor: pointer;
+}
+
+
+/* ==================================================
+   이슈 기본 정보
+================================================== */
+
+.issueInfo {
+  width: 100%;
+}
+
+
+.title {
+  margin:
+    0
+    0
+    10px;
+
+  color: #ffffff;
+
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+
+.description {
+  margin: 0;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.72
+  );
+
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.55;
+
+  word-break: keep-all;
+}
+
+
+/* ==================================================
+   우선순위
+================================================== */
+
+.priority {
+  width: fit-content;
+
+  display: flex;
+  align-items: center;
+
+  margin-top: 15px;
+
+  padding:
+    5px
+    10px;
+
+  border:
+    1px solid
+    rgba(
+      166,
+      180,
+      255,
+      0.22
+    );
+
+  border-radius: 14px;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.74
+  );
+
+  font-size: 11px;
+}
+
+
+/* ==================================================
+   담당자
+================================================== */
+
+.assignee {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 25px;
+}
+
+
+.assigneeAvatar {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #dedede;
+}
+
+
+.assigneeText {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.assigneeText strong {
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+.assigneeText span {
+  color: rgba(
+    255,
+    255,
+    255,
+    0.58
+  );
+
+  font-size: 13px;
+}
+
+
+/* ==================================================
+   마감일
+================================================== */
+
+.dueDate {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 22px;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.72
+  );
+
+  font-size: 13px;
+}
+
+
+.dueDate img {
+  width: 18px;
+  height: 18px;
+
+  object-fit: contain;
+}
+
+
+.delayed {
+  color: #fe6057;
+}
+
+
+.delayed img {
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(49%)
+    sepia(99%)
+    saturate(1992%)
+    hue-rotate(331deg)
+    brightness(102%)
+    contrast(102%);
+}
+
+
+/* ==================================================
+   AI 감지
+================================================== */
+
+.aiBox {
+  height: 48px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  margin-top: 22px;
+
+  padding:
+    0
+    14px;
+
+  border:
+    1px solid
+    rgba(
+      166,
+      180,
+      255,
+      0.14
+    );
+
+  border-radius: 10px;
+
+  color: #5771ff;
+}
+
+
+.aiTitle {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  flex-shrink: 0;
+}
+
+
+.aiTitle img {
+  width: 17px;
+  height: 17px;
+
+  object-fit: contain;
+}
+
+
+.aiTitle strong {
+  color: #5771ff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+.aiBox > span {
+  margin-left: 20px;
+
+  color: #5771ff;
+
+  font-size: 12px;
+
+  white-space: nowrap;
+}
+
+
+/* ==================================================
+   댓글
+================================================== */
+
+.commentSection {
+  margin-top: 20px;
+}
+
+
+.commentTitle {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.72
+  );
+
+  font-size: 12px;
+}
+
+
+.commentTitle img {
+  width: 17px;
+  height: 17px;
+
+  object-fit: contain;
+}
+
+
+.commentDate {
+  display: block;
+
+  margin-top: 14px;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.55
+  );
+
+  font-size: 9px;
+}
+
+
+/* ==================================================
+   댓글 목록
+================================================== */
+
+.commentList {
+  margin-top: 12px;
+}
+
+
+.comment {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding:
+    0
+    0
+    16px;
+}
+
+
+.comment + .comment {
+  padding-top: 14px;
+
+  border-top:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.06
+    );
+}
+
+
+.commentAvatar {
+  width: 30px;
+  height: 30px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #b8bac2;
+}
+
+
+.commentContent {
+  flex: 1;
+
+  min-width: 0;
+}
+
+
+.commentMeta {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+
+  gap: 6px;
+}
+
+
+.commentMeta strong {
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+.commentTime {
+  color: rgba(
+    255,
+    255,
+    255,
+    0.55
+  );
+
+  font-size: 7px;
+
+  white-space: nowrap;
+}
+
+
+.commentText {
+  margin:
+    8px
+    0
+    0;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.85
+  );
+
+  font-size: 8px;
+  line-height: 1.55;
+
+  word-break: keep-all;
+}
+
+
+.commentRole {
+  display: inline-block;
+
+  margin-top: 4px;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.42
+  );
+
+  font-size: 7px;
+}
+
+
+/* ==================================================
+   ... 메뉴
+================================================== */
+
+.menuWrapper {
+  position: relative;
+
+  margin-left: auto;
+}
+
+
+.moreButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  width: 22px;
+  height: 18px;
+
+  border: none;
+
+  background: transparent;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.72
+  );
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+
+  cursor: pointer;
+}
+
+
+/* ==================================================
+   수정 / 삭제 팝업
+
+   피그마의 작은 남색 메뉴
+================================================== */
+
+.commentMenu {
+  position: absolute;
+
+  top: 19px;
+  right: -4px;
+
+  width: 58px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border-radius: 5px;
+
+  background: #354278;
+
+  box-shadow:
+    0 5px 14px
+    rgba(0, 0, 0, 0.25);
+
+  z-index: 20;
+}
+
+
+.commentMenu button {
+  width: 100%;
+  height: 34px;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  font-size: 13px;
+  font-weight: 400;
+
+  cursor: pointer;
+
+  text-align: center;
+}
+
+
+.commentMenu button:hover {
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.08
+    );
+}
+
+
+/* ==================================================
+   댓글 본문 수정
+================================================== */
+
+.editArea {
+  margin-top: 8px;
+}
+
+
+.editTextarea {
+  width: 100%;
+  min-height: 56px;
+
+  box-sizing: border-box;
+
+  resize: vertical;
+
+  padding: 8px;
+
+  border:
+    1px solid
+    rgba(
+      166,
+      180,
+      255,
+      0.28
+    );
+
+  border-radius: 5px;
+
+  outline: none;
+
+  background: #303b70;
+
+  color: #ffffff;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+
+.editTextarea:focus {
+  border-color: #5771ff;
+}
+
+
+.editActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 6px;
+
+  margin-top: 6px;
+}
+
+
+.cancelEditButton,
+.saveEditButton {
+  height: 24px;
+
+  padding:
+    0
+    9px;
+
+  border-radius: 5px;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  font-size: 8px;
+
+  cursor: pointer;
+}
+
+
+.cancelEditButton {
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.15
+    );
+
+  background: transparent;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.7
+  );
+}
+
+
+.saveEditButton {
+  border: none;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+}
+
+
+.saveEditButton:disabled {
+  opacity: 0.45;
+
+  cursor: default;
+}
+
+
+/* ==================================================
+   새 댓글 작성
+================================================== */
+
+.writeSection {
+  margin-top: 9px;
+}
+
+
+.writeLabel {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.72
+  );
+
+  font-size: 9px;
+}
+
+
+.writeBox {
+  position: relative;
+
+  width: 100%;
+  height: 64px;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  border-radius: 6px;
+
+  background: #303b70;
+}
+
+
+.writeBox textarea {
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+
+  resize: none;
+
+  padding:
+    10px
+    48px
+    10px
+    10px;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+
+.sendButton {
+  position: absolute;
+
+  right: 6px;
+  bottom: 6px;
+
+  min-width: 34px;
+  height: 23px;
+
+  padding:
+    0
+    7px;
+
+  border: none;
+  border-radius: 6px;
+
+  background: #4d67ff;
+
+  color: #ffffff;
+
+  font-size: 8px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+.sendButton:disabled {
+  opacity: 0.55;
+
+  cursor: default;
+}
+
+
+/* ==================================================
+   상세 정보
+================================================== */
+
+.detailArea {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 48px;
+}
+
+
+.detailButton {
+  width: 230px;
+  height: 37px;
+
+  border:
+    1px solid
+    rgba(
+      166,
+      180,
+      255,
+      0.12
+    );
+
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.88
+  );
+
+  font-family:
+    Pretendard,
+    sans-serif;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+
+.detailButton:hover {
+  border-color:
+    rgba(
+      166,
+      180,
+      255,
+      0.3
+    );
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.025
+    );
+}

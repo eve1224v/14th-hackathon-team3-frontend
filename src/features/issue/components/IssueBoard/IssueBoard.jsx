@@ -1,16 +1,27 @@
+import {
+  useState,
+} from "react";
+
+import {
+  useNavigate,
+} from "react-router-dom";
+
 import IssueColumn from "../IssueColumn/IssueColumn";
+import IssueCommentPanel from "../IssueCommentPanel/IssueCommentPanel";
 
 import styles from "./IssueBoard.module.css";
 
 
 /* =========================
-   우선순위 표시
+   우선순위
 ========================= */
 
 const getPriorityText = (
   priority
 ) => {
-  switch (priority) {
+  switch (
+    priority
+  ) {
     case "URGENT":
       return "우선순위 긴급";
 
@@ -24,13 +35,16 @@ const getPriorityText = (
       return "우선순위 낮음";
 
     default:
-      return priority || "-";
+      return (
+        priority ||
+        "-"
+      );
   }
 };
 
 
 /* =========================
-   날짜 표시
+   날짜
 ========================= */
 
 const formatDate = (
@@ -45,7 +59,8 @@ const formatDate = (
     year,
     month,
     day,
-  ] = dueDate.split("-");
+  ] =
+    dueDate.split("-");
 
 
   if (
@@ -79,7 +94,8 @@ const isDelayedIssue = (
 
 
   if (
-    status === "DONE"
+    status ===
+    "DONE"
   ) {
     return false;
   }
@@ -87,6 +103,7 @@ const isDelayedIssue = (
 
   const today =
     new Date();
+
 
   today.setHours(
     0,
@@ -110,7 +127,7 @@ const isDelayedIssue = (
 
 
 /* =========================
-   API 이슈 → 카드 형식
+   API Issue → 카드
 ========================= */
 
 const formatIssue = (
@@ -128,14 +145,14 @@ const formatIssue = (
     id:
       issue.issueId,
 
+    issueId:
+      issue.issueId,
+
     title:
       issue.title,
 
-    /*
-      리스트 조회 API에는
-      description 필드가 없음
-    */
     description:
+      issue.description ||
       "",
 
     priority:
@@ -147,11 +164,8 @@ const formatIssue = (
       issue.assigneeName ||
       "담당자 없음",
 
-    /*
-      리스트 조회 API에는
-      담당자 직책 필드가 없음
-    */
     role:
+      issue.assigneeRole ||
       "",
 
     date:
@@ -189,21 +203,126 @@ const formatIssue = (
 
 function IssueBoard({
   issues = [],
+  onCommentCountChange,
 }) {
-  /*
-    API status
-    → 현재 UI 컬럼
-  */
+  const navigate =
+    useNavigate();
+
+
+  const [
+    selectedIssue,
+    setSelectedIssue,
+  ] = useState(null);
+
+
+  /* =========================
+     카드 클릭 → 패널
+  ========================= */
+
+  const handleIssueClick =
+    (
+      issue
+    ) => {
+      setSelectedIssue(
+        issue
+      );
+    };
+
+
+  /* =========================
+     패널 닫기
+  ========================= */
+
+  const handleClosePanel =
+    () => {
+      setSelectedIssue(
+        null
+      );
+    };
+
+
+  /* =========================
+     이슈 상세
+  ========================= */
+
+  const handleViewIssueDetail =
+    () => {
+      if (
+        !selectedIssue?.id
+      ) {
+        return;
+      }
+
+
+      navigate(
+        `/issue/${selectedIssue.id}`
+      );
+    };
+
+
+  /* ==================================================
+     댓글 개수 변경
+
+     부모 IssueListPage에도 전달하고
+     현재 패널의 selectedIssue도 같이 갱신
+  ================================================== */
+
+  const handleCommentCountChange =
+    (
+      issueId,
+      count
+    ) => {
+      onCommentCountChange?.(
+        issueId,
+        count
+      );
+
+
+      setSelectedIssue(
+        (
+          prev
+        ) => {
+          if (
+            !prev ||
+            Number(
+              prev.id
+            ) !==
+              Number(
+                issueId
+              )
+          ) {
+            return prev;
+          }
+
+
+          return {
+            ...prev,
+
+            commentCount:
+              count,
+          };
+        }
+      );
+    };
+
+
+  /* =========================
+     컬럼
+  ========================= */
 
   const todoIssues =
     issues
       .filter(
-        (issue) =>
+        (
+          issue
+        ) =>
           issue.status ===
           "TODO"
       )
       .map(
-        (issue) =>
+        (
+          issue
+        ) =>
           formatIssue(
             issue,
             "todo"
@@ -214,12 +333,16 @@ function IssueBoard({
   const progressIssues =
     issues
       .filter(
-        (issue) =>
+        (
+          issue
+        ) =>
           issue.status ===
           "IN_PROGRESS"
       )
       .map(
-        (issue) =>
+        (
+          issue
+        ) =>
           formatIssue(
             issue,
             "progress"
@@ -230,12 +353,16 @@ function IssueBoard({
   const reviewIssues =
     issues
       .filter(
-        (issue) =>
+        (
+          issue
+        ) =>
           issue.status ===
           "NEEDS_REVIEW"
       )
       .map(
-        (issue) =>
+        (
+          issue
+        ) =>
           formatIssue(
             issue,
             "check"
@@ -246,12 +373,16 @@ function IssueBoard({
   const completeIssues =
     issues
       .filter(
-        (issue) =>
+        (
+          issue
+        ) =>
           issue.status ===
           "DONE"
       )
       .map(
-        (issue) =>
+        (
+          issue
+        ) =>
           formatIssue(
             issue,
             "complete"
@@ -307,34 +438,66 @@ function IssueBoard({
 
 
   return (
-    <div
-      className={
-        styles.board
-      }
-    >
-      {columns.map(
-        (column) => (
-          <IssueColumn
-            key={
-              column.title
-            }
-            title={
-              column.title
-            }
-            type={
-              column.type
-            }
-            count={
-              column.issues
-                .length
-            }
-            issues={
-              column.issues
-            }
-          />
-        )
+    <>
+      <div
+        className={
+          styles.board
+        }
+      >
+        {columns.map(
+          (
+            column
+          ) => (
+            <IssueColumn
+              key={
+                column.title
+              }
+              title={
+                column.title
+              }
+              type={
+                column.type
+              }
+              count={
+                column.issues
+                  .length
+              }
+              issues={
+                column.issues
+              }
+              onIssueClick={
+                handleIssueClick
+              }
+            />
+          )
+        )}
+      </div>
+
+
+      {/* =========================
+          오른쪽 이슈 패널
+      ========================= */}
+
+      {selectedIssue && (
+        <IssueCommentPanel
+          key={
+            selectedIssue.id
+          }
+          issue={
+            selectedIssue
+          }
+          onClose={
+            handleClosePanel
+          }
+          onDetail={
+            handleViewIssueDetail
+          }
+          onCommentCountChange={
+            handleCommentCountChange
+          }
+        />
       )}
-    </div>
+    </>
   );
 }
 

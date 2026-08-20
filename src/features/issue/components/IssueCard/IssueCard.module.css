@@ -295,6 +295,8 @@
 
 /* =========================
    댓글
+
+   기존 div → button 변경
 ========================= */
 
 .commentItem {
@@ -308,12 +310,27 @@
 
   gap: 6px;
 
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
   color: rgba(255, 255, 255, 0.75);
+
+  font-family: Pretendard, sans-serif;
 
   font-size: 10px;
   font-weight: 400;
 
   white-space: nowrap;
+
+  cursor: pointer;
+}
+
+
+.commentItem:hover {
+  color: #ffffff;
 }
 
 
