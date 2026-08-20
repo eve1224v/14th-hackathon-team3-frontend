@@ -1,7 +1,5 @@
 import styles from "./HandoverItem.module.css";
 
-import warningTriangleIcon from "../../../../assets/icons/warningTriangleIcon.svg";
-import referenceLinkIcon from "../../../../assets/icons/referenceLinkIcon.svg";
 import editPencilIcon from "../../../../assets/icons/editPencilIcon.svg";
 
 
@@ -10,60 +8,63 @@ function HandoverItem({
   title,
   description,
   manager,
-  evidenceCount,
-  warning,
   onEdit,
 }) {
   return (
-    <div className={styles.itemRow}>
-      <article className={styles.item}>
-        <strong className={styles.title}>
+    <div
+      className={
+        styles.itemRow
+      }
+    >
+      <article
+        className={
+          styles.item
+        }
+      >
+        <strong
+          className={
+            styles.title
+          }
+        >
           {title}
         </strong>
 
-        <p className={styles.description}>
+
+        <p
+          className={
+            styles.description
+          }
+        >
           {description}
         </p>
 
-        <span className={styles.manager}>
+
+        <span
+          className={
+            styles.manager
+          }
+        >
           담당자 · {manager}
         </span>
-
-        {warning ? (
-          <div className={styles.warning}>
-            <img
-              src={warningTriangleIcon}
-              alt=""
-            />
-
-            <span>
-              근거 부족
-            </span>
-          </div>
-        ) : (
-          <div className={styles.evidence}>
-            <img
-              src={referenceLinkIcon}
-              alt=""
-            />
-
-            <span>
-              근거 {evidenceCount}개
-            </span>
-          </div>
-        )}
       </article>
 
 
       <button
         type="button"
-        className={styles.editButton}
-        onClick={() => onEdit(issueId)}
+        className={
+          styles.editButton
+        }
+        onClick={() =>
+          onEdit(issueId)
+        }
       >
         <img
-          src={editPencilIcon}
+          src={
+            editPencilIcon
+          }
           alt=""
         />
+
 
         <span>
           수정
