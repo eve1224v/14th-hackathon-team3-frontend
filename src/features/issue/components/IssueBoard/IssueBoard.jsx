@@ -28,6 +28,11 @@ const getPriorityText = (
     case "HIGH":
       return "우선순위 높음";
 
+    /*
+      실제 API 값은 NORMAL
+      MEDIUM도 혹시 들어올 경우를 대비해 같이 처리
+    */
+    case "NORMAL":
     case "MEDIUM":
       return "우선순위 보통";
 
@@ -262,9 +267,6 @@ function IssueBoard({
 
   /* ==================================================
      댓글 개수 변경
-
-     부모 IssueListPage에도 전달하고
-     현재 패널의 selectedIssue도 같이 갱신
   ================================================== */
 
   const handleCommentCountChange =
@@ -307,7 +309,7 @@ function IssueBoard({
 
 
   /* =========================
-     컬럼
+     진행 전
   ========================= */
 
   const todoIssues =
@@ -330,6 +332,10 @@ function IssueBoard({
       );
 
 
+  /* =========================
+     진행 중
+  ========================= */
+
   const progressIssues =
     issues
       .filter(
@@ -350,6 +356,10 @@ function IssueBoard({
       );
 
 
+  /* =========================
+     확인 필요
+  ========================= */
+
   const reviewIssues =
     issues
       .filter(
@@ -369,6 +379,10 @@ function IssueBoard({
           )
       );
 
+
+  /* =========================
+     완료
+  ========================= */
 
   const completeIssues =
     issues
@@ -473,10 +487,6 @@ function IssueBoard({
         )}
       </div>
 
-
-      {/* =========================
-          오른쪽 이슈 패널
-      ========================= */}
 
       {selectedIssue && (
         <IssueCommentPanel

@@ -1,10 +1,14 @@
 .panel {
+  position: relative;
+
   width: 312px;
   height: 353px;
 
   box-sizing: border-box;
 
   padding: 27px 23px 35px;
+
+  overflow: visible;
 
   border-radius: 8px;
 
@@ -67,6 +71,13 @@
 }
 
 
+.editButton:disabled {
+  opacity: 0.6;
+
+  cursor: default;
+}
+
+
 /* =========================
    LABEL
 ========================= */
@@ -86,10 +97,13 @@
 
 /* =========================
    전달 대상
+
+   기존 17px → 10px
+   전달 대상부터 살짝 위로 이동
 ========================= */
 
 .targetSection {
-  margin-top: 17px;
+  margin-top: 10px;
 }
 
 
@@ -104,12 +118,17 @@
 
 
 .targetRow strong {
+  max-width: 160px;
+
+  overflow: hidden;
+
   color: #ffffff;
 
   font-size: 12px;
   font-weight: 600;
   line-height: 110%;
 
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -153,8 +172,6 @@
 
 /* =========================
    팀 수정 input
-
-   select 사용 X
 ========================= */
 
 .teamEditInput {
@@ -231,8 +248,6 @@
 
 /* =========================
    담당자 수정 input
-
-   select 사용 X
 ========================= */
 
 .managerEditInput {
@@ -268,6 +283,8 @@
 ========================= */
 
 .timeSection {
+  position: relative;
+
   margin-top: 20px;
 }
 
@@ -360,6 +377,7 @@
 
 .dateBox {
   position: relative;
+
   width: 217px;
   height: 33px;
 
@@ -372,9 +390,9 @@
   margin-top: 12px;
   margin-left: 5px;
 
-  padding: 0 9px 0 14px;
+  padding: 0 7px 0 14px;
 
-  overflow: hidden;
+  overflow: visible;
 
   border-radius: 8px;
 
@@ -382,7 +400,9 @@
 }
 
 
-.dateBox span {
+.dateBox > span {
+  min-width: 0;
+
   overflow: hidden;
 
   color: rgba(255, 255, 255, 0.7);
@@ -391,16 +411,43 @@
   font-weight: 400;
   line-height: 110%;
 
-  white-space: nowrap;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 
-.dateBox img {
-  width: 18px;
-  height: 18px;
+/* =========================
+   달력 아이콘 버튼
+========================= */
+
+.calendarButton {
+  width: 26px;
+  height: 26px;
 
   flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+
+.calendarButton:disabled {
+  cursor: default;
+}
+
+
+.calendarButton img {
+  width: 18px;
+  height: 18px;
 
   object-fit: contain;
 
@@ -412,64 +459,185 @@
   opacity: 0.7;
 }
 
-.dateBox[aria-disabled="false"] {
-  cursor: pointer;
-}
+
+/* ==================================================
+   CALENDAR
+================================================== */
 
 .calendar {
   position: absolute;
-  top: 39px;
+
+  top: calc(100% + 8px);
   right: 0;
-  z-index: 20;
+
+  z-index: 9999;
+
   width: 252px;
-  padding: 14px;
+
   box-sizing: border-box;
-  border: 1px solid #4d67ff;
-  border-radius: 10px;
-  background: #202641;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+
+  padding: 14px 15px 17px;
+
+  border: 1px solid #eeeeee;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 12px 30px
+    rgba(0, 0, 0, 0.25);
+
+  color: #111111;
 }
+
+
+/* =========================
+   달력 Header
+========================= */
 
 .calendarHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.calendarHeader button,
-.calendarDay {
-  border: 0;
-  background: transparent;
-  color: #fff;
-  cursor: pointer;
-}
-
-.calendarGrid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
+
+  grid-template-columns:
+    28px
+    1fr
+    28px;
+
+  align-items: center;
+
+  margin-bottom: 8px;
+}
+
+
+.calendarHeader strong {
+  color: #858585;
+
+  font-size: 12px;
+  font-weight: 500;
+
   text-align: center;
 }
 
-.weekday {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 10px;
+
+.calendarHeader button {
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 5px;
+
+  background: transparent;
+
+  color: #111111;
+
+  font-size: 21px;
+
+  cursor: pointer;
 }
+
+
+.calendarHeader button:hover {
+  background: #f4f4f4;
+}
+
+
+.calendarDivider {
+  width: 100%;
+  height: 1px;
+
+  margin-bottom: 9px;
+
+  background: #eeeeee;
+}
+
+
+/* =========================
+   날짜 Grid
+========================= */
+
+.calendarGrid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(7, 1fr);
+
+  gap: 3px;
+
+  text-align: center;
+}
+
+
+.weekday {
+  height: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #222222;
+
+  font-size: 8px;
+  font-weight: 500;
+}
+
 
 .calendarDay {
   width: 27px;
   height: 27px;
+
+  justify-self: center;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   padding: 0;
+
+  border: none;
   border-radius: 50%;
+
+  background: transparent;
+
+  color: #111111;
+
+  font-family: Pretendard, sans-serif;
   font-size: 11px;
+  font-weight: 500;
+
+  cursor: pointer;
 }
+
+
+.calendarDay:hover {
+  background: #eef4ff;
+}
+
 
 .otherMonth {
-  color: rgba(255, 255, 255, 0.28);
+  color: #c5c5c5;
 }
 
+
+.sunday {
+  color: #ef4c58;
+}
+
+
 .selectedDay {
-  background: #4d67ff;
-  color: #fff;
+  background: #1597ef;
+
+  color: #ffffff;
+}
+
+
+.selectedDay:hover {
+  background: #1597ef;
+
+  color: #ffffff;
 }
