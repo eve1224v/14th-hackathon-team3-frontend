@@ -115,7 +115,9 @@ function IssueScheduleSection({
 
   const getDisplayDate =
     () => {
-      if (!dueDate) {
+      if (
+        !dueDate
+      ) {
         return "";
       }
 
@@ -124,7 +126,10 @@ function IssueScheduleSection({
         year,
         month,
         day,
-      ] = dueDate.split("-");
+      ] =
+        dueDate.split(
+          "-"
+        );
 
 
       return `~ ${day} / ${month} / ${year}`;
@@ -136,145 +141,162 @@ function IssueScheduleSection({
   ================================================== */
 
   const calendarDates =
-    useMemo(() => {
-      const firstDay =
-        new Date(
-          calendarYear,
-          calendarMonth,
-          1
-        );
-
-
-      const lastDay =
-        new Date(
-          calendarYear,
-          calendarMonth + 1,
-          0
-        );
-
-
-      const previousMonthLastDay =
-        new Date(
-          calendarYear,
-          calendarMonth,
-          0
-        );
-
-
-      const startWeekDay =
-        firstDay.getDay();
-
-
-      const currentMonthLastDate =
-        lastDay.getDate();
-
-
-      const previousMonthLastDate =
-        previousMonthLastDay.getDate();
-
-
-      const dates = [];
-
-
-      /* 이전 달 */
-
-      for (
-        let index =
-          startWeekDay - 1;
-        index >= 0;
-        index -= 1
-      ) {
-        const day =
-          previousMonthLastDate -
-          index;
-
-
-        const previousDate =
+    useMemo(
+      () => {
+        const firstDay =
           new Date(
             calendarYear,
-            calendarMonth - 1,
-            day
-          );
-
-
-        dates.push({
-          year:
-            previousDate.getFullYear(),
-
-          month:
-            previousDate.getMonth(),
-
-          day,
-
-          isCurrentMonth:
-            false,
-        });
-      }
-
-
-      /* 현재 달 */
-
-      for (
-        let day = 1;
-        day <=
-        currentMonthLastDate;
-        day += 1
-      ) {
-        dates.push({
-          year:
-            calendarYear,
-
-          month:
             calendarMonth,
-
-          day,
-
-          isCurrentMonth:
-            true,
-        });
-      }
-
-
-      /* 다음 달 */
-
-      let nextDay = 1;
-
-
-      while (
-        dates.length < 42
-      ) {
-        const nextDate =
-          new Date(
-            calendarYear,
-            calendarMonth + 1,
-            nextDay
+            1
           );
 
 
-        dates.push({
-          year:
-            nextDate.getFullYear(),
-
-          month:
-            nextDate.getMonth(),
-
-          day:
-            nextDay,
-
-          isCurrentMonth:
-            false,
-        });
+        const lastDay =
+          new Date(
+            calendarYear,
+            calendarMonth +
+              1,
+            0
+          );
 
 
-        nextDay += 1;
-      }
+        const previousMonthLastDay =
+          new Date(
+            calendarYear,
+            calendarMonth,
+            0
+          );
 
 
-      return dates;
-    }, [
-      calendarYear,
-      calendarMonth,
-    ]);
+        const startWeekDay =
+          firstDay.getDay();
+
+
+        const currentMonthLastDate =
+          lastDay.getDate();
+
+
+        const previousMonthLastDate =
+          previousMonthLastDay.getDate();
+
+
+        const dates =
+          [];
+
+
+        /* =========================
+           이전 달
+        ========================= */
+
+        for (
+          let index =
+            startWeekDay -
+            1;
+          index >= 0;
+          index -= 1
+        ) {
+          const day =
+            previousMonthLastDate -
+            index;
+
+
+          const previousDate =
+            new Date(
+              calendarYear,
+              calendarMonth -
+                1,
+              day
+            );
+
+
+          dates.push({
+            year:
+              previousDate.getFullYear(),
+
+            month:
+              previousDate.getMonth(),
+
+            day,
+
+            isCurrentMonth:
+              false,
+          });
+        }
+
+
+        /* =========================
+           현재 달
+        ========================= */
+
+        for (
+          let day = 1;
+          day <=
+          currentMonthLastDate;
+          day += 1
+        ) {
+          dates.push({
+            year:
+              calendarYear,
+
+            month:
+              calendarMonth,
+
+            day,
+
+            isCurrentMonth:
+              true,
+          });
+        }
+
+
+        /* =========================
+           다음 달
+        ========================= */
+
+        let nextDay =
+          1;
+
+
+        while (
+          dates.length <
+          42
+        ) {
+          const nextDate =
+            new Date(
+              calendarYear,
+              calendarMonth +
+                1,
+              nextDay
+            );
+
+
+          dates.push({
+            year:
+              nextDate.getFullYear(),
+
+            month:
+              nextDate.getMonth(),
+
+            day:
+              nextDay,
+
+            isCurrentMonth:
+              false,
+          });
+
+
+          nextDay +=
+            1;
+        }
+
+
+        return dates;
+      },
+      [
+        calendarYear,
+        calendarMonth,
+      ]
+    );
 
 
   /* ==================================================
@@ -284,11 +306,15 @@ function IssueScheduleSection({
   const handlePreviousMonth =
     () => {
       if (
-        calendarMonth === 0
+        calendarMonth ===
+        0
       ) {
         setCalendarYear(
-          (prev) =>
-            prev - 1
+          (
+            prev
+          ) =>
+            prev -
+            1
         );
 
 
@@ -302,8 +328,11 @@ function IssueScheduleSection({
 
 
       setCalendarMonth(
-        (prev) =>
-          prev - 1
+        (
+          prev
+        ) =>
+          prev -
+          1
       );
     };
 
@@ -315,11 +344,15 @@ function IssueScheduleSection({
   const handleNextMonth =
     () => {
       if (
-        calendarMonth === 11
+        calendarMonth ===
+        11
       ) {
         setCalendarYear(
-          (prev) =>
-            prev + 1
+          (
+            prev
+          ) =>
+            prev +
+            1
         );
 
 
@@ -333,8 +366,11 @@ function IssueScheduleSection({
 
 
       setCalendarMonth(
-        (prev) =>
-          prev + 1
+        (
+          prev
+        ) =>
+          prev +
+          1
       );
     };
 
@@ -380,7 +416,9 @@ function IssueScheduleSection({
     (
       date
     ) => {
-      if (!dueDate) {
+      if (
+        !dueDate
+      ) {
         return false;
       }
 
@@ -483,7 +521,9 @@ function IssueScheduleSection({
                 event
               ) =>
                 onAssigneeInputChange(
-                  event.target.value
+                  event
+                    .target
+                    .value
                 )
               }
               autoComplete="off"
@@ -617,7 +657,9 @@ function IssueScheduleSection({
               }
             >
               <span>
-                {getDisplayDate()}
+                {
+                  getDisplayDate()
+                }
               </span>
 
 
@@ -629,7 +671,9 @@ function IssueScheduleSection({
                 aria-label="처리 일자 선택"
                 onClick={() =>
                   setIsCalendarOpen(
-                    (prev) =>
+                    (
+                      prev
+                    ) =>
                       !prev
                   )
                 }
@@ -761,7 +805,8 @@ function IssueScheduleSection({
                           key={`${date.year}-${date.month}-${date.day}-${index}`}
                           type="button"
                           className={`${styles.calendarDate} ${
-                            !date.isCurrentMonth
+                            !date
+                              .isCurrentMonth
                               ? styles.outsideDate
                               : ""
                           } ${
@@ -830,7 +875,9 @@ function IssueScheduleSection({
             }
             onClick={() =>
               setCycleOpen(
-                (prev) =>
+                (
+                  prev
+                ) =>
                   !prev
               )
             }
@@ -903,7 +950,7 @@ function IssueScheduleSection({
                       }
                     >
                       {
-                        item.name
+                        item.cycleLabel
                       }
                     </button>
                   )

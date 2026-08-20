@@ -113,17 +113,17 @@ const defaultReviewSummary = [
 ================================================== */
 
 const sortCyclesByPeriod = (
-  cycles,
+  cycles
 ) => {
   return [...cycles].sort(
     (a, b) => {
       const startCompare =
         String(
-          a.startDate || "",
+          a.startDate || ""
         ).localeCompare(
           String(
-            b.startDate || "",
-          ),
+            b.startDate || ""
+          )
         );
 
 
@@ -136,11 +136,11 @@ const sortCyclesByPeriod = (
 
       const endCompare =
         String(
-          a.endDate || "",
+          a.endDate || ""
         ).localeCompare(
           String(
-            b.endDate || "",
-          ),
+            b.endDate || ""
+          )
         );
 
 
@@ -153,13 +153,13 @@ const sortCyclesByPeriod = (
 
       return (
         Number(
-          a.cycleId || 0,
+          a.cycleId || 0
         ) -
         Number(
-          b.cycleId || 0,
+          b.cycleId || 0
         )
       );
-    },
+    }
   );
 };
 
@@ -169,7 +169,7 @@ const sortCyclesByPeriod = (
 ================================================== */
 
 const getRelativeTimeText = (
-  dateString,
+  dateString
 ) => {
   if (!dateString) {
     return "";
@@ -178,7 +178,7 @@ const getRelativeTimeText = (
 
   const syncedDate =
     new Date(
-      dateString,
+      dateString
     );
 
 
@@ -194,8 +194,8 @@ const getRelativeTimeText = (
           now.getTime() -
           syncedDate.getTime()
         ) /
-          (1000 * 60),
-      ),
+          (1000 * 60)
+      )
     );
 
 
@@ -215,7 +215,7 @@ const getRelativeTimeText = (
 
   const diffHours =
     Math.floor(
-      diffMinutes / 60,
+      diffMinutes / 60
     );
 
 
@@ -227,7 +227,7 @@ const getRelativeTimeText = (
 
 
   return `${Math.floor(
-    diffHours / 24,
+    diffHours / 24
   )}일 전`;
 };
 
@@ -237,15 +237,15 @@ const getRelativeTimeText = (
 ================================================== */
 
 const wait = (
-  milliseconds,
+  milliseconds
 ) =>
   new Promise(
     (resolve) => {
       setTimeout(
         resolve,
-        milliseconds,
+        milliseconds
       );
-    },
+    }
   );
 
 
@@ -255,7 +255,7 @@ const wait = (
 
 const getDatePartsInTimezone = (
   date,
-  timezone,
+  timezone
 ) => {
   const formatter =
     new Intl.DateTimeFormat(
@@ -284,7 +284,7 @@ const getDatePartsInTimezone = (
 
         hourCycle:
           "h23",
-      },
+      }
     );
 
 
@@ -293,7 +293,7 @@ const getDatePartsInTimezone = (
 
   formatter
     .formatToParts(
-      date,
+      date
     )
     .forEach(
       (part) => {
@@ -305,10 +305,10 @@ const getDatePartsInTimezone = (
             part.type
           ] =
             Number(
-              part.value,
+              part.value
             );
         }
-      },
+      }
     );
 
 
@@ -319,7 +319,7 @@ const getDatePartsInTimezone = (
 const buildDateTimeWithOffset = (
   dateString,
   timezone,
-  isEnd = false,
+  isEnd = false
 ) => {
   const [
     year,
@@ -327,7 +327,7 @@ const buildDateTimeWithOffset = (
     day,
   ] =
     String(
-      dateString,
+      dateString
     )
       .split("-")
       .map(Number);
@@ -339,7 +339,7 @@ const buildDateTimeWithOffset = (
     !day
   ) {
     throw new Error(
-      "Cycle 날짜 정보가 올바르지 않습니다.",
+      "Cycle 날짜 정보가 올바르지 않습니다."
     );
   }
 
@@ -347,8 +347,10 @@ const buildDateTimeWithOffset = (
   const hour =
     isEnd ? 23 : 0;
 
+
   const minute =
     isEnd ? 59 : 0;
+
 
   const second =
     isEnd ? 59 : 0;
@@ -361,7 +363,7 @@ const buildDateTimeWithOffset = (
       day,
       hour,
       minute,
-      second,
+      second
     );
 
 
@@ -377,9 +379,9 @@ const buildDateTimeWithOffset = (
     const parts =
       getDatePartsInTimezone(
         new Date(
-          instant,
+          instant
         ),
-        timezone,
+        timezone
       );
 
 
@@ -390,7 +392,7 @@ const buildDateTimeWithOffset = (
         parts.day,
         parts.hour,
         parts.minute,
-        parts.second,
+        parts.second
       );
 
 
@@ -417,7 +419,7 @@ const buildDateTimeWithOffset = (
         targetAsUtc -
         instant
       ) /
-        (1000 * 60),
+        (1000 * 60)
     );
 
 
@@ -429,27 +431,27 @@ const buildDateTimeWithOffset = (
 
   const absoluteOffset =
     Math.abs(
-      offsetMinutes,
+      offsetMinutes
     );
 
 
   const offsetHour =
     String(
       Math.floor(
-        absoluteOffset / 60,
-      ),
+        absoluteOffset / 60
+      )
     ).padStart(
       2,
-      "0",
+      "0"
     );
 
 
   const offsetMinute =
     String(
-      absoluteOffset % 60,
+      absoluteOffset % 60
     ).padStart(
       2,
-      "0",
+      "0"
     );
 
 
@@ -468,7 +470,7 @@ const buildDateTimeWithOffset = (
 ================================================== */
 
 const getErrorMessage = (
-  error,
+  error
 ) =>
   error.response?.data?.message ||
   error.data?.message ||
@@ -481,11 +483,11 @@ const getErrorMessage = (
 ================================================== */
 
 const buildDraftItems = (
-  items,
+  items
 ) => {
   return (
     Array.isArray(
-      items,
+      items
     )
       ? items
       : []
@@ -497,14 +499,14 @@ const buildDraftItems = (
 
       if (
         Array.isArray(
-          item.evidenceIds,
+          item.evidenceIds
         )
       ) {
         evidenceIds =
           item.evidenceIds;
       } else if (
         Array.isArray(
-          item.evidences,
+          item.evidences
         )
       ) {
         evidenceIds =
@@ -512,12 +514,12 @@ const buildDraftItems = (
             .map(
               (evidence) =>
                 evidence
-                  ?.evidenceId,
+                  ?.evidenceId
             )
             .filter(
               (id) =>
                 id !== null &&
-                id !== undefined,
+                id !== undefined
             );
       }
 
@@ -547,7 +549,7 @@ const buildDraftItems = (
           item.reviewStatus ||
           "NEEDS_REVIEW",
       };
-    },
+    }
   );
 };
 
@@ -575,7 +577,7 @@ function HandoverDashboard() {
     reviewSummary,
     setReviewSummary,
   ] = useState(
-    defaultReviewSummary,
+    defaultReviewSummary
   );
 
 
@@ -584,9 +586,9 @@ function HandoverDashboard() {
     setProjectName,
   ] = useState(
     localStorage.getItem(
-      "projectName",
+      "projectName"
     ) ||
-      "프로젝트",
+      "프로젝트"
   );
 
 
@@ -594,7 +596,7 @@ function HandoverDashboard() {
     cycleLabel,
     setCycleLabel,
   ] = useState(
-    "Cycle",
+    "Cycle"
   );
 
 
@@ -642,12 +644,19 @@ function HandoverDashboard() {
 
   /* ==================================================
      Handover 데이터 적용
+
+     GET에서 delivery가 null이어도
+     이미 만들어진 deliveryDraft는 유지
   ================================================== */
 
   const applyHandoverData =
     useCallback(
-      (data) => {
-        if (!data) {
+      (
+        data
+      ) => {
+        if (
+          !data
+        ) {
           return;
         }
 
@@ -658,25 +667,38 @@ function HandoverDashboard() {
           localStorage.setItem(
             "handoverId",
             String(
-              data.handoverId,
-            ),
+              data.handoverId
+            )
           );
         }
 
 
         setHandoverData(
-          data,
+          data
         );
 
 
-        setDeliveryDraft(data.delivery ?? null);
+        /*
+          polling 중 delivery: null이 와도
+          현재 전달 정보를 지우지 않음
+        */
+
+        setDeliveryDraft(
+          (
+            previousDelivery
+          ) =>
+            data.delivery ??
+            previousDelivery
+        );
 
 
         const summary =
           data.reviewSummary;
 
 
-        if (summary) {
+        if (
+          summary
+        ) {
           setReviewSummary([
             {
               label:
@@ -716,7 +738,7 @@ function HandoverDashboard() {
           ]);
         }
       },
-      [],
+      []
     );
 
 
@@ -726,11 +748,11 @@ function HandoverDashboard() {
         handoverData
           ?.handoverId ||
         localStorage.getItem(
-          "handoverId",
+          "handoverId"
         ),
       [
         handoverData,
-      ],
+      ]
     );
 
 
@@ -741,10 +763,11 @@ function HandoverDashboard() {
   const fetchHandoverUntilReady =
     useCallback(
       async (
-        handoverId,
+        handoverId
       ) => {
         const MAX_ATTEMPTS =
           30;
+
 
         const INTERVAL =
           2000;
@@ -770,13 +793,13 @@ function HandoverDashboard() {
           try {
             const response =
               await getHandover(
-                handoverId,
+                handoverId
               );
 
 
             console.log(
               "AI 인수인계 전체 조회:",
-              response,
+              response
             );
 
 
@@ -784,13 +807,15 @@ function HandoverDashboard() {
               response?.data;
 
 
-            if (data) {
+            if (
+              data
+            ) {
               lastData =
                 data;
 
 
               applyHandoverData(
-                data,
+                data
               );
 
 
@@ -812,18 +837,10 @@ function HandoverDashboard() {
                 "FAILED"
               ) {
                 throw new Error(
-                  "AI 인수인계 생성에 실패했습니다.",
+                  "AI 인수인계 생성에 실패했습니다."
                 );
               }
 
-
-              /*
-                PENDING
-                RUNNING
-                AI_GENERATING
-
-                → 계속 polling
-              */
 
               const isRunning =
                 [
@@ -831,7 +848,7 @@ function HandoverDashboard() {
                   "RUNNING",
                   "AI_GENERATING",
                 ].includes(
-                  generationStatus,
+                  generationStatus
                 );
 
 
@@ -844,7 +861,9 @@ function HandoverDashboard() {
                 return data;
               }
             }
-          } catch (error) {
+          } catch (
+            error
+          ) {
             const status =
               error.response
                 ?.status ||
@@ -863,7 +882,7 @@ function HandoverDashboard() {
 
 
           await wait(
-            INTERVAL,
+            INTERVAL
           );
         }
 
@@ -872,7 +891,7 @@ function HandoverDashboard() {
       },
       [
         applyHandoverData,
-      ],
+      ]
     );
 
 
@@ -883,10 +902,6 @@ function HandoverDashboard() {
   ================================================== */
 
   useEffect(() => {
-    /*
-      React StrictMode 대응
-    */
-
     isUnmountedRef.current =
       false;
 
@@ -909,29 +924,35 @@ function HandoverDashboard() {
       async () => {
         const projectId =
           localStorage.getItem(
-            "projectId",
+            "projectId"
           );
 
 
         const cycleId =
           localStorage.getItem(
-            "cycleId",
+            "cycleId"
           );
 
 
-        if (!projectId) {
+        if (
+          !projectId
+        ) {
           setErrorMessage(
-            "선택된 프로젝트가 없습니다.",
+            "선택된 프로젝트가 없습니다."
           );
+
 
           return;
         }
 
 
-        if (!cycleId) {
+        if (
+          !cycleId
+        ) {
           setErrorMessage(
-            "선택된 Cycle이 없습니다. 사이클 페이지에서 Cycle을 먼저 선택해주세요.",
+            "선택된 Cycle이 없습니다. 사이클 페이지에서 Cycle을 먼저 선택해주세요."
           );
+
 
           return;
         }
@@ -939,11 +960,12 @@ function HandoverDashboard() {
 
         try {
           setIsLoading(
-            true,
+            true
           );
 
+
           setErrorMessage(
-            "",
+            ""
           );
 
 
@@ -953,14 +975,14 @@ function HandoverDashboard() {
 
           const cycleListResponse =
             await getCycles(
-              projectId,
+              projectId
             );
 
 
           const cycleList =
             Array.isArray(
               cycleListResponse
-                ?.data,
+                ?.data
             )
               ? cycleListResponse
                   .data
@@ -969,19 +991,21 @@ function HandoverDashboard() {
 
           const sortedCycles =
             sortCyclesByPeriod(
-              cycleList,
+              cycleList
             );
 
 
           const selectedCycleIndex =
             sortedCycles.findIndex(
-              (cycle) =>
+              (
+                cycle
+              ) =>
                 Number(
-                  cycle.cycleId,
+                  cycle.cycleId
                 ) ===
                 Number(
-                  cycleId,
-                ),
+                  cycleId
+                )
             );
 
 
@@ -990,7 +1014,7 @@ function HandoverDashboard() {
             0
           ) {
             throw new Error(
-              "선택한 Cycle이 현재 프로젝트에 속하지 않습니다.",
+              "선택한 Cycle이 현재 프로젝트에 속하지 않습니다."
             );
           }
 
@@ -999,7 +1023,7 @@ function HandoverDashboard() {
             `Cycle ${
               selectedCycleIndex +
               1
-            }`,
+            }`
           );
 
 
@@ -1009,11 +1033,11 @@ function HandoverDashboard() {
           ] =
             await Promise.all([
               getCycle(
-                cycleId,
+                cycleId
               ),
 
               getProjectDetail(
-                projectId,
+                projectId
               ),
             ]);
 
@@ -1033,7 +1057,7 @@ function HandoverDashboard() {
             !projectData
           ) {
             throw new Error(
-              "프로젝트 또는 Cycle 정보를 불러오지 못했습니다.",
+              "프로젝트 또는 Cycle 정보를 불러오지 못했습니다."
             );
           }
 
@@ -1042,12 +1066,13 @@ function HandoverDashboard() {
             projectData.name
           ) {
             setProjectName(
-              projectData.name,
+              projectData.name
             );
+
 
             localStorage.setItem(
               "projectName",
-              projectData.name,
+              projectData.name
             );
           }
 
@@ -1058,19 +1083,19 @@ function HandoverDashboard() {
 
           const existingHandoverId =
             localStorage.getItem(
-              "handoverId",
+              "handoverId"
             );
 
 
           const handoverProjectId =
             localStorage.getItem(
-              "handoverProjectId",
+              "handoverProjectId"
             );
 
 
           const handoverCycleId =
             localStorage.getItem(
-              "handoverCycleId",
+              "handoverCycleId"
             );
 
 
@@ -1078,11 +1103,11 @@ function HandoverDashboard() {
             existingHandoverId &&
             handoverProjectId ===
               String(
-                projectId,
+                projectId
               ) &&
             handoverCycleId ===
               String(
-                cycleId,
+                cycleId
               );
 
 
@@ -1091,12 +1116,12 @@ function HandoverDashboard() {
           ) {
             console.log(
               "기존 인수인계 조회:",
-              existingHandoverId,
+              existingHandoverId
             );
 
 
             await fetchHandoverUntilReady(
-              existingHandoverId,
+              existingHandoverId
             );
 
 
@@ -1105,20 +1130,32 @@ function HandoverDashboard() {
 
 
           /* =========================
-             현재 프로젝트/Cycle에
-             handoverId가 없으므로 생성
+             다른 Cycle / 프로젝트이므로
+             기존 handover 정보 초기화
           ========================= */
 
           localStorage.removeItem(
-            "handoverId",
+            "handoverId"
           );
 
-          localStorage.removeItem(
-            "handoverProjectId",
-          );
 
           localStorage.removeItem(
-            "handoverCycleId",
+            "handoverProjectId"
+          );
+
+
+          localStorage.removeItem(
+            "handoverCycleId"
+          );
+
+
+          /*
+            이전 Cycle의 전달 정보가
+            새 인수인계에 섞이지 않도록 초기화
+          */
+
+          setDeliveryDraft(
+            null
           );
 
 
@@ -1127,7 +1164,7 @@ function HandoverDashboard() {
             !cycleData.endDate
           ) {
             throw new Error(
-              "Cycle 기간 정보가 없습니다.",
+              "Cycle 기간 정보가 없습니다."
             );
           }
 
@@ -1136,8 +1173,10 @@ function HandoverDashboard() {
             projectData
               ?.teamSchedules
               ?.find(
-                (team) =>
-                  team.timezone,
+                (
+                  team
+                ) =>
+                  team.timezone
               )
               ?.timezone;
 
@@ -1155,14 +1194,14 @@ function HandoverDashboard() {
               buildDateTimeWithOffset(
                 cycleData.startDate,
                 timezone,
-                false,
+                false
               ),
 
             to:
               buildDateTimeWithOffset(
                 cycleData.endDate,
                 timezone,
-                true,
+                true
               ),
           };
 
@@ -1172,18 +1211,19 @@ function HandoverDashboard() {
             {
               projectId:
                 Number(
-                  projectId,
+                  projectId
                 ),
 
               cycleId:
                 Number(
-                  cycleId,
+                  cycleId
                 ),
 
               sourceRange,
 
-              sourceTypes: [],
-            },
+              sourceTypes:
+                [],
+            }
           );
 
 
@@ -1193,13 +1233,13 @@ function HandoverDashboard() {
               cycleId,
               {
                 sourceRange,
-              },
+              }
             );
 
 
           console.log(
             "AI 인수인계 초안 생성 성공:",
-            draftResponse,
+            draftResponse
           );
 
 
@@ -1209,9 +1249,11 @@ function HandoverDashboard() {
               ?.handoverId;
 
 
-          if (!handoverId) {
+          if (
+            !handoverId
+          ) {
             throw new Error(
-              "handoverId를 받지 못했습니다.",
+              "handoverId를 받지 못했습니다."
             );
           }
 
@@ -1219,53 +1261,58 @@ function HandoverDashboard() {
           localStorage.setItem(
             "handoverId",
             String(
-              handoverId,
-            ),
+              handoverId
+            )
           );
+
 
           localStorage.setItem(
             "handoverProjectId",
             String(
-              projectId,
-            ),
+              projectId
+            )
           );
+
 
           localStorage.setItem(
             "handoverCycleId",
             String(
-              cycleId,
-            ),
+              cycleId
+            )
           );
 
 
           await fetchHandoverUntilReady(
-            handoverId,
+            handoverId
           );
-        } catch (error) {
+        } catch (
+          error
+        ) {
           console.error(
             "AI 인수인계 초기화 실패:",
-            error,
+            error
           );
 
 
           console.error(
             "서버 응답:",
-            error.response?.data ||
-              error.data,
+            error.response
+              ?.data ||
+              error.data
           );
 
 
           setErrorMessage(
             getErrorMessage(
-              error,
-            ),
+              error
+            )
           );
         } finally {
           if (
             !isUnmountedRef.current
           ) {
             setIsLoading(
-              false,
+              false
             );
           }
         }
@@ -1289,81 +1336,91 @@ function HandoverDashboard() {
   ================================================== */
 
   const handoverSections =
-    useMemo(() => {
-      const items =
-        handoverData?.items ??
-        [];
+    useMemo(
+      () => {
+        const items =
+          handoverData
+            ?.items ??
+          [];
 
 
-      return CATEGORY_ORDER.map(
-        (category) => {
-          const categoryInfo =
-            CATEGORY_INFO[
-              category
-            ];
+        return CATEGORY_ORDER.map(
+          (
+            category
+          ) => {
+            const categoryInfo =
+              CATEGORY_INFO[
+                category
+              ];
 
 
-          const categoryItems =
-            items
-              .filter(
-                (item) =>
-                  item.category ===
-                  category,
-              )
-              .map(
-                (item) => ({
-                  itemId:
-                    item.itemId,
+            const categoryItems =
+              items
+                .filter(
+                  (
+                    item
+                  ) =>
+                    item.category ===
+                    category
+                )
+                .map(
+                  (
+                    item
+                  ) => ({
+                    itemId:
+                      item.itemId,
 
-                  title:
-                    item.title ||
-                    "",
+                    title:
+                      item.title ||
+                      "",
 
-                  description:
-                    item.description ||
-                    "",
+                    description:
+                      item.description ||
+                      "",
 
-                  manager:
-                    item.assigneeMemberId
-                      ? `멤버 ${item.assigneeMemberId}`
-                      : "-",
+                    manager:
+                      item.assigneeMemberId
+                        ? `멤버 ${item.assigneeMemberId}`
+                        : "-",
 
-                  evidenceCount:
-                    Array.isArray(
-                      item.evidences,
-                    )
-                      ? item
-                          .evidences
-                          .length
-                      : 0,
+                    evidenceCount:
+                      Array.isArray(
+                        item.evidences
+                      )
+                        ? item
+                            .evidences
+                            .length
+                        : 0,
 
-                  warning:
-                    item.reviewStatus !==
-                    "VERIFIED",
-                }),
-              );
+                    warning:
+                      item.reviewStatus !==
+                      "VERIFIED",
+                  })
+                );
 
 
-          return {
-            category,
+            return {
+              category,
 
-            number:
-              categoryInfo.number,
+              number:
+                categoryInfo.number,
 
-            title:
-              categoryInfo.title,
+              title:
+                categoryInfo.title,
 
-            count:
-              categoryItems.length,
+              count:
+                categoryItems.length,
 
-            items:
-              categoryItems,
-          };
-        },
-      );
-    }, [
-      handoverData,
-    ]);
+              items:
+                categoryItems,
+            };
+          }
+        );
+      },
+      [
+        handoverData,
+      ]
+    );
 
 
   /* ==================================================
@@ -1374,7 +1431,8 @@ function HandoverDashboard() {
     useCallback(
       async ({
         items =
-          handoverData?.items ??
+          handoverData
+            ?.items ??
           [],
 
         delivery =
@@ -1384,7 +1442,7 @@ function HandoverDashboard() {
           handoverData
             ?.handoverId ||
           localStorage.getItem(
-            "handoverId",
+            "handoverId"
           );
 
 
@@ -1393,19 +1451,34 @@ function HandoverDashboard() {
             ?.version;
 
 
-        if (!handoverId) {
+        if (
+          !handoverId
+        ) {
           throw new Error(
-            "handoverId가 없습니다.",
+            "handoverId가 없습니다."
           );
         }
 
 
         if (
-          version === null ||
-          version === undefined
+          handoverData
+            ?.status ===
+          "DELIVERED"
         ) {
           throw new Error(
-            "인수인계 version이 없습니다.",
+            "이미 전달 완료된 인수인계입니다."
+          );
+        }
+
+
+        if (
+          version ===
+            null ||
+          version ===
+            undefined
+        ) {
+          throw new Error(
+            "인수인계 version이 없습니다."
           );
         }
 
@@ -1421,7 +1494,7 @@ function HandoverDashboard() {
             ?.timezone
         ) {
           throw new Error(
-            "전달 정보를 먼저 설정해주세요.",
+            "전달 정보를 먼저 설정해주세요."
           );
         }
 
@@ -1429,7 +1502,7 @@ function HandoverDashboard() {
         const request = {
           items:
             buildDraftItems(
-              items,
+              items
             ),
 
           removedItemIds:
@@ -1438,19 +1511,20 @@ function HandoverDashboard() {
           delivery: {
             targetTeamId:
               Number(
-                delivery.targetTeamId,
+                delivery.targetTeamId
               ),
 
             recipientMemberId:
               Number(
-                delivery.recipientMemberId,
+                delivery.recipientMemberId
               ),
 
             timingType:
               delivery.timingType,
 
             scheduledAt:
-              delivery.scheduledAt ??
+              delivery
+                .scheduledAt ??
               null,
 
             timezone:
@@ -1459,119 +1533,224 @@ function HandoverDashboard() {
 
           version:
             Number(
-              version,
+              version
             ),
         };
 
 
         console.log(
           "인수인계 draft 저장 Payload:",
-          request,
+          request
         );
 
 
         try {
           setIsSavingDraft(
-            true,
+            true
           );
 
+
           setErrorMessage(
-            "",
+            ""
           );
 
 
           const response =
             await saveHandoverDraft(
               handoverId,
-              request,
+              request
             );
 
 
           console.log(
             "인수인계 draft 저장 성공:",
-            response,
+            response
           );
 
 
           /*
-            저장 후 GET으로 서버 상태 동기화
+            PUT 응답에서 최신 데이터 확인
           */
 
-          const latestResponse =
-            await getHandover(
-              handoverId,
+          const savedData =
+            response
+              ?.data ??
+            null;
+
+
+          const savedVersion =
+            savedData
+              ?.version;
+
+
+          /*
+            저장 이후 GET으로
+            서버 최신 상태 동기화
+
+            GET 실패하더라도
+            PUT 성공 결과는 유지
+          */
+
+          let latestData =
+            null;
+
+
+          try {
+            const latestResponse =
+              await getHandover(
+                handoverId
+              );
+
+
+            latestData =
+              latestResponse
+                ?.data ??
+              null;
+
+
+            console.log(
+              "draft 저장 후 최신 인수인계 조회:",
+              latestResponse
             );
-
-
-          const latestData =
-            latestResponse
-              ?.data;
-
-
-          if (latestData) {
-            applyHandoverData(
-              latestData,
+          } catch (
+            getError
+          ) {
+            console.warn(
+              "draft 저장 후 최신 조회 실패:",
+              getError
             );
-
-
-            return latestData;
           }
 
 
           /*
-            GET에 데이터가 없을 경우
-            저장 응답 version이라도 반영
+            version 후보 중
+            가장 최신 값 사용
           */
 
-          const savedVersion =
-            response?.data
-              ?.version;
+          const versionCandidates = [
+            Number(
+              version
+            ),
 
+            Number(
+              savedVersion
+            ),
 
-          const fallbackData = {
-            ...handoverData,
-
-            items,
-
-            delivery,
-
-            version:
-              savedVersion ??
-              version,
-          };
-
-
-          applyHandoverData(
-            fallbackData,
+            Number(
+              latestData
+                ?.version
+            ),
+          ].filter(
+            (
+              value
+            ) =>
+              Number.isFinite(
+                value
+              )
           );
 
 
-          return fallbackData;
-        } catch (error) {
+          const resolvedVersion =
+            versionCandidates.length >
+              0
+              ? Math.max(
+                  ...versionCandidates
+                )
+              : Number(
+                  version
+                );
+
+
+          /*
+            GET 결과의 delivery가 null이어도
+            방금 저장한 delivery는 유지
+          */
+
+          const resolvedData = {
+            ...handoverData,
+
+            ...(latestData ||
+              {}),
+
+            ...(savedData ||
+              {}),
+
+            handoverId:
+              latestData
+                ?.handoverId ??
+              savedData
+                ?.handoverId ??
+              handoverData
+                ?.handoverId ??
+              Number(
+                handoverId
+              ),
+
+            items:
+              Array.isArray(
+                savedData
+                  ?.items
+              )
+                ? savedData.items
+                : Array.isArray(
+                      latestData
+                        ?.items
+                    )
+                  ? latestData.items
+                  : items,
+
+            delivery:
+              savedData
+                ?.delivery ??
+              latestData
+                ?.delivery ??
+              delivery,
+
+            version:
+              resolvedVersion,
+          };
+
+
+          console.log(
+            "draft 저장 후 최종 동기화 데이터:",
+            resolvedData
+          );
+
+
+          applyHandoverData(
+            resolvedData
+          );
+
+
+          return resolvedData;
+        } catch (
+          error
+        ) {
           console.error(
             "인수인계 draft 저장 실패:",
-            error,
+            error
           );
 
 
           console.error(
             "서버 응답:",
-            error.response?.data ||
-              error.data,
+            error.response
+              ?.data ||
+              error.data
           );
 
 
           setErrorMessage(
             getErrorMessage(
-              error,
-            ),
+              error
+            )
           );
 
 
           throw error;
         } finally {
           setIsSavingDraft(
-            false,
+            false
           );
         }
       },
@@ -1579,7 +1758,7 @@ function HandoverDashboard() {
         handoverData,
         deliveryDraft,
         applyHandoverData,
-      ],
+      ]
     );
 
 
@@ -1589,22 +1768,31 @@ function HandoverDashboard() {
 
   const handleDeliveryChange =
     useCallback(
-      (delivery) => {
+      (
+        delivery
+      ) => {
+        if (
+          !delivery
+        ) {
+          return;
+        }
+
+
         setDeliveryDraft(
-          delivery,
+          delivery
         );
       },
-      [],
+      []
     );
 
 
   const handleDeliverySave =
     useCallback(
       async (
-        delivery,
+        delivery
       ) => {
         setDeliveryDraft(
-          delivery,
+          delivery
         );
 
 
@@ -1614,7 +1802,7 @@ function HandoverDashboard() {
       },
       [
         saveCurrentDraft,
-      ],
+      ]
     );
 
 
@@ -1628,11 +1816,11 @@ function HandoverDashboard() {
 
   const handleAddItem =
     async (
-      category,
+      category
     ) => {
       const title =
         window.prompt(
-          "인수인계 항목 제목을 입력해주세요.",
+          "인수인계 항목 제목을 입력해주세요."
         );
 
 
@@ -1645,7 +1833,7 @@ function HandoverDashboard() {
 
       const description =
         window.prompt(
-          "인수인계 항목 내용을 입력해주세요.",
+          "인수인계 항목 내용을 입력해주세요."
         );
 
 
@@ -1711,26 +1899,31 @@ function HandoverDashboard() {
 
   const handleEditItem =
     async (
-      itemId,
+      itemId
     ) => {
       const items =
         handoverData
-          ?.items ?? [];
+          ?.items ??
+        [];
 
 
       const target =
         items.find(
-          (item) =>
+          (
+            item
+          ) =>
             Number(
-              item.itemId,
+              item.itemId
             ) ===
             Number(
-              itemId,
-            ),
+              itemId
+            )
         );
 
 
-      if (!target) {
+      if (
+        !target
+      ) {
         return;
       }
 
@@ -1739,12 +1932,13 @@ function HandoverDashboard() {
         window.prompt(
           "제목을 수정해주세요.",
           target.title ||
-            "",
+            ""
         );
 
 
       if (
-        title === null
+        title ===
+        null
       ) {
         return;
       }
@@ -1754,7 +1948,7 @@ function HandoverDashboard() {
         window.prompt(
           "내용을 수정해주세요.",
           target.description ||
-            "",
+            ""
         );
 
 
@@ -1771,8 +1965,9 @@ function HandoverDashboard() {
         !description.trim()
       ) {
         alert(
-          "제목과 내용은 비워둘 수 없습니다.",
+          "제목과 내용은 비워둘 수 없습니다."
         );
+
 
         return;
       }
@@ -1780,12 +1975,14 @@ function HandoverDashboard() {
 
       const nextItems =
         items.map(
-          (item) =>
+          (
+            item
+          ) =>
             Number(
-              item.itemId,
+              item.itemId
             ) ===
             Number(
-              itemId,
+              itemId
             )
               ? {
                   ...item,
@@ -1796,7 +1993,7 @@ function HandoverDashboard() {
                   description:
                     description.trim(),
                 }
-              : item,
+              : item
         );
 
 
@@ -1831,11 +2028,12 @@ function HandoverDashboard() {
 
       try {
         setIsRefreshing(
-          true,
+          true
         );
 
+
         setErrorMessage(
-          "",
+          ""
         );
 
 
@@ -1845,30 +2043,38 @@ function HandoverDashboard() {
             {
               preserveManualEdits:
                 true,
-            },
+            }
           );
 
 
         console.log(
           "AI 최신 활동 재반영 성공:",
-          response,
+          response
         );
 
 
         await fetchHandoverUntilReady(
           response?.data
             ?.handoverId ||
-            handoverId,
+            handoverId
         );
-      } catch (error) {
+      } catch (
+        error
+      ) {
+        console.error(
+          "AI 최신 활동 재반영 실패:",
+          error
+        );
+
+
         setErrorMessage(
           getErrorMessage(
-            error,
-          ),
+            error
+          )
         );
       } finally {
         setIsRefreshing(
-          false,
+          false
         );
       }
     };
@@ -1877,9 +2083,11 @@ function HandoverDashboard() {
   /* ==================================================
      최종 전달
 
+     현재 delivery 확인
+     ↓
      draft 저장
      ↓
-     최신 version
+     최신 version 확보
      ↓
      deliver
   ================================================== */
@@ -1893,22 +2101,97 @@ function HandoverDashboard() {
       }
 
 
-      try {
-        setIsDelivering(
-          true,
+      /*
+        이미 전달 완료된 Handover
+      */
+
+      if (
+        handoverData
+          ?.status ===
+        "DELIVERED"
+      ) {
+        setErrorMessage(
+          "이미 전달 완료된 인수인계입니다."
         );
 
+
+        return;
+      }
+
+
+      const currentItems =
+        handoverData
+          ?.items ??
+        [];
+
+
+      /*
+        전달할 항목 확인
+      */
+
+      if (
+        !Array.isArray(
+          currentItems
+        ) ||
+        currentItems.length ===
+          0
+      ) {
         setErrorMessage(
-          "",
+          "전달할 인수인계 항목이 없습니다."
+        );
+
+
+        return;
+      }
+
+
+      /*
+        전달 정보 확인
+      */
+
+      if (
+        !deliveryDraft
+          ?.targetTeamId ||
+        !deliveryDraft
+          ?.recipientMemberId ||
+        !deliveryDraft
+          ?.timingType ||
+        !deliveryDraft
+          ?.timezone
+      ) {
+        setErrorMessage(
+          "전달 대상과 담당자를 먼저 확인해주세요."
+        );
+
+
+        return;
+      }
+
+
+      try {
+        setIsDelivering(
+          true
+        );
+
+
+        setErrorMessage(
+          ""
         );
 
 
         /*
-          전달 직전 현재 화면 상태 저장
+          1. 전달 직전
+             현재 items + delivery 저장
         */
 
         const savedData =
-          await saveCurrentDraft();
+          await saveCurrentDraft({
+            items:
+              currentItems,
+
+            delivery:
+              deliveryDraft,
+          });
 
 
         const handoverId =
@@ -1921,25 +2204,47 @@ function HandoverDashboard() {
           savedData
             ?.version;
 
-        if (!savedData?.delivery) {
-          throw new Error("전달 정보를 먼저 저장해주세요.");
-        }
 
-        if (!Array.isArray(savedData?.items) || savedData.items.length === 0) {
-          throw new Error("전달할 인수인계 항목이 없습니다.");
+        if (
+          !handoverId
+        ) {
+          throw new Error(
+            "handoverId가 없습니다."
+          );
         }
 
 
         if (
-          !handoverId ||
-          version === null ||
-          version === undefined
+          version ===
+            null ||
+          version ===
+            undefined
         ) {
           throw new Error(
-            "전달에 필요한 인수인계 정보가 없습니다.",
+            "최신 인수인계 version을 확인할 수 없습니다."
           );
         }
 
+
+        console.log(
+          "인수인계 전달 Payload:",
+          {
+            handoverId,
+
+            version:
+              Number(
+                version
+              ),
+
+            acknowledgeReviewAlerts:
+              true,
+          }
+        );
+
+
+        /*
+          2. 최신 version으로 전달
+        */
 
         const response =
           await deliverHandover(
@@ -1947,7 +2252,7 @@ function HandoverDashboard() {
             {
               version:
                 Number(
-                  version,
+                  version
                 ),
 
               acknowledgeReviewAlerts:
@@ -1955,38 +2260,89 @@ function HandoverDashboard() {
 
               deliveryRequestId:
                 crypto.randomUUID(),
-            },
+            }
           );
 
 
         console.log(
           "인수인계 전달 성공:",
-          response,
+          response
+        );
+
+
+        /*
+          전달 성공 상태 반영
+        */
+
+        setHandoverData(
+          (
+            prev
+          ) =>
+            prev
+              ? {
+                  ...prev,
+
+                  status:
+                    response
+                      ?.data
+                      ?.status ??
+                    "DELIVERED",
+                }
+              : prev
         );
 
 
         setIsCompleteModalOpen(
-          true,
+          true
         );
-      } catch (error) {
+      } catch (
+        error
+      ) {
         console.error(
           "인수인계 전달 실패:",
-          error,
+          error
         );
 
 
-        setErrorMessage(
-          getErrorMessage(
-            error,
-          ),
+        console.error(
+          "서버 응답:",
+          error.response
+            ?.data ||
+            error.data
         );
+
+
+        const code =
+          error.response
+            ?.data
+            ?.code;
+
+
+        if (
+          code ===
+          "409HANDOVER_LOCKED"
+        ) {
+          setErrorMessage(
+            "이미 전달 완료된 인수인계입니다."
+          );
+        } else {
+          setErrorMessage(
+            getErrorMessage(
+              error
+            )
+          );
+        }
       } finally {
         setIsDelivering(
-          false,
+          false
         );
       }
     };
 
+
+  /* ==================================================
+     생성 상태
+  ================================================== */
 
   const generationStatus =
     handoverData
@@ -2007,30 +2363,40 @@ function HandoverDashboard() {
       "RUNNING",
       "AI_GENERATING",
     ].includes(
-      generationStatus,
+      generationStatus
     );
 
 
   const itemCount =
     Array.isArray(
-      handoverData?.items,
+      handoverData
+        ?.items
     )
-      ? handoverData.items.length
+      ? handoverData
+          .items
+          .length
       : 0;
 
 
   const isEmptyDraft =
     Boolean(
-      handoverData,
+      handoverData
     ) &&
     !isGenerating &&
-    itemCount === 0;
+    itemCount ===
+      0;
+
+
+  const isDelivered =
+    handoverData
+      ?.status ===
+    "DELIVERED";
 
 
   const lastSyncedText =
     getRelativeTimeText(
       handoverData
-        ?.lastSyncedAt,
+        ?.lastSyncedAt
     );
 
 
@@ -2041,6 +2407,10 @@ function HandoverDashboard() {
           styles.dashboard
         }
       >
+        {/* ==================================================
+            HEADER
+        ================================================== */}
+
         <header
           className={
             styles.pageHeader
@@ -2097,19 +2467,22 @@ function HandoverDashboard() {
                 {errorMessage
                   ? errorMessage
 
+                  : isDelivered
+                    ? "인수인계 전달이 완료되었습니다."
+
                   : isGenerating
                     ? `AI 인수인계를 생성하고 있습니다. (${generationProgress}%)`
 
-                    : isEmptyDraft
-                      ? "사이클에 등록된 이슈가 없어 빈 초안이 생성되었습니다."
+                  : isEmptyDraft
+                    ? "사이클에 등록된 이슈가 없어 빈 초안이 생성되었습니다."
 
-                    : lastSyncedText
-                      ? `AI가 ${lastSyncedText}에 최신 활동을 반영했습니다.`
+                  : lastSyncedText
+                    ? `AI가 ${lastSyncedText}에 최신 활동을 반영했습니다.`
 
-                      : isLoading
-                        ? "AI 인수인계 정보를 불러오는 중입니다."
+                  : isLoading
+                    ? "AI 인수인계 정보를 불러오는 중입니다."
 
-                        : "AI 최신 활동 정보가 없습니다."}
+                  : "AI 최신 활동 정보가 없습니다."}
               </span>
             </div>
           </div>
@@ -2131,7 +2504,8 @@ function HandoverDashboard() {
               disabled={
                 isRefreshing ||
                 isLoading ||
-                !handoverData
+                !handoverData ||
+                isDelivered
               }
             >
               {isRefreshing
@@ -2147,7 +2521,7 @@ function HandoverDashboard() {
               }
               onClick={() =>
                 navigate(
-                  ROUTES.CREATE_ISSUE,
+                  ROUTES.CREATE_ISSUE
                 )
               }
             >
@@ -2162,11 +2536,19 @@ function HandoverDashboard() {
             styles.contentGrid
           }
         >
+          {/* ==================================================
+              MAIN
+          ================================================== */}
+
           <main
             className={
               styles.mainColumn
             }
           >
+            {/* =========================
+                AI 검토 결과
+            ========================= */}
+
             <section
               className={
                 styles.reviewSection
@@ -2187,7 +2569,9 @@ function HandoverDashboard() {
                 }
               >
                 {reviewSummary.map(
-                  (item) => (
+                  (
+                    item
+                  ) => (
                     <ReviewSummaryCard
                       key={
                         item.label
@@ -2199,11 +2583,15 @@ function HandoverDashboard() {
                         item.count
                       }
                     />
-                  ),
+                  )
                 )}
               </div>
             </section>
 
+
+            {/* =========================
+                할 일
+            ========================= */}
 
             <section
               className={
@@ -2231,13 +2619,14 @@ function HandoverDashboard() {
                   }
                   onClick={() =>
                     navigate(
-                      ROUTES.ISSUE,
+                      ROUTES.ISSUE
                     )
                   }
                 >
                   <span>
                     전체 보기
                   </span>
+
 
                   <img
                     src={
@@ -2264,6 +2653,7 @@ function HandoverDashboard() {
                       아직 이 사이클에 등록된 이슈가 없습니다.
                     </strong>
 
+
                     <p>
                       AI는 이 사이클의 이슈, 진행 상태, 완료 조건을 분석해 인수인계
                       초안을 만듭니다. 이슈를 등록하거나 아래에서 항목을 직접 추가할 수 있습니다.
@@ -2271,13 +2661,16 @@ function HandoverDashboard() {
                   </div>
                 )}
 
+
                 <div
                   className={
                     styles.sectionList
                   }
                 >
                   {handoverSections.map(
-                    (section) => (
+                    (
+                      section
+                    ) => (
                       <HandoverSection
                         key={
                           section.category
@@ -2294,16 +2687,21 @@ function HandoverDashboard() {
                         items={
                           section.items
                         }
-                        onAdd={() =>
-                          handleAddItem(
-                            section.category,
-                          )
+                        onAdd={
+                          isDelivered
+                            ? undefined
+                            : () =>
+                                handleAddItem(
+                                  section.category
+                                )
                         }
                         onEdit={
-                          handleEditItem
+                          isDelivered
+                            ? undefined
+                            : handleEditItem
                         }
                       />
-                    ),
+                    )
                   )}
                 </div>
               </div>
@@ -2326,7 +2724,8 @@ function HandoverDashboard() {
                     isDelivering ||
                     isSavingDraft ||
                     isLoading ||
-                    !handoverData
+                    !handoverData ||
+                    isDelivered
                   }
                 >
                   <span
@@ -2334,10 +2733,14 @@ function HandoverDashboard() {
                       styles.transferText
                     }
                   >
-                    {isDelivering ||
-                    isSavingDraft
-                      ? "처리 중..."
-                      : "인수인계 전달 →"}
+                    {isDelivered
+                      ? "전달 완료"
+
+                      : isDelivering ||
+                          isSavingDraft
+                        ? "처리 중..."
+
+                        : "인수인계 전달 →"}
                   </span>
                 </button>
               </div>
@@ -2345,14 +2748,26 @@ function HandoverDashboard() {
           </main>
 
 
+          {/* ==================================================
+              SIDE
+          ================================================== */}
+
           <aside
             className={
               styles.sideColumn
             }
           >
             <AiCheckPanel
-              items={handoverData?.items ?? []}
-              reviewSummary={handoverData?.reviewSummary ?? null}
+              items={
+                handoverData
+                  ?.items ??
+                []
+              }
+              reviewSummary={
+                handoverData
+                  ?.reviewSummary ??
+                null
+              }
             />
 
 
@@ -2368,11 +2783,18 @@ function HandoverDashboard() {
               onSave={
                 handleDeliverySave
               }
+              isLocked={
+                isDelivered
+              }
             />
           </aside>
         </div>
       </div>
 
+
+      {/* ==================================================
+          전달 완료 Modal
+      ================================================== */}
 
       {isCompleteModalOpen && (
         <div
@@ -2393,7 +2815,7 @@ function HandoverDashboard() {
               aria-label="닫기"
               onClick={() =>
                 navigate(
-                  ROUTES.DASHBOARD,
+                  ROUTES.DASHBOARD
                 )
               }
             >

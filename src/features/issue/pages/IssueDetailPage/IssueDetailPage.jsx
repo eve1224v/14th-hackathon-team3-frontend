@@ -40,60 +40,70 @@ const PRIORITY_TEXT = {
 };
 
 
-/* ==================================================
-   Cycle 기간 순 정렬
-================================================== */
-
-const sortCyclesByPeriod = (
-  cycles
-) => {
-  return [...cycles].sort(
-    (a, b) => {
-      const startCompare =
-        String(
-          a.startDate || ""
-        ).localeCompare(
+const sortCyclesByPeriod =
+  (
+    cycles
+  ) => {
+    return [
+      ...cycles,
+    ].sort(
+      (
+        a,
+        b
+      ) => {
+        const startCompare =
           String(
-            b.startDate || ""
+            a.startDate ||
+              ""
+          ).localeCompare(
+            String(
+              b.startDate ||
+                ""
+            )
+          );
+
+
+        if (
+          startCompare !==
+          0
+        ) {
+          return startCompare;
+        }
+
+
+        const endCompare =
+          String(
+            a.endDate ||
+              ""
+          ).localeCompare(
+            String(
+              b.endDate ||
+                ""
+            )
+          );
+
+
+        if (
+          endCompare !==
+          0
+        ) {
+          return endCompare;
+        }
+
+
+        return (
+          Number(
+            a.cycleId ||
+              0
+          ) -
+          Number(
+            b.cycleId ||
+              0
           )
         );
-
-
-      if (
-        startCompare !== 0
-      ) {
-        return startCompare;
       }
-
-
-      const endCompare =
-        String(
-          a.endDate || ""
-        ).localeCompare(
-          String(
-            b.endDate || ""
-          )
-        );
-
-
-      if (
-        endCompare !== 0
-      ) {
-        return endCompare;
-      }
-
-
-      return (
-        Number(
-          a.cycleId || 0
-        ) -
-        Number(
-          b.cycleId || 0
-        )
-      );
-    }
-  );
-};
+    );
+  };
 
 
 function IssueDetailPage() {
@@ -133,7 +143,9 @@ function IssueDetailPage() {
   const [
     cycleLabel,
     setCycleLabel,
-  ] = useState("Cycle");
+  ] = useState(
+    "Cycle"
+  );
 
 
   /* ==================================================
@@ -141,6 +153,10 @@ function IssueDetailPage() {
   ================================================== */
 
   useEffect(() => {
+    let cancelled =
+      false;
+
+
     const fetchIssue =
       async () => {
         try {
@@ -153,6 +169,13 @@ function IssueDetailPage() {
             await getIssue(
               issueId
             );
+
+
+          if (
+            cancelled
+          ) {
+            return;
+          }
 
 
           console.log(
@@ -185,15 +208,13 @@ function IssueDetailPage() {
                   condition.content,
 
                 checked:
-                  condition.isDone,
+                  Boolean(
+                    condition.isDone
+                  ),
               })
             )
           );
 
-
-          /* ==================================================
-             Cycle N 계산
-          ================================================== */
 
           const projectId =
             issueData.projectId ||
@@ -213,15 +234,6 @@ function IssueDetailPage() {
             !projectId ||
             !currentCycleId
           ) {
-            console.warn(
-              "Cycle N 계산에 필요한 projectId 또는 cycleId가 없습니다.",
-              {
-                projectId,
-                currentCycleId,
-              }
-            );
-
-
             setCycleLabel(
               "Cycle"
             );
@@ -238,10 +250,11 @@ function IssueDetailPage() {
               );
 
 
-            console.log(
-              "이슈 상세 Cycle 목록 조회 성공:",
-              cycleResponse
-            );
+            if (
+              cancelled
+            ) {
+              return;
+            }
 
 
             const cycleList =
@@ -272,51 +285,21 @@ function IssueDetailPage() {
               );
 
 
-            const nextCycleLabel =
-              cycleIndex >= 0
-                ? `Cycle ${
-                    cycleIndex + 1
-                  }`
-                : "Cycle";
-
-
             setCycleLabel(
-              nextCycleLabel
-            );
-
-
-            console.log(
-              "이슈 상세 Cycle 표시:",
-              {
-                issueId:
-                  Number(
-                    issueId
-                  ),
-
-                cycleId:
-                  Number(
-                    currentCycleId
-                  ),
-
-                originalCycleName:
-                  issueData.cycleName,
-
-                cycleLabel:
-                  nextCycleLabel,
-              }
+              cycleIndex >=
+                0
+                ? `Cycle ${
+                    cycleIndex +
+                    1
+                  }`
+                : "Cycle"
             );
           } catch (
             cycleError
           ) {
             console.error(
-              "이슈 상세 Cycle 목록 조회 실패:",
+              "Cycle 목록 조회 실패:",
               cycleError
-            );
-
-
-            console.error(
-              "서버 응답:",
-              cycleError.response?.data
             );
 
 
@@ -324,7 +307,16 @@ function IssueDetailPage() {
               "Cycle"
             );
           }
-        } catch (error) {
+        } catch (
+          error
+        ) {
+          if (
+            cancelled
+          ) {
+            return;
+          }
+
+
           console.error(
             "이슈 상세 조회 실패:",
             error
@@ -333,7 +325,8 @@ function IssueDetailPage() {
 
           console.error(
             "서버 응답:",
-            error.response?.data
+            error.response
+              ?.data
           );
 
 
@@ -341,16 +334,28 @@ function IssueDetailPage() {
             null
           );
         } finally {
-          setLoading(
-            false
-          );
+          if (
+            !cancelled
+          ) {
+            setLoading(
+              false
+            );
+          }
         }
       };
 
 
-    if (issueId) {
-      fetchIssue();
+    if (
+      issueId
+    ) {
+      void fetchIssue();
     }
+
+
+    return () => {
+      cancelled =
+        true;
+    };
   }, [
     issueId,
   ]);
@@ -387,7 +392,9 @@ function IssueDetailPage() {
         );
 
 
-      if (!confirmed) {
+      if (
+        !confirmed
+      ) {
         return;
       }
 
@@ -398,40 +405,31 @@ function IssueDetailPage() {
         );
 
 
-        const response =
-          await deleteIssue(
-            issueId
-          );
-
-
-        console.log(
-          "이슈 삭제 성공:",
-          response
+        await deleteIssue(
+          issueId
         );
 
 
         navigate(
           "/issue"
         );
-      } catch (error) {
+      } catch (
+        error
+      ) {
         console.error(
           "이슈 삭제 실패:",
           error
         );
 
 
-        console.error(
-          "서버 응답:",
-          error.response?.data
-        );
-
-
         const responseData =
-          error.response?.data;
+          error.response
+            ?.data;
 
 
         if (
-          responseData?.code ===
+          responseData
+            ?.code ===
           "404ISSUE"
         ) {
           alert(
@@ -449,7 +447,8 @@ function IssueDetailPage() {
 
 
         alert(
-          responseData?.message ||
+          responseData
+            ?.message ||
             "이슈 삭제에 실패했습니다."
         );
       } finally {
@@ -461,13 +460,20 @@ function IssueDetailPage() {
 
 
   /* ==================================================
-     완료 조건 체크 변경
+     완료 조건 변경
 
-     체크리스트
-     false → true
+     1. 체크 상태 API 저장
+     2. 변경 후 전체 checklist 계산
+     3. 상태 자동 변경
 
-     현재 이슈 상태가 TODO라면
-     TODO → IN_PROGRESS
+     일부 체크
+     → IN_PROGRESS
+
+     전부 체크
+     → DONE
+
+     DONE에서 체크 해제
+     → IN_PROGRESS
   ================================================== */
 
   const handleToggleCondition =
@@ -495,13 +501,46 @@ function IssueDetailPage() {
         !targetCondition.checked;
 
 
-      try {
-        /* =========================
-           완료 조건 체크 저장
-        ========================= */
+      const nextConditions =
+        conditions.map(
+          (
+            condition
+          ) =>
+            condition.id ===
+            conditionId
+              ? {
+                  ...condition,
 
+                  checked:
+                    nextChecked,
+                }
+              : condition
+        );
+
+
+      const allCompleted =
+        nextConditions.length >
+          0 &&
+        nextConditions.every(
+          (
+            condition
+          ) =>
+            condition.checked
+        );
+
+
+      const anyCompleted =
+        nextConditions.some(
+          (
+            condition
+          ) =>
+            condition.checked
+        );
+
+
+      try {
         console.log(
-          "완료 조건 체크 변경 Payload:",
+          "완료 조건 체크 변경:",
           {
             issueId:
               Number(
@@ -513,116 +552,151 @@ function IssueDetailPage() {
 
             isDone:
               nextChecked,
+
+            allCompleted,
           }
         );
 
 
-        const response =
+        /* =========================
+           체크 저장
+        ========================= */
+
+        const checklistResponse =
           await updateChecklistItem(
             issueId,
             conditionId,
-            {
-              isDone:
-                nextChecked,
-            }
+            nextChecked
           );
 
 
         console.log(
           "완료 조건 체크 변경 성공:",
-          response
+          checklistResponse
         );
 
 
         setConditions(
-          (
-            prev
-          ) =>
-            prev.map(
-              (
-                condition
-              ) =>
-                condition.id ===
-                conditionId
-                  ? {
-                      ...condition,
-
-                      checked:
-                        nextChecked,
-                    }
-
-                  : condition
-            )
+          nextConditions
         );
 
 
-        /* ==================================================
-           진행 전 상태에서
-           완료 조건을 체크하면 진행 중으로 변경
+        /* =========================
+           상태 계산
+        ========================= */
 
-           체크 해제 시에는 상태를 되돌리지 않음
-        ================================================== */
+        let nextStatus =
+          null;
+
+
+        /*
+          모든 완료 조건 완료
+        */
 
         if (
-          nextChecked &&
+          allCompleted
+        ) {
+          nextStatus =
+            "DONE";
+        }
+
+        /*
+          DONE 상태에서
+          하나라도 해제
+        */
+
+        else if (
+          issue?.status ===
+          "DONE"
+        ) {
+          nextStatus =
+            "IN_PROGRESS";
+        }
+
+        /*
+          TODO 상태에서
+          작업 시작
+        */
+
+        else if (
+          anyCompleted &&
           issue?.status ===
             "TODO"
         ) {
-          console.log(
-            "이슈 상태 자동 변경 Payload:",
-            {
-              issueId:
-                Number(
-                  issueId
-                ),
-
-              status:
-                "IN_PROGRESS",
-            }
-          );
-
-
-          const statusResponse =
-            await updateIssueStatus(
-              issueId,
-              {
-                status:
-                  "IN_PROGRESS",
-              }
-            );
-
-
-          console.log(
-            "이슈 상태 자동 변경 성공:",
-            statusResponse
-          );
-
-
-          setIssue(
-            (
-              prev
-            ) =>
-              prev
-                ? {
-                    ...prev,
-
-                    status:
-                      "IN_PROGRESS",
-                  }
-
-                : prev
-          );
+          nextStatus =
+            "IN_PROGRESS";
         }
-      } catch (error) {
+
+
+        if (
+          !nextStatus ||
+          nextStatus ===
+            issue?.status
+        ) {
+          return;
+        }
+
+
+        console.log(
+          "이슈 상태 자동 변경:",
+          {
+            from:
+              issue?.status,
+
+            to:
+              nextStatus,
+          }
+        );
+
+
+        const statusResponse =
+          await updateIssueStatus(
+            issueId,
+            nextStatus,
+            ""
+          );
+
+
+        console.log(
+          "이슈 상태 변경 성공:",
+          statusResponse
+        );
+
+
+        setIssue(
+          (
+            prev
+          ) =>
+            prev
+              ? {
+                  ...prev,
+
+                  status:
+                    nextStatus,
+                }
+              : prev
+        );
+      } catch (
+        error
+      ) {
         console.error(
-          "완료 조건 또는 이슈 상태 변경 실패:",
+          "완료 조건 또는 상태 변경 실패:",
           error
         );
 
 
         console.error(
           "서버 응답:",
-          error.response?.data
+          error.response
+            ?.data
+        );
+
+
+        alert(
+          error.response
+            ?.data
+            ?.message ||
+            "완료 조건 변경에 실패했습니다."
         );
       }
     };
@@ -639,11 +713,6 @@ function IssueDetailPage() {
       if (
         !file.fileUrl
       ) {
-        console.warn(
-          "다운로드할 파일 URL이 없습니다."
-        );
-
-
         return;
       }
 
@@ -703,30 +772,16 @@ function IssueDetailPage() {
         window.URL.revokeObjectURL(
           blobUrl
         );
-
-
-        console.log(
-          "첨부파일 다운로드 성공:",
-          file.fileName
-        );
-      } catch (error) {
+      } catch (
+        error
+      ) {
         console.error(
           "첨부파일 다운로드 실패:",
           error
         );
-
-
-        console.error(
-          "서버 응답:",
-          error.response?.data
-        );
       }
     };
 
-
-  /* ==================================================
-     완료 조건 개수
-  ================================================== */
 
   const checkedCount =
     conditions.filter(
@@ -737,15 +792,13 @@ function IssueDetailPage() {
     ).length;
 
 
-  /* ==================================================
-     날짜 표시
-  ================================================== */
-
   const formatDate =
     (
       date
     ) => {
-      if (!date) {
+      if (
+        !date
+      ) {
         return "-";
       }
 
@@ -755,16 +808,14 @@ function IssueDetailPage() {
         month,
         day,
       ] =
-        date.split("-");
+        date.split(
+          "-"
+        );
 
 
       return `${day} / ${month} / ${year}`;
     };
 
-
-  /* ==================================================
-     파일 크기
-  ================================================== */
 
   const formatFileSize =
     (
@@ -779,7 +830,8 @@ function IssueDetailPage() {
 
 
       if (
-        size < 1024
+        size <
+        1024
       ) {
         return `${size} B`;
       }
@@ -787,10 +839,12 @@ function IssueDetailPage() {
 
       if (
         size <
-        1024 * 1024
+        1024 *
+          1024
       ) {
         return `${(
-          size / 1024
+          size /
+          1024
         ).toFixed(
           1
         )} KB`;
@@ -809,11 +863,9 @@ function IssueDetailPage() {
     };
 
 
-  /* ==================================================
-     로딩
-  ================================================== */
-
-  if (loading) {
+  if (
+    loading
+  ) {
     return (
       <MainLayout>
         <main
@@ -822,8 +874,7 @@ function IssueDetailPage() {
           }
         >
           <p>
-            이슈 정보를
-            불러오는 중입니다.
+            이슈 정보를 불러오는 중입니다.
           </p>
         </main>
       </MainLayout>
@@ -831,11 +882,9 @@ function IssueDetailPage() {
   }
 
 
-  /* ==================================================
-     조회 실패
-  ================================================== */
-
-  if (!issue) {
+  if (
+    !issue
+  ) {
     return (
       <MainLayout>
         <main
@@ -844,8 +893,7 @@ function IssueDetailPage() {
           }
         >
           <p>
-            이슈 정보를
-            불러오지 못했습니다.
+            이슈 정보를 불러오지 못했습니다.
           </p>
         </main>
       </MainLayout>
