@@ -1,6 +1,8 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -13,12 +15,29 @@ import {
   getProjectMembers,
 } from "../../../../api/projectApi";
 
+const normalizeName = (value) =>
+  String(value || "").trim().toLowerCase();
+
+const belongsToTeam = (member, team) => {
+  if (!member || !team) {
+    return false;
+  }
+
+  if (member.teamId != null && team.teamId != null) {
+    return Number(member.teamId) === Number(team.teamId);
+  }
+
+  return Boolean(member.teamName && team.teamName) &&
+    normalizeName(member.teamName) === normalizeName(team.teamName);
+};
+
 
 function TransferInfoPanel({
   initialDelivery = null,
   onChange,
   onSave,
 }) {
+  const calendarRef = useRef(null);
   const [
     isEditing,
     setIsEditing,
@@ -83,6 +102,21 @@ function TransferInfoPanel({
     timingOption,
     setTimingOption,
   ] = useState("next");
+
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date());
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
+        setIsCalendarOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
 
 
   /* ==================================================
@@ -230,13 +264,7 @@ function TransferInfoPanel({
 
           const teamMembers =
             memberList.filter(
-              (member) =>
-                Number(
-                  member.teamId,
-                ) ===
-                Number(
-                  teamId,
-                ),
+              (member) => belongsToTeam(member, initialTeam),
             );
 
 
@@ -381,12 +409,37 @@ function TransferInfoPanel({
       .timeZone ||
     "Asia/Seoul";
 
+  const calendarDays = useMemo(() => {
+    const year = calendarMonth.getFullYear();
+    const month = calendarMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const start = new Date(year, month, 1 - firstDay.getDay());
+
+    return Array.from({ length: 42 }, (_, index) => {
+      const date = new Date(start);
+      date.setDate(start.getDate() + index);
+      return date;
+    });
+  }, [calendarMonth]);
+
+  const formattedDate = new Intl.DateTimeFormat("ko-KR", {
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+    timeZone: timezone,
+  }).format(selectedDate);
+
+  const isSameDate = (left, right) =>
+    left.getFullYear() === right.getFullYear() &&
+    left.getMonth() === right.getMonth() &&
+    left.getDate() === right.getDate();
+
 
   /* ==================================================
      현재 전달 정보
   ================================================== */
 
-  const getDeliveryValue =
+  const getDeliveryValue = useCallback(
     (
       teamId =
         selectedTeamId,
@@ -425,7 +478,9 @@ function TransferInfoPanel({
 
         timezone,
       };
-    };
+    },
+    [selectedTeamId, selectedMemberId, timingOption, timezone],
+  );
 
 
   /* ==================================================
@@ -441,6 +496,8 @@ function TransferInfoPanel({
     selectedMemberId,
     timingOption,
     timezone,
+    getDeliveryValue,
+    onChange,
   ]);
 
 
@@ -506,12 +563,7 @@ function TransferInfoPanel({
       const matchedMember =
         members.find(
           (member) =>
-            Number(
-              member.teamId,
-            ) ===
-              Number(
-                matchedTeam.teamId,
-              ) &&
+            belongsToTeam(member, matchedTeam) &&
             String(
               member.name ||
                 "",
@@ -809,6 +861,7 @@ function TransferInfoPanel({
                 "now",
               )
             }
+            disabled={!isEditing}
           />
 
           <span
@@ -845,6 +898,7 @@ function TransferInfoPanel({
                 "next",
               )
             }
+            disabled={!isEditing}
           />
 
           <span
@@ -867,11 +921,22 @@ function TransferInfoPanel({
           className={
             styles.dateBox
           }
+          role="button"
+          tabIndex={isEditing ? 0 : -1}
+          aria-disabled={!isEditing}
+          onClick={() => isEditing && setIsCalendarOpen((open) => !open)}
+          onKeyDown={(event) => {
+            if (isEditing && (event.key === "Enter" || event.key === " ")) {
+              event.preventDefault();
+              setIsCalendarOpen((open) => !open);
+            }
+          }}
+          ref={calendarRef}
         >
           <span>
             {timingOption ===
             "next"
-              ? `다음 업무 시작 · ${workStartTime} · ${timezone}`
+              ? `${formattedDate} · ${workStartTime}`
               : "지금 바로 전달"}
           </span>
 
@@ -881,6 +946,32 @@ function TransferInfoPanel({
             }
             alt=""
           />
+
+          {isCalendarOpen && isEditing && (
+            <div className={styles.calendar} onClick={(event) => event.stopPropagation()}>
+              <div className={styles.calendarHeader}>
+                <button type="button" onClick={() => setCalendarMonth((date) => new Date(date.getFullYear(), date.getMonth() - 1, 1))}>‹</button>
+                <strong>{calendarMonth.getFullYear()}년 {calendarMonth.getMonth() + 1}월</strong>
+                <button type="button" onClick={() => setCalendarMonth((date) => new Date(date.getFullYear(), date.getMonth() + 1, 1))}>›</button>
+              </div>
+              <div className={styles.calendarGrid}>
+                {["일", "월", "화", "수", "목", "금", "토"].map((day) => <span key={day} className={styles.weekday}>{day}</span>)}
+                {calendarDays.map((date) => (
+                  <button
+                    type="button"
+                    key={date.toISOString()}
+                    className={`${styles.calendarDay} ${date.getMonth() !== calendarMonth.getMonth() ? styles.otherMonth : ""} ${isSameDate(date, selectedDate) ? styles.selectedDay : ""}`}
+                    onClick={() => {
+                      setSelectedDate(date);
+                      setIsCalendarOpen(false);
+                    }}
+                  >
+                    {date.getDate()}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
